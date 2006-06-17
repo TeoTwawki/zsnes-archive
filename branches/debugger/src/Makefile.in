@@ -1,0 +1,152 @@
+#Copyright (C) 1997-2006 ZSNES Team ( zsKnight, _Demo_, pagefault, Nach )
+#
+#http://www.zsnes.com
+#http://sourceforge.net/projects/zsnes
+#
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#version 2 as published by the Free Software Foundation.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+CHIPDIR=chips
+CPUDIR=cpu
+DOSDIR=dos
+EFFECTSDIR=effects
+GUIDIR=gui
+JMADIR=jma
+MMLIBDIR=mmlib
+NETDIR=net
+TOOLSDIR=tools
+VIDEODIR=video
+WINDIR=linux
+ZIPDIR=zip
+
+PSR=parsegen
+PSRH=cfg.h md.h
+
+CHIPSOBJ=$(CHIPDIR)/sfxproc.o $(CHIPDIR)/fxemu2.o $(CHIPDIR)/dsp1proc.o\
+	$(CHIPDIR)/fxemu2b.o $(CHIPDIR)/fxemu2c.o $(CHIPDIR)/fxtable.o\
+	$(CHIPDIR)/sa1proc.o $(CHIPDIR)/sa1regs.o $(CHIPDIR)/dsp1emu.o\
+	$(CHIPDIR)/st10proc.o $(CHIPDIR)/seta10.o $(CHIPDIR)/dsp2proc.o\
+	$(CHIPDIR)/sdd1emu.o $(CHIPDIR)/c4emu.o $(CHIPDIR)/dsp4proc.o\
+	$(CHIPDIR)/dsp4emu.o $(CHIPDIR)/dsp3proc.o $(CHIPDIR)/dsp3emu.o\
+	$(CHIPDIR)/obc1emu.o $(CHIPDIR)/obc1proc.o
+
+CPUOBJ=$(CPUDIR)/dma.o $(CPUDIR)/dsp.o $(CPUDIR)/dspproc.o $(CPUDIR)/execute.o\
+	$(CPUDIR)/executec.o $(CPUDIR)/irq.o $(CPUDIR)/memory.o\
+	$(CPUDIR)/memtable.o $(CPUDIR)/spc700.o $(CPUDIR)/stable.o\
+	$(CPUDIR)/table.o $(CPUDIR)/tableb.o $(CPUDIR)/tablec.o
+
+EFFECTSOBJ=$(EFFECTSDIR)/burn.o $(EFFECTSDIR)/water.o $(EFFECTSDIR)/smoke.o
+
+GUIOBJ=$(GUIDIR)/gui.o $(GUIDIR)/guifuncs.o $(GUIDIR)/menu.o
+
+JMAOBJ=@JMA_FILES@
+
+MMLIBOBJ=@MMLIB_FILES@
+
+MAINOBJ=cfg.o debug.o endmem.o init.o initc.o md.o patch.o ui.o uic.o vcache.o\
+	version.o zloader.o zmovie.o zpath.o zstate.o
+
+NETOBJ=
+#$(NETDIR)/ztcp.o
+
+TOOLSOBJ=$(TOOLSDIR)/fileutil.o $(TOOLSDIR)/strutil.o
+
+VIDEOBJ=$(VIDEODIR)/makev16b.o $(VIDEODIR)/makev16t.o $(VIDEODIR)/makevid.o\
+	$(VIDEODIR)/mode716.o $(VIDEODIR)/mode716b.o $(VIDEODIR)/mode716d.o\
+	$(VIDEODIR)/mode716e.o $(VIDEODIR)/mode716t.o $(VIDEODIR)/mode7.o\
+	$(VIDEODIR)/mode7ext.o $(VIDEODIR)/mv16tms.o $(VIDEODIR)/m716text.o\
+	$(VIDEODIR)/newg162.o $(VIDEODIR)/newgfx.o $(VIDEODIR)/newgfx16.o\
+	$(VIDEODIR)/newgfx2.o $(VIDEODIR)/procvid.o $(VIDEODIR)/procvidc.o\
+	$(VIDEODIR)/sw_draw.o $(VIDEODIR)/2xsaiw.o\
+	$(VIDEODIR)/hq2x16.o $(VIDEODIR)/hq2x32.o\
+	$(VIDEODIR)/hq3x16.o $(VIDEODIR)/hq3x32.o\
+	$(VIDEODIR)/hq4x16.o $(VIDEODIR)/hq4x32.o $(VIDEODIR)/ntsc.o
+
+WINOBJ=$(WINDIR)/copyvwin.o $(WINDIR)/sdlintrf.o $(WINDIR)/sdllink.o @GL_DRAW@\
+	$(WINDIR)/sw_draw.o $(WINDIR)/zfilew.o $(WINDIR)/safelib.o
+
+WINDOSOBJ=$(DOSDIR)/debug.o $(DOSDIR)/joy.o $(DOSDIR)/vesa2.o
+
+ZIPOBJ=$(ZIPDIR)/unzip.o $(ZIPDIR)/zpng.o
+
+ZOBJS=$(MAINOBJ) $(CHIPSOBJ) $(CPUOBJ) $(GUIOBJ) $(EFFECTSOBJ) $(JMAOBJ)\
+	$(MMLIBOBJ) $(NETOBJ) $(VIDEOBJ) $(WINOBJ) $(WINDOSOBJ) $(ZIPOBJ)
+
+.PHONY: default main tools all install clean tclean distclean
+.SUFFIXES: .asm .c .cpp .psr
+
+%: %.cpp
+	@CXX@ @CXXFLAGS@ -o $@ $<
+%.o: %.asm
+	@NASMPATH@ @NFLAGS@ -o $@ $<
+%.o: %.c
+	@CC@ @CFLAGS@ -o $@ -c $<
+%.o: %.cpp
+	@CXX@ @CXXFLAGS@ -o $@ -c $<
+%.h: %.psr $(PSR)
+	./$(PSR) @PSRFLAGS@ -cheader $*.h -fname $* t_$*.c $<
+@PSR_TEMP@
+%.o: %.psr $(PSR)
+	./$(PSR) @PSRFLAGS@ -fname $* t_$*.c $<
+	@CC@ @CFLAGS@ -O1 -o $@ -c t_$*.c
+@PSR_TEMP@
+
+default: main
+all: main tools
+main: makefile.dep $(ZOBJS)
+	@ZC@ -o @ZSNESEXE@ $(ZOBJS) @ZCFLAGS@ @LDFLAGS@
+	rm -f version.o
+
+$(PSR): parsegen.cpp
+
+TOOLSEXE=$(TOOLSDIR)/archopt $(TOOLSDIR)/cutrtype $(TOOLSDIR)/extraext\
+	$(TOOLSDIR)/minwhite $(TOOLSDIR)/nreplace $(TOOLSDIR)/sec-test\
+	$(TOOLSDIR)/srccount $(TOOLSDIR)/depbuild
+tools: $(TOOLSEXE)
+$(TOOLSDIR)/archopt:
+	@CC@ @CFLAGS@ -m32 -o $@ $@.c
+$(TOOLSDIR)/cutrtype: $(TOOLSOBJ)
+	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOLSOBJ)
+$(TOOLSDIR)/extraext: $(TOOLSOBJ)
+	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOLSOBJ)
+$(TOOLSDIR)/minwhite: $(TOOLSOBJ)
+	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOLSDIR)/fileutil.o
+$(TOOLSDIR)/nreplace: $(TOOLSOBJ)
+	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOLSDIR)/fileutil.o
+$(TOOLSDIR)/scanskip: $(TOOLSOBJ)
+	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOLSOBJ)
+$(TOOLSDIR)/sec-test: $(TOOLSOBJ)
+	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOLSOBJ)
+$(TOOLSDIR)/srccount: $(TOOLSOBJ)
+	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOLSDIR)/fileutil.o
+$(TOOLSDIR)/depbuild: $(TOOLSOBJ)
+	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOLSOBJ)
+
+include makefile.dep
+makefile.dep: $(TOOLSDIR)/depbuild Makefile
+	$(TOOLSDIR)/depbuild @CC@ "@CFLAGS@" @NASMPATH@ "@NFLAGS@" $(ZOBJS) > makefile.dep
+
+install:
+	@INSTALL@ -d -m 0755 $(DESTDIR)/@prefix@/bin
+	@INSTALL@ -m 0755 @ZSNESEXE@ $(DESTDIR)/@prefix@/bin
+	@INSTALL@ -d -m 0755 $(DESTDIR)/@prefix@/man/man1
+	@INSTALL@ -m 0644 linux/zsnes.1 $(DESTDIR)/@prefix@/man/man1
+uninstall:
+	rm -f @prefix@/bin/$(notdir @ZSNESEXE@) @prefix@/man/man1/zsnes.1
+
+clean:
+	rm -f $(ZOBJS) $(PSR) $(PSRH) t_*.c @ZSNESEXE@
+tclean:
+	rm -f $(TOOLSOBJ) $(TOOLSEXE)
+distclean: clean tclean
+	rm -f Makefile makefile.dep aclocal.m4 configure config.cache config.log config.status config.h
