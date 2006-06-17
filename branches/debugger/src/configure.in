@@ -60,7 +60,7 @@ case x$target in
     ;;
 esac
 
-dnl - Checks for libraries: libSDL*, zlib*, libpng, OpenGL, JMAlib
+dnl - Checks for libraries: libSDL*, zlib*, libpng, curses*, OpenGL, JMAlib
 dnl - libs marked * are required, the other are optionnal
 
 dnl - libsdl stuff
@@ -84,6 +84,10 @@ else
   CFLAGS="$CFLAGS $LIBPNG_CFLAGS"
   LDFLAGS="$LDFLAGS $LIBPNG_LIBS"
 fi
+
+dnl - curses stuff
+# can't figure out how to locate curses, so:
+LDFLAGS="$LDFLAGS -lncurses"
 
 dnl - opengl stuff
 AC_ARG_ENABLE(opengl,

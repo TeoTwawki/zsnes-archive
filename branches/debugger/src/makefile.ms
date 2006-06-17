@@ -59,7 +59,7 @@ ifneq ($(CPU),)
 CPUOPT=$(CPU)
 endif
 CFLAGSORIG=-march=${CPUOPT} -ffast-math -fomit-frame-pointer -fno-unroll-loops -Wall -Wno-unused -I.
-LIBSORIG=-lz -lpng
+LIBSORIG=-lz -lpng -lpdcur
 DRESOBJ=${WINDIR}/zsnes.obj
 CROSS=no
 STRIP=-Ws -s
@@ -161,7 +161,9 @@ CPUOBJ=${CPUDIR}/dma${OE} ${CPUDIR}/dsp${OE} ${CPUDIR}/dspproc${OE}\
 	${CPUDIR}/stable${OE} ${CPUDIR}/table${OE} ${CPUDIR}/tableb${OE}\
 	${CPUDIR}/tablec${OE}
 
-DOSOBJORIG=${DOSDIR}/debug${OE} ${DOSDIR}/joy${OE} ${DOSDIR}/vesa2${OE}
+#DOSOBJORIG=${DOSDIR}/debug${OE} ${DOSDIR}/joy${OE} ${DOSDIR}/vesa2${OE}
+DOSOBJORIG=${DOSDIR}/debugger${OE} ${DOSDIR}/debugasm${OE} \
+	${DOSDIR}/joy${OE} ${DOSDIR}/vesa2${OE}
 
 EFFECTSOBJ=${EFFECTSDIR}/burn${OE} ${EFFECTSDIR}/water${OE} ${EFFECTSDIR}/smoke${OE}
 

@@ -75,7 +75,9 @@ VIDEOBJ=$(VIDEODIR)/makev16b.o $(VIDEODIR)/makev16t.o $(VIDEODIR)/makevid.o\
 WINOBJ=$(WINDIR)/copyvwin.o $(WINDIR)/sdlintrf.o $(WINDIR)/sdllink.o @GL_DRAW@\
 	$(WINDIR)/sw_draw.o $(WINDIR)/zfilew.o $(WINDIR)/safelib.o
 
-WINDOSOBJ=$(DOSDIR)/debug.o $(DOSDIR)/joy.o $(DOSDIR)/vesa2.o
+#WINDOSOBJ=$(DOSDIR)/debug.o $(DOSDIR)/joy.o $(DOSDIR)/vesa2.o
+WINDOSOBJ=$(DOSDIR)/debugger.o $(DOSDIR)/debugasm.o $(DOSDIR)/joy.o \
+	 $(DOSDIR)/vesa2.o
 
 ZIPOBJ=$(ZIPDIR)/unzip.o $(ZIPDIR)/zpng.o
 
