@@ -59,7 +59,7 @@ ifneq ($(CPU),)
 CPUOPT=$(CPU)
 endif
 CFLAGSORIG=-march=${CPUOPT} -ffast-math -fomit-frame-pointer -fno-unroll-loops -Wall -Wno-unused -I.
-LIBSORIG=-lz -lpng -lpdcur
+LIBSORIG=-lz -lpng
 DRESOBJ=${WINDIR}/zsnes.obj
 CROSS=no
 STRIP=-Ws -s
@@ -115,14 +115,14 @@ endif
 ifeq (${OS},__MSDOS__)
   EXE=zsnes.exe
   FILEFORMAT=coff
-  LIBS=${LIBSORIG} -lm
+  LIBS=${LIBSORIG} -lm -lpdcur
   OE=.do
 endif
 
 ifeq (${OS},__WIN32__)
   EXE=zsnesw.exe
   FILEFORMAT=win32
-  LIBS=${LIBSORIG} -ldxguid -ldinput8 -lwsock32 -luser32 -lgdi32 -lshell32 -lwinmm -mwindows
+  LIBS=${LIBSORIG} -ldxguid -ldinput8 -lwsock32 -luser32 -lgdi32 -lshell32 -lwinmm -mwindows -lpdcurses
   OE=.obj
 endif
 
