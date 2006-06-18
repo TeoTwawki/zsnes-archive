@@ -315,8 +315,9 @@ void out65816_addrmode (unsigned char *instr) {
 
     case 0:
     case 6:
+    case 21:
 	// nothing to show
-	
+
 	wprintw(debugwin, "%19s", padding);
 	break;
 	
@@ -342,15 +343,26 @@ void out65816_addrmode (unsigned char *instr) {
 	wprintw(debugwin, "%12s", padding);
 	break;
 
-    case 25:     // #$12 (Flag Operations)
+    case 4:     // $12 : $12+d
+	wprintw(debugwin, "$%02x%7s[%02x%04x] ", instr[1], padding, 0,
+		                                 instr[1]+xd);
+	break;
+
+    case 15:    // +-$12 / $1234
+    {   
+	char c = instr[1];
+	unsigned short t = c + xpc + 2;
+	wprintw(debugwin, "$%04x%4s [%02x%04x] ", t, padding, xpb, t);
+	break;
+    }
+
+    case 25:    // #$12 (Flag Operations)
 	wprintw(debugwin, "#$%02x%15s", instr[1], padding);
 	break;
 
     default:
 	wprintw(debugwin, "%15s %02d ", "bad addr mode", addrmode[instr[0]]);
     }
-
-    
 }
 
 unsigned char *findoppage() {
