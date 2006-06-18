@@ -77,7 +77,7 @@ unsigned char *findop();
 unsigned char *findoppage();
 
 void startdebugger() {
-    int firsttime = 1;
+    static int firsttime = 1;
 
     curblank = 0x40;
     debuggeron = 1;
@@ -106,9 +106,9 @@ void startdebugger() {
     
     execut = 0;
 
+    if (firsttime) {
     startdisplay();
 
-    if (firsttime) {
     debugwin = newwin(20, 77, 2, 1);
     
     wbkgd(debugwin, CP(cp_white_on_blue) | ' ');
@@ -433,7 +433,7 @@ void nextopcode() {
 
 
 void cleardisplay() {
-    move(0, 0); clear(); refresh(); endwin();
+    move(0, 0); /* clear(); refresh(); */ endwin();
 }
 
 //*******************************************************
