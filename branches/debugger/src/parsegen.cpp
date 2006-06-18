@@ -31,14 +31,18 @@ Config file handler creator by Nach (C) 2005-2006
 #include <sstream>
 #include <set>
 #include <stack>
+#include <cstdio>
 using namespace std;
 
 #include <errno.h>
 
 #ifdef _MSC_VER //MSVC
+#include <io.h>
 typedef int ssize_t;
 #define strcasecmp stricmp
 #define __WIN32__
+#else
+#include <unistd.h>
 #endif
 
 #if defined(__MSDOS__) || defined(__WIN32__)
@@ -47,17 +51,32 @@ typedef int ssize_t;
 #define SLASH_STR "/"
 #endif
 
+string cflags;
+
 #ifdef _MSC_VER //MSVC
-#define COMPILE_EXE(exe, c) "cl /nologo /Fe"exe " "c
-#define COMPILE_OBJ(obj, c) "cl /nologo /Fo"obj " "c
+static inline string COMPILE_EXE(string exe, string c)
+{
+  return(string(string("cl /nologo /Fe")+exe+string(" ")+c));
+}
+static inline string COMPILE_OBJ(string obj, string c)
+{
+  return(string(string("cl /nologo /Fo")+obj+string(" ")+c));
+}
 #else
-#define COMPILE_EXE(exe, c) "gcc -o "exe " "c " -s"
-#define COMPILE_OBJ(obj, c) "gcc -o "obj " -c "c
+static inline string COMPILE_EXE(string exe, string c)
+{
+  return(string(string("gcc -o ")+exe+string(" ")+c+string(" -s")));
+}
+static inline string COMPILE_OBJ(string obj, string c)
+{
+  return(string(string("gcc ")+cflags+(" -o ")+obj+string(" -c ")+c));
+}
 #endif
 
 #define LINE_LENGTH 2048*10
 char line[LINE_LENGTH];
 
+string family_name = "cfg";
 
 /*
 
@@ -222,53 +241,79 @@ string hex_convert(string str)
   return(str);
 }
 
+//Unforunetly, this can have a time of check vs. time of use race condition
+string temp_name(string prefix, string suffix)
+{
+  unsigned int count = 0;
+  char buff[6];
+  for (;;)
+  {
+    sprintf(buff, "%d", count);
+    string name = prefix+buff+suffix;
+    if (access(name.c_str(), F_OK))
+    {
+      return(name);
+    }
+    if (count == 99999)
+    {
+      break;
+    }
+    count++;
+  }
+  return(prefix+suffix); //Oh well, stupid fall back
+}
+
 //Ascii numbers to integer, with support for mathematics in the string
 ssize_t enhanced_atoi(const char *str)
 {
   ssize_t num = 0;
-
-  //Make sure result file doesn't exist
-  if (remove("eatio.res") && (errno != ENOENT))
-  {
-    cerr << "Error: Can not get accurate value information (eatio.res)." << endl;
-  }
+  string cname(temp_name(family_name, ".c"));
+  string ename(temp_name(string("."SLASH_STR)+family_name, ".exe"));
+  char buffer[20];
+  *buffer = 0;
 
   //Biggest cheat of all time
-  ofstream out_stream("eatio.c");
+  ofstream out_stream(cname.c_str());
   if (out_stream)
   {
     out_stream << "#include <stdio.h>\n"
                << "int main()\n"
                << "{\n"
-               << "  FILE *fp = fopen(\"eatio.res\", \"w\");\n"
-               << "  if (fp)\n"
-               << "  {\n"
-               << "    fprintf(fp, \"%d\", " << hex_convert(str) << ");\n"
-               << "    fclose(fp);\n"
-               << "  }\n"
+               << "  printf(\"%d\\n\", " << hex_convert(str) << ");\n"
                << "  return(0);\n"
                << "}\n\n";
     out_stream.close();
 
-    system(COMPILE_EXE("eatio.exe", "eatio.c"));
-    system("."SLASH_STR"eatio.exe");
+    system(COMPILE_EXE(ename, cname).c_str());
+    remove(cname.c_str());
 
-    remove("eatio.c");
-    remove("eatio.exe");
-    remove("eatio.obj"); //Needed for stupid MSVCs which leave object files lying around
-
-    ifstream in_stream("eatio.res");
-    if (in_stream)
+    if (!access(ename.c_str(), F_OK))
     {
-      in_stream >> num;
-      in_stream.close();
+      FILE *fp = popen(ename.c_str(), "r");
+      if (fp)
+      {
+        fgets(buffer, sizeof(buffer), fp);
+        pclose(fp);
+      }
+      remove(ename.c_str());
+    }
+
+    if (*buffer)
+    {
+      num = atoi(buffer);
     }
     else
     {
-      cerr << "Error: Can not get accurate value information (eatio.res)." << endl;
+      cerr << "Error: Can not get accurate value information (" << ename << ")." << endl;
     }
 
-    remove("eatio.res");
+    //Needed for stupid MSVCs which leave object files lying around
+    cname.erase(cname.length()-2);
+    cname += ".obj";
+    remove(cname.c_str());
+    ename.erase(ename.length()-4);
+    ename += ".obj";
+    remove(ename.c_str());
   }
 
   return(num);
@@ -329,10 +374,37 @@ Structures used to store config data
 
 */
 
-string family_name = "cfg";
+template <typename T>
+class nstack
+{
+  public:
+  nstack() {}
+  ~nstack() {}
+
+  void push(T data) { this->data.push_back(data); }
+  bool empty() { return(data.empty()); }
+  T top() { return(data.back()); }
+  void pop() { data.pop_back(); }
+  size_t size() { return(data.size()); }
+
+  bool all_true()
+  {
+    for (typename vector<T>::iterator i = data.begin(); i != data.end(); i++)
+    {
+      if (!*i)
+      {
+        return(false);
+      }
+    }
+    return(true);
+  }
+
+  private:
+  vector<T> data;
+};
 
 set<string> defines;
-stack<bool> ifs;
+nstack<bool> ifs;
 
 typedef vector<string> str_array;
 
@@ -998,7 +1070,7 @@ void output_read_var(ostream& c_stream)
            << "}\n";
 }
 
-void handle_directive(char *instruction, char *label)
+void handle_directive(const char *instruction, const char *label)
 {
   if (!strcasecmp(instruction, "define"))
   {
@@ -1148,6 +1220,24 @@ void output_parser_comment(ostream& c_stream, const char *comment)
   c_stream << "\n";
 }
 
+void output_header_conditional(ostream& cheader_stream, const char *instruction, const char *label)
+{
+  if ((!strcasecmp(instruction, "elifdef") || !strcasecmp(instruction, "elseifdef")) && label)
+  {
+    cheader_stream << "#elif defined(" << label << ")\n";
+  }
+  else
+  {
+    cheader_stream << "#" << instruction;
+    if (label)
+    {
+      cheader_stream << " " << label;
+    }
+    cheader_stream << "\n";
+  }
+}
+
+
 #define CONFIG_COMMENT (config_comment ? config_comment : "")
 
 void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_stream)
@@ -1174,7 +1264,7 @@ void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_st
 
     if (all_spaces(line))
     {
-      if (ifs.empty() || ifs.top())
+      if (ifs.all_true())
       {
         output_parser_comment(c_stream, parser_comment);
       }
@@ -1185,7 +1275,7 @@ void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_st
 
     if (all_spaces(line) && config_comment)
     {
-      if (ifs.empty() || ifs.top())
+      if (ifs.all_true())
       {
         variable::config_data.add_comment(config_comment);
       }
@@ -1197,12 +1287,13 @@ void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_st
     {
       if ((*token == '#') || (*token == '%'))
       {
-        handle_directive(token+1, get_token(0, " "));
-        continue;
-      }
+        char *next_token = get_token(0, " ");
+        handle_directive(token+1, next_token);
 
-      if (!ifs.empty() && !ifs.top())
-      {
+        if (cheader_stream)
+        {
+          output_header_conditional(cheader_stream, token+1, next_token);
+        }
         continue;
       }
 
@@ -1238,19 +1329,22 @@ void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_st
 
               var_init << "char " << varname << "[" << array << "];";
 
-              ostringstream memset_line;
+              if (ifs.all_true())
+              {
+                ostringstream memset_line;
 
-              if (initial_value.length()-2 < array)
-              {
-                memset_line << "strcpy(" << varname << ", " << initial_value << ");";
+                if (initial_value.length()-2 < array)
+                {
+                  memset_line << "strcpy(" << varname << ", " << initial_value << ");";
+                }
+                else
+                {
+                  memset_line << "strncpy(" << varname << ", " << initial_value << ", " << (array-1) << "); "
+                              << varname << "[" << array << "] = 0;";
+                }
+                memsets.push_back(memset_line.str());
+                variable::config_data.add_var_quoted(varname, CONFIG_COMMENT);
               }
-              else
-              {
-                memset_line << "strncpy(" << varname << ", " << initial_value << ", " << (array-1) << "); "
-                            << varname << "[" << array << "] = 0;";
-              }
-              memsets.push_back(memset_line.str());
-              variable::config_data.add_var_quoted(varname, CONFIG_COMMENT);
             }
             else
             {
@@ -1268,20 +1362,23 @@ void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_st
                 {
                   var_init << "[" << array << "]";
 
-                  ostringstream memset_line;
-                  memset_line << "memset(" << varname << ", " << init_value_num << ", " << array;
-
-                  if (var_type_is_short(var_type))
+                  if (ifs.all_true())
                   {
-                    memset_line << short_scale;
-                  }
-                  else if (var_type_is_int(var_type))
-                  {
-                    memset_line << int_scale;
-                  }
+                    ostringstream memset_line;
+                    memset_line << "memset(" << varname << ", " << init_value_num << ", " << array;
 
-                  memset_line << ");";
-                  memsets.push_back(memset_line.str());
+                    if (var_type_is_short(var_type))
+                    {
+                      memset_line << short_scale;
+                    }
+                    else if (var_type_is_int(var_type))
+                    {
+                      memset_line << int_scale;
+                    }
+
+                    memset_line << ");";
+                    memsets.push_back(memset_line.str());
+                  }
                 }
                 else
                 {
@@ -1293,13 +1390,16 @@ void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_st
                   var_init << init_value_num << "%d}";
                 }
 
-                if (is_array)
+                if (ifs.all_true())
                 {
-                  variable::config_data.add_var_mult(varname, var_type, array, CONFIG_COMMENT);
-                }
-                else if (is_packed)
-                {
-                  variable::config_data.add_var_packed(varname, array, CONFIG_COMMENT);
+                  if (is_array)
+                  {
+                    variable::config_data.add_var_mult(varname, var_type, array, CONFIG_COMMENT);
+                  }
+                  else if (is_packed)
+                  {
+                    variable::config_data.add_var_packed(varname, array, CONFIG_COMMENT);
+                  }
                 }
               }
               else
@@ -1315,19 +1415,28 @@ void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_st
                   } while((token = get_token(0, " ,\n")));
                   var_init << "}";
 
-                  variable::config_data.add_var_mult(varname, var_type, array, CONFIG_COMMENT);
+                  if (ifs.all_true())
+                  {
+                    variable::config_data.add_var_mult(varname, var_type, array, CONFIG_COMMENT);
+                  }
                 }
                 else
                 {
                   var_init << " = " << init_value_num;
 
-                  variable::config_data.add_var_single(varname, var_type, CONFIG_COMMENT);
+                  if (ifs.all_true())
+                  {
+                    variable::config_data.add_var_single(varname, var_type, CONFIG_COMMENT);
+                  }
                 }
               }
               var_init << ";";
             }
 
-            c_stream << var_init.str();
+            if (ifs.all_true())
+            {
+              c_stream << var_init.str();
+            }
 
             if (cheader_stream)
             {
@@ -1358,7 +1467,10 @@ void parser_generate(istream& psr_stream, ostream& c_stream, ostream& cheader_st
       current_location.error("Could not get variable name");
     }
 
-    output_parser_comment(c_stream, parser_comment);
+    if (ifs.all_true())
+    {
+      output_parser_comment(c_stream, parser_comment);
+    }
   }
 
   output_init_var(c_stream);
@@ -1399,6 +1511,11 @@ int main(size_t argc, const char **argv)
     {
       compile = true;
     }
+    else if (!strcmp(argv[param_pos], "-flags"))
+    {
+      param_pos++;
+      cflags = argv[param_pos];
+    }
     else if (!strcmp(argv[param_pos], "-fname"))
     {
       param_pos++;
@@ -1436,7 +1553,8 @@ int main(size_t argc, const char **argv)
     return(1);
   }
 
-  const char *psr_file = argv[param_pos+1], *c_file = compile ? "psrtemp.c" : argv[param_pos];
+  string cname = family_name+string(".c");
+  const char *psr_file = argv[param_pos+1], *c_file = compile ? cname.c_str() : argv[param_pos];
   const char *obj_file = compile ? argv[param_pos] : 0;
   int ret_val = 0;
 
@@ -1484,11 +1602,10 @@ int main(size_t argc, const char **argv)
 
   if (!ret_val && compile)
   {
-    cout << COMPILE_OBJ("psrtemp.obj", "psrtemp.c") << "\n";
-    system(COMPILE_OBJ("psrtemp.obj", "psrtemp.c"));
-    remove("psrtemp.c");
-    cout << "Renaming psrtemp.obj to " << obj_file << endl;
-    rename("psrtemp.obj", obj_file);
+    string command = COMPILE_OBJ(obj_file, cname);
+    cout << "parsegen: " << command << "\n";
+    system(command.c_str());
+    remove(cname.c_str());
   }
 
   return(ret_val);
