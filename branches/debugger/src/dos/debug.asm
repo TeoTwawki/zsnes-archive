@@ -29,6 +29,7 @@ EXTSYM regaccessbankr8,selcB800,snesmap2,snesmmap,ram7f,StringLength,exiter
 EXTSYM CurrentCPU,SA1RegP,curypos,xa,xd,xdb,xe,xp,xpb,xpc,xs,xx,xy,SA1xpb,SA1xpc
 EXTSYM SA1xa,SA1xx,SA1xy,SA1xd,SA1xdb,SA1xs,cycpbl,debugbuf,soundon,spcA,spcNZ
 EXTSYM spcP,spcPCRam,SPCRAM,spcS,spcX,spcY,vesa2_bfull,vesa2_btrcl,DSPMem
+EXTSYM SaveOAMRamLog
 
 ; debstop at regsw.asm 2118/2119
 
@@ -53,18 +54,7 @@ NEWSYM startdebugger
     call LastLog
 ;    cmp dword[DecompAPtr],0
 ;    je near .nofile
-    mov edx,.fname2+1
-    call Create_File
-    xor ecx,ecx
-    mov bx,ax
-    mov ecx,65536
-    mov edx,[vram]
-    EXTSYM oamram
-    mov edx,oamram
-    mov ecx,544
-    call Write_File
-    call Close_File
-.nofile
+    call SaveOAMRamLog
     popad
 
     cmp byte[execut],1
@@ -97,8 +87,6 @@ NEWSYM startdebugger
     jmp DosExit
 
 SECTION .data
-.fname2 db 9,'vram.dat',0
-.fname3 db 9,'vram2.dat',0
 
 ; global variables
 NEWSYM debugh,  dw 0            ; debug head
@@ -184,8 +172,8 @@ NEWSYM debugloopb
     je near SPCmodify
     cmp al,'T'
     je near trace
-    cmp al,'D'
-    je near debugdump
+;    cmp al,'D'
+;    je near debugdump
     cmp al,'W'
     je near breakatsign
     cmp al,'L'
@@ -287,28 +275,28 @@ NEWSYM debugloopb
 ; Debug dump
 ;*******************************************************
 
-NEWSYM debugdump
+;NEWSYM debugdump
     ; Dump SPCRam
-    mov edx,.fname
-    call Create_File
-    mov bx,ax
-    mov ecx,65536
-    mov edx,SPCRAM
-    call Write_File
-    call Close_File
-    mov edx,.fname2
-    call Create_File
-    mov bx,ax
-    mov ecx,256
-    mov edx,DSPMem
-    call Write_File
-    call Close_File
-    jmp debugloopb
+;    mov edx,.fname
+;    call Create_File
+;    mov bx,ax
+;    mov ecx,65536
+;    mov edx,SPCRAM
+;    call Write_File
+;    call Close_File
+;    mov edx,.fname2
+;    call Create_File
+;    mov bx,ax
+;    mov ecx,256
+;    mov edx,DSPMem
+;    call Write_File
+;    call Close_File
+;    jmp debugloopb
 
-SECTION .data
-.fname db 'SPCRAM.DMP',0
-.fname2 db 'DSP.DMP',0
-SECTION .text
+;SECTION .data
+;.fname db 'SPCRAM.DMP',0
+;.fname2 db 'DSP.DMP',0
+;SECTION .text
 
 ;*******************************************************
 ; Debug save states (debug load state ported to c)

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <curses.h>
+#include <zpath.h>
 
 #ifdef __MSDOS__
 #include <dpmi.h>
@@ -69,6 +70,7 @@ void startdisplay();
 void nextopcode();
 void cleardisplay();
 void nextspcopcode();
+void SaveOAMRamLog();
 extern void execnextop();
 
 unsigned char *findop();
@@ -122,6 +124,7 @@ void startdebugger() {
     cleardisplay();
 
     // "pushad / call LastLog / ... / popad" elided
+    SaveOAMRamLog();
 
     
     if (execut == 1) {
@@ -488,3 +491,28 @@ unsigned char addrmode[256] = {
     26, 9,25,22, 4, 4, 4,19, 6, 1, 6, 6, 2, 2, 2, 3,
     15, 7,18,23, 2,10,10, 8, 6,13,21, 6,20,12,12,14
 };
+
+extern unsigned char oamram[1024], SPCRAM[65472], DSPMem[256];
+
+void SaveOAMRamLog() {
+  FILE *fp = 0;
+
+  if ((fp = fopen_dir(ZCfgPath,"vram.dat","wb"))) {
+    fwrite(oamram,1,544,fp);
+    fclose(fp);
+  }
+}
+
+void debugdump() {
+  FILE *fp = 0;
+
+  if ((fp = fopen_dir(ZCfgPath,"SPCRAM.dmp","wb"))) {
+    fwrite(SPCRAM,1,65536,fp);
+    fclose(fp);
+  }
+
+  if ((fp = fopen_dir(ZCfgPath,"DSP.dmp","wb"))) {
+    fwrite(DSPMem,1,256,fp);
+    fclose(fp);
+  }
+}
