@@ -7,7 +7,7 @@
 #include <dpmi.h>
 #endif // __MSDOS__
 
-#include "../asm_call.h"
+#include "asm_call.h"
 
 // All of these should be in headers, people!
 
