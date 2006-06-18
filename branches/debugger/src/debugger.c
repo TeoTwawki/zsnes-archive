@@ -2,7 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <curses.h>
-#include <zpath.h>
+#include "zpath.h"
 
 #ifdef __MSDOS__
 #include <dpmi.h>
@@ -82,13 +82,13 @@ void startdebugger() {
     curblank = 0x40;
     debuggeron = 1;
     
-    if (firsttime) {
 #ifdef __MSDOS__
     __dpmi_regs regs;
     regs.x.ax = 0x0003;
     __dpmi_int(0x10, &regs);
 #endif // __MSDOS__
             
+    if (firsttime) {
     initscr(); cbreak(); noecho();
     intrflush(stdscr, FALSE);
     keypad(stdscr, TRUE);
