@@ -28,6 +28,7 @@ extern void *snesmap2[256];
 extern char *dmadata;
 
 extern void (*memtabler8[256])();
+extern unsigned char memtabler8_wrapper(unsigned char, unsigned short);
 
 extern void regaccessbankr8();
 extern void start65816();
@@ -355,6 +356,21 @@ void out65816_addrmode (unsigned char *instr) {
 	wprintw(debugwin, "A%18s", padding);
 	break;
 
+    case 14:    // $123456,x : $123456+x
+    {
+	unsigned int t = instr[1] | (instr[2] << 8) | (instr[3] << 16);
+	wprintw(debugwin, "$%06x,X ", t);
+	if (xp & 0x10) {
+	    t = (t & ~0xff)   | ((t + xx) & 0xff);
+	} else {
+	    t = (t & ~0xffff) | ((t + xx) & 0xffff);
+	}
+	wprintw(debugwin, "[%06x] ", t);
+	
+	
+	break;
+    }
+
     case 15:    // +-$12 / $1234
     {   
 	char c = instr[1];
@@ -363,20 +379,24 @@ void out65816_addrmode (unsigned char *instr) {
 	break;
     }
 
-    /*
     case 20:    // ($1234,x)
     {
-	wprintw(debugwin, "($%02x,X) [%02x", instr[1], xpb);
 	unsigned short cx = *(unsigned short*)(instr+1);
+	wprintw(debugwin, "($%04x,X) [%02x", cx, xpb);
 	if (xp & 0x10) 
 	    cx = (cx & 0xFF00) | ((cx + xx) & 0xFF);
 	else
 	    cx += xx;
 	// .out20n
 	// next part baffles me!
+	unsigned short x;
+	x = memtabler8_wrapper(xpb, cx);
+	x += memtabler8_wrapper(xpb, cx+1) << 8;
+	wprintw(debugwin, "%04x] ", x);
+
 	break;
     }	
-    */
+   
 
     case 25:    // #$12 (Flag Operations)
 	wprintw(debugwin, "#$%02x%15s", instr[1], padding);

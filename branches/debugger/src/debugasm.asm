@@ -5,6 +5,23 @@
 EXTSYM snesmmap, snesmap2, memtabler8, regaccessbankr8, dmadata
 EXTSYM initaddrl, spcPCRam, UpdateDPage, pdh, numinst
 EXTSYM xp, xpb, xpc, curcyc, Curtableaddr, splitflags, execsingle, joinflags
+
+;; Wrapper for calls to routines in memtabler8
+
+NEWSYM memtabler8_wrapper
+        push    ebp
+        mov     ebp, esp
+        push    ebx
+        mov     bl, BYTE [ebp+8]
+        mov     ecx, DWORD [ebp+12]
+        xor     eax, eax
+        mov     al, bl
+        call    DWORD [memtabler8+eax*4]
+        and     eax, 255
+        pop     ebx
+        pop     ebp
+        ret
+ 
 		
 ;*******************************************************
 ; Execute Next Opcode
