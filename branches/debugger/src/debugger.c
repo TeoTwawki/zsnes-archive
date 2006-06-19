@@ -189,12 +189,15 @@ void debugloop() {
        wgetch(w);
        
        closewindow(w);
+  
+       goto b;
    }
 
    default:
        wprintw(debugwin, "Unknown key code: %d\n", key);
        goto b;
    }
+
   e:
    skipdebugsa1 = 0;
    asm_call(execnextop);
