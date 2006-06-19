@@ -113,7 +113,7 @@ void startdebugger() {
     debugwin = newwin(20, 77, 2, 1);
     
     wbkgd(debugwin, CP(cp_white_on_blue) | ' ');
-    wattrset(debugwin, CP(cp_white_on_blue));
+    // wattrset(debugwin, CP(cp_white_on_blue));
 
     scrollok(debugwin, TRUE);
     idlok(debugwin, TRUE);
@@ -134,6 +134,25 @@ void startdebugger() {
   
 }
 
+WINDOW *openwindow(int nlines, int ncols, int begin_y, int begin_x,
+		   char *message) {
+    WINDOW *w = newwin(nlines, ncols, begin_y, begin_x);
+    wbkgd(w, CP(cp_white_on_blue|' '));
+    // wattrset(w, CP(cp_white_on_blue));
+    
+    mvwprintw(w, 1, 1, "%s", message);
+    wclrtoeol(w);
+    box(w, 0, 0);
+	
+    return w;
+}
+
+void closewindow(WINDOW *w) {
+    delwin(w);
+    touchwin(debugwin);
+    wrefresh(debugwin);
+}
+
 //*******************************************************
 // Debug Loop
 //*******************************************************
@@ -150,13 +169,28 @@ void debugloop() {
    if (key >= 0 && key < 256)
        key = toupper(key);
    switch (key) {
-   case KEY_F(1):
+   case KEY_F(1): // run
        execut = 1;
        return;
-   case 27:
+   case 27:       // exit
        return;
-   case '\n':
+   case '\n':     // step
        goto e;
+   /*
+   case '-':      // skip opcode
+   case 'C':      // clear ???
+   case 'M':      // modify ???
+   */
+   case 'B':      // breakpoint
+   {
+       WINDOW *w = openwindow(3, 33, 11, 24, "    Enter Address : ");
+       wrefresh(w); 
+
+       wgetch(w);
+       
+       closewindow(w);
+   }
+
    default:
        wprintw(debugwin, "Unknown key code: %d\n", key);
        goto b;
