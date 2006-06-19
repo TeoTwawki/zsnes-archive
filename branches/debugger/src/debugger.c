@@ -342,13 +342,17 @@ void out65816_addrmode (unsigned char *instr) {
 	break;
 	
     case 3:     // $123456
-	wprintw(debugwin, "$%02x%04x", instr[3], *(unsigned short *)(instr+1));
+	wprintw(debugwin, "$%02x%04x", instr[3], *(unsigned short*)(instr+1));
 	wprintw(debugwin, "%12s", padding);
 	break;
 
     case 4:     // $12 : $12+d
 	wprintw(debugwin, "$%02x%7s[%02x%04x] ", instr[1], padding, 0,
 		                                 instr[1]+xd);
+	break;
+
+    case 5:     // A
+	wprintw(debugwin, "A%18s", padding);
 	break;
 
     case 15:    // +-$12 / $1234
@@ -359,8 +363,32 @@ void out65816_addrmode (unsigned char *instr) {
 	break;
     }
 
+    /*
+    case 20:    // ($1234,x)
+    {
+	wprintw(debugwin, "($%02x,X) [%02x", instr[1], xpb);
+	unsigned short cx = *(unsigned short*)(instr+1);
+	if (xp & 0x10) 
+	    cx = (cx & 0xFF00) | ((cx + xx) & 0xFF);
+	else
+	    cx += xx;
+	// .out20n
+	// next part baffles me!
+	break;
+    }	
+    */
+
     case 25:    // #$12 (Flag Operations)
 	wprintw(debugwin, "#$%02x%15s", instr[1], padding);
+	break;
+
+    case 26:    // #$12,#$1234 (X-flag)
+	if (xp & 0x10) {
+	    wprintw(debugwin, "#$%02x%15s", instr[1], padding);
+	} else {
+	    wprintw(debugwin, "#$%04x%13s",
+		    *(unsigned short*)(instr+1), padding);
+	}
 	break;
 
     default:
