@@ -10,7 +10,7 @@ EXTSYM xp, xpb, xpc, curcyc, Curtableaddr, splitflags, execsingle, joinflags
 EXTSYM PrevBreakPt
 
 ;;; from curses
-EXTSYM nodelay, getch, stdscr
+EXTSYM nodelay, wgetch, stdscr
 
 	
 ;; Wrapper for calls to routines in memtabler8
@@ -137,8 +137,10 @@ NEWSYM breakops
 ;     jz .skipa
 ;     mov ah,07h
 ;     int 21h
-	
-    call getch
+
+    push DWORD [stdscr]
+    call wgetch
+    
     cmp al,27
     je .skipc
 .skipa
