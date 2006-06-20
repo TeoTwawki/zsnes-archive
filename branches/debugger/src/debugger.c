@@ -28,7 +28,9 @@ extern void *snesmap2[256];
 extern char *dmadata;
 
 extern void (*memtabler8[256])();
+
 extern unsigned char memtabler8_wrapper(unsigned char, unsigned short);
+extern void breakops_wrapper(unsigned char, unsigned short);
 
 extern void regaccessbankr8();
 extern void start65816();
@@ -157,6 +159,8 @@ void closewindow(WINDOW *w) {
 // Debug Loop
 //*******************************************************
 
+struct { unsigned short offset; unsigned char page; } PrevBreakPt;
+
 void debugloop() {
   a:
     if (!(debugds & 2))
@@ -186,9 +190,24 @@ void debugloop() {
        WINDOW *w = openwindow(3, 33, 11, 24, "    Enter Address : ");
        wrefresh(w); 
 
-       wgetch(w);
+       echo();
+       unsigned addr;
+       unsigned n = wscanw(w, "%x", &addr);
+       noecho();
        
        closewindow(w);
+
+       if (n == 1) {
+	   w = openwindow(3, 52, 11, 14,
+			  "   Locating Breakpoint ... Press ESC to stop.    ");
+	   wrefresh(w);
+
+	   breakops_wrapper(addr >> 16, addr);
+	   
+	   closewindow(w);
+
+	   goto a;
+       }
   
        goto b;
    }
@@ -228,6 +247,18 @@ void breakatsignb() {
 unsigned char sndwrit;
 
 /* void breakatsignc() {} */
+
+
+//*******************************************************
+// BreakOps                          Breaks at Breakpoint
+//*******************************************************
+
+/* in ASM still, but not identical to other version 
+void breakops(unsigned char page, unsigned short offset) {
+    
+}
+*/
+
 
 
 void printinfo(char *s) {

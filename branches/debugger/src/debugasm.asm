@@ -6,6 +6,13 @@ EXTSYM snesmmap, snesmap2, memtabler8, regaccessbankr8, dmadata
 EXTSYM initaddrl, spcPCRam, UpdateDPage, pdh, numinst
 EXTSYM xp, xpb, xpc, curcyc, Curtableaddr, splitflags, execsingle, joinflags
 
+;;; from debugger.c
+EXTSYM PrevBreakPt
+
+;;; from curses
+EXTSYM nodelay, getch, stdscr
+
+	
 ;; Wrapper for calls to routines in memtabler8
 
 NEWSYM memtabler8_wrapper
@@ -21,7 +28,145 @@ NEWSYM memtabler8_wrapper
         pop     ebx
         pop     ebp
         ret
- 
+
+	
+NEWSYM breakops_wrapper
+	push	ebp
+	mov	ebp, esp
+	pushad
+	xor     ebx, ebx
+        mov     bl, BYTE [ebp+8]
+        mov     ecx, DWORD [ebp+12]
+	call 	breakops
+	popad
+        pop     ebp
+        ret
+	
+	
+;*******************************************************
+; BreakOps                          Breaks at Breakpoint
+;*******************************************************
+
+NEWSYM breakops
+    ; set cursor to (12,60)
+    mov [PrevBreakPt],cx
+    mov [PrevBreakPt+2],bl
+	
+;     push ebx
+;     mov ah,02h
+;     mov bl,0
+;     mov dh,12
+;     mov dl,60
+;     int 10h
+;     pop ebx
+	
+	;; tell getch() not to wait for input
+    push 1
+    push DWORD[stdscr]
+    call nodelay
+
+    test cx,8000h
+    jz .loweraddr2
+    mov esi,[snesmmap+ebx*4]
+    jmp .skiplower2
+.loweraddr2
+    mov esi,[snesmap2+ebx*4]
+.skiplower2
+    add esi,ecx                 ; add program counter to address
+    mov [breakarea],esi
+
+	;; factored out
+;     mov byte[wx],14
+;     mov byte[wx2],65
+;     mov byte[wy],11
+;     mov byte[wy2],13
+;     call drawwindow
+;     mov ax,[selcB800]
+;     mov es,ax
+;     mov edi,12*160+18*2
+;     mov esi,.message1
+;     mov ecx,42
+;     mov ah,31
+; .loopb
+;     lodsb
+;     stosw
+;     dec ecx
+;     jnz .loopb
+    xor eax,eax
+    xor ebx,ebx
+    xor ecx,ecx
+    xor edx,edx
+    mov bl,[xpb]
+    mov ax,[xpc]
+    test ax,8000h
+    jz .loweraddr
+    mov esi,[snesmmap+ebx*4]
+    jmp .skiplower
+.loweraddr
+    cmp ax,4300h
+    jb .lower
+    cmp dword[memtabler8+ebx*4],regaccessbankr8
+    je .dma
+.lower
+    mov esi,[snesmap2+ebx*4]
+    jmp .skiplower
+.dma
+    mov esi,dmadata-4300h
+.skiplower
+    mov [initaddrl],esi
+    add esi,eax                 ; add program counter to address
+    mov ebp,[spcPCRam]
+    mov dl,[xp]                 ; set flags
+    mov dh,[curcyc]             ; set cycles
+    mov edi,[Curtableaddr]
+    call UpdateDPage
+    ; execute
+.loopa
+    call splitflags
+    call execsingle
+    call joinflags
+    mov dh,[pdh]
+    inc dword[numinst]
+    cmp byte[numinst],0
+    jne .skipa
+
+	;; not DOS anymore
+;     mov ah,0bh
+;     int 21h
+;     test al,0FFh
+;     jz .skipa
+;     mov ah,07h
+;     int 21h
+	
+    call getch
+    cmp al,27
+    je .skipc
+.skipa
+    cmp esi,[breakarea]
+    jne .loopa
+.skipc
+    ; copy back data
+    mov [spcPCRam],ebp
+    mov [Curtableaddr],edi
+    mov [xp],dl
+    mov [curcyc],dh
+
+    mov eax,[initaddrl]
+    sub esi,eax                 ; subtract program counter by address
+    mov [xpc],si
+
+	;; make getch() wait for input again
+
+    push 0
+    push DWORD [stdscr]
+    call nodelay
+	
+    ret
+
+SECTION .data
+NEWSYM breakarea, dd 0
+SECTION .text	
+	
 		
 ;*******************************************************
 ; Execute Next Opcode
