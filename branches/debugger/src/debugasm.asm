@@ -7,10 +7,7 @@ EXTSYM initaddrl, spcPCRam, UpdateDPage, pdh, numinst
 EXTSYM xp, xpb, xpc, curcyc, Curtableaddr, splitflags, execsingle, joinflags
 
 ;;; from debugger.c
-EXTSYM PrevBreakPt
-
-;;; from curses
-EXTSYM nodelay, wgetch, stdscr
+EXTSYM PrevBreakPt, my_getch_ret, my_getch
 
 	
 ;; Wrapper for calls to routines in memtabler8
@@ -60,11 +57,6 @@ NEWSYM breakops
 ;     int 10h
 ;     pop ebx
 	
-	;; tell getch() not to wait for input
-    push 1
-    push DWORD[stdscr]
-    call nodelay
-
     test cx,8000h
     jz .loweraddr2
     mov esi,[snesmmap+ebx*4]
@@ -138,10 +130,10 @@ NEWSYM breakops
 ;     mov ah,07h
 ;     int 21h
 
-    push DWORD [stdscr]
-    call wgetch
+    call my_getch
+    mov eax, [my_getch_ret]
     
-    cmp al,27
+    cmp eax,27
     je .skipc
 .skipa
     cmp esi,[breakarea]
@@ -157,12 +149,6 @@ NEWSYM breakops
     sub esi,eax                 ; subtract program counter by address
     mov [xpc],si
 
-	;; make getch() wait for input again
-
-    push 0
-    push DWORD [stdscr]
-    call nodelay
-	
     ret
 
 SECTION .data

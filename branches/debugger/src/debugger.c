@@ -82,6 +82,10 @@ unsigned char *findoppage();
 void startdebugger() {
     static int firsttime = 1;
 
+    // ACK! would prefer not to have to do this just to keep
+    // CheckTimers from hanging in the SDL port...
+    initvideo();
+
     curblank = 0x40;
     debuggeron = 1;
     
@@ -135,6 +139,14 @@ void startdebugger() {
     }
   
 }
+
+// Called from ASM
+
+int my_getch_ret;
+void my_getch() {
+    my_getch_ret = my_getch;
+}
+
 
 WINDOW *openwindow(int nlines, int ncols, int begin_y, int begin_x,
 		   char *message) {
@@ -201,9 +213,11 @@ void debugloop() {
 	   w = openwindow(3, 52, 11, 14,
 			  "   Locating Breakpoint ... Press ESC to stop.    ");
 	   wrefresh(w);
+	   nodelay(stdscr, 1);
 
 	   breakops_wrapper(addr >> 16, addr);
 	   
+	   nodelay(stdscr, 0);
 	   closewindow(w);
 
 	   goto a;
@@ -456,7 +470,6 @@ void out65816_addrmode (unsigned char *instr) {
 	else
 	    cx += xx;
 	// .out20n
-	// next part baffles me!
 	unsigned short x;
 	x = memtabler8_wrapper(xpb, cx);
 	x += memtabler8_wrapper(xpb, cx+1) << 8;
