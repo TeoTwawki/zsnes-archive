@@ -82,10 +82,6 @@ unsigned char *findoppage();
 void startdebugger() {
     static int firsttime = 1;
 
-    // ACK! would prefer not to have to do this just to keep
-    // CheckTimers from hanging in the SDL port...
-    initvideo();
-
     curblank = 0x40;
     debuggeron = 1;
     
@@ -144,7 +140,7 @@ void startdebugger() {
 
 int my_getch_ret;
 void my_getch() {
-    my_getch_ret = my_getch;
+    my_getch_ret = getch();
 }
 
 
@@ -386,15 +382,9 @@ void addtail() {
 
 
 void out65816_addrmode (unsigned char *instr) {
-    int i;
     char *padding = "";
 
-    inline unsigned char getxb() {
-	if (ocname[4*instr[0]] != 'J')
-	    return xdb;
-	else
-	    return xpb;
-    }
+    #define GETXB() ((ocname[4*instr[0]] != 'J') ? xdb : xpb)
 
     // each mode must output 19 characters
     switch (addrmode[instr[0]]) {
@@ -420,7 +410,7 @@ void out65816_addrmode (unsigned char *instr) {
 	
     case 2:     // $1234 : db+$1234
 	wprintw(debugwin, "$%04x", *(unsigned short *)(instr+1));
-	wprintw(debugwin, "%5s[%02x%04x] ", padding, getxb(),
+	wprintw(debugwin, "%5s[%02x%04x] ", padding, GETXB(),
 		                            *(unsigned short *)(instr+1));
 	break;
 	
@@ -457,20 +447,23 @@ void out65816_addrmode (unsigned char *instr) {
     {   
 	char c = instr[1];
 	unsigned short t = c + xpc + 2;
+
 	wprintw(debugwin, "$%04x%4s [%02x%04x] ", t, padding, xpb, t);
+
 	break;
     }
 
     case 20:    // ($1234,x)
     {
 	unsigned short cx = *(unsigned short*)(instr+1);
+	unsigned short x;
+
 	wprintw(debugwin, "($%04x,X) [%02x", cx, xpb);
 	if (xp & 0x10) 
 	    cx = (cx & 0xFF00) | ((cx + xx) & 0xFF);
 	else
 	    cx += xx;
 	// .out20n
-	unsigned short x;
 	x = memtabler8_wrapper(xpb, cx);
 	x += memtabler8_wrapper(xpb, cx+1) << 8;
 	wprintw(debugwin, "%04x] ", x);
