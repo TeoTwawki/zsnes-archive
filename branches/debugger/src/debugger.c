@@ -386,6 +386,12 @@ void out65816_addrmode (unsigned char *instr) {
 
     #define GETXB() ((ocname[4*instr[0]] != 'J') ? xdb : xpb)
 
+    #define INDEX_RIGHT(addr, index)                         \
+            ((xp & 0x10)                                     \
+	     ? ((addr & ~0xff)   | ((addr + index) & 0xff))  \
+	     : ((addr & ~0xffff) | ((addr + index) & 0xffff)))
+
+
     // each mode must output 19 characters
     switch (addrmode[instr[0]]) {
 
@@ -427,19 +433,51 @@ void out65816_addrmode (unsigned char *instr) {
     case 5:     // A
 	wprintw(debugwin, "A%18s", padding);
 	break;
+	
+    case 8:     // [$12],y : [$12+$13+$14+d]+y
+    {
+	unsigned short addr;
+	unsigned int t;
+
+	wprintw(debugwin, "[$%02x],Y   ", instr[1]);
+	
+	addr = instr[1] + xd;
+	t = memtabler8_wrapper(0, addr);
+	t |= memtabler8_wrapper(0, addr+1) << 8;
+	t |= memtabler8_wrapper(0, addr+2) << 16;
+	t = INDEX_RIGHT(t, xy);
+	wprintw(debugwin, "[%06x] ", t);
+
+	break;
+    }
+
+    case 12:    // $1234,x : dbr+$1234+x
+    {
+	unsigned int t = instr[1] | (instr[2] << 8);
+	wprintw(debugwin, "$%04x,X   ", t);
+	t = INDEX_RIGHT(t, xx);
+	wprintw(debugwin, "[%02x%04x] ", xdb, t);
+
+	break;
+    }
+
+    case 13:    // $1234,y : dbr+$1234+y
+    {
+	unsigned int t = instr[1] | (instr[2] << 8);
+	wprintw(debugwin, "$%04x,Y   ", t);
+	t = INDEX_RIGHT(t, xy);
+	wprintw(debugwin, "[%02x%04x] ", xdb, t);
+
+	break;
+    }
 
     case 14:    // $123456,x : $123456+x
     {
 	unsigned int t = instr[1] | (instr[2] << 8) | (instr[3] << 16);
 	wprintw(debugwin, "$%06x,X ", t);
-	if (xp & 0x10) {
-	    t = (t & ~0xff)   | ((t + xx) & 0xff);
-	} else {
-	    t = (t & ~0xffff) | ((t + xx) & 0xffff);
-	}
+	t = INDEX_RIGHT(t, xx);
 	wprintw(debugwin, "[%06x] ", t);
-	
-	
+
 	break;
     }
 
