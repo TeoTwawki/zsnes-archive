@@ -170,14 +170,15 @@ void closewindow(WINDOW *w) {
 struct { unsigned short offset; unsigned char page; } PrevBreakPt;
 
 void debugloop() {
+    int key;
   a:
     if (!(debugds & 2))
 	nextopcode();
     if (!(debugds & 1))
 	nextspcopcode();
   
-  b:;
-   int key = getch();
+  b:
+   key = getch();
    if (key >= 0 && key < 256)
        key = toupper(key);
    switch (key) {
@@ -196,11 +197,12 @@ void debugloop() {
    case 'B':      // breakpoint
    {
        WINDOW *w = openwindow(3, 33, 11, 24, "    Enter Address : ");
+       unsigned addr, n;
+
        wrefresh(w); 
 
        echo();
-       unsigned addr;
-       unsigned n = wscanw(w, "%x", &addr);
+       n = wscanw(w, "%x", &addr);
        noecho();
        
        closewindow(w);
@@ -550,13 +552,15 @@ unsigned char *findop() {
 
 // print out a 65816 instruction
 void out65816() {
+    unsigned char *address, opcode;
+    char opname[5] = "FOO ";
+
     wprintw(debugwin, "%02x%04x ", xpb, xpc);
 
     // is this safe?
-    unsigned char *address = findop();
-    unsigned char opcode = *address;
-    
-    char opname[5] = "FOO ";
+    address = findop();
+    opcode = *address;
+
     memcpy(opname, &ocname[opcode*4], 4);
     wprintw(debugwin, "%s", opname);
 
