@@ -65,9 +65,10 @@ bool reloadBuffer()
 {
   if (IPSPatch.proccessed == IPSPatch.file_size) { return(false); }
 
+  /* FIXME: this code doesn't check for errors! --SamB */
   IPSPatch.buffer_total = IPSPatch.fp ?
   /* Regular Files */     fread(IPSPatch.data, 1, BUFFER_SIZE, IPSPatch.fp) :
-  /* Zip Files     */     unzReadCurrentFile(IPSPatch.zipfile, IPSPatch.data, BUFFER_SIZE);
+  /* Zip Files     */     (size_t) unzReadCurrentFile(IPSPatch.zipfile, IPSPatch.data, BUFFER_SIZE);
 
   IPSPatch.current = IPSPatch.data;
   if (IPSPatch.buffer_total && (IPSPatch.buffer_total <= BUFFER_SIZE))
