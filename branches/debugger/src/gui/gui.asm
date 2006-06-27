@@ -139,11 +139,11 @@ EXTSYM mousewrap,GUIClick,PrevFSMode,PrevWinMode,SaveSramData
 EXTSYM FPSAtStart,Turbo30hz,TimerEnable,OldGfxMode2,SmallMsgText
 EXTSYM AutoPatch,RomInfo,AllowUDLR,Triplebufen,GrayscaleMode
 EXTSYM Mode7HiRes16b,FFRatio,SDRatio,EmuSpeed,mouseshad,TripleBufferWin
-EXTSYM BilinearFilter,lastcursres,SidewinderFix,RaisePitch
+EXTSYM BilinearFilter,lastcursres,SidewinderFix
 EXTSYM GUIEnableTransp,FilteredGUI,Surround,SoundBufEn,SPCDisable
 EXTSYM pl1p209,pl2p209,pl3p209,pl4p209,pl5p209,FastFwdToggle
 EXTSYM KeyDisplayBatt,PauseFocusChange,KeyIncreaseGamma,KeyDecreaseGamma
-EXTSYM MovieVideoMode, MovieAudio,MovieVideoAudio,MovieAudioCompress
+EXTSYM MovieVideoMode, MovieAudio,MovieVideoAudio,MovieAudioCompress,newfont
 
 %ifdef __UNIXSDL__
 EXTSYM numlockptr
@@ -152,7 +152,7 @@ EXTSYM initDirectDraw,reInitSound,CheckAlwaysOnTop,CheckPriority,AlwaysOnTop
 EXTSYM CheckScreenSaver,MouseWheel,TrapMouseCursor,AllowMultipleInst
 EXTSYM HighPriority,DisableScreenSaver,SaveMainWindowPos
 %elifdef __MSDOS__
-EXTSYM dssel,SetInputDevice209,initvideo2,Force8b
+EXTSYM dssel,SetInputDevice209,initvideo2,Force8b,SBHDMA,vibracard
 %endif
 
 %ifndef __MSDOS__
@@ -487,7 +487,7 @@ GUIQuickLoadUpdate:
   mov edx,10
 .mainloop
 %ifdef __MSDOS__
-  mov ecx,16
+  mov ecx,15
 %else
   mov ecx,25
 %endif
@@ -1331,13 +1331,6 @@ SECTION .data
 WrongCheckSum db 10,13,'ROM Data Mismatch',10,13,10,13,0
 SECTION .text
 
-SRAMDirc:
-  ; get LoadDrive/LoadDir
-  mov ebx,LoadDir
-  mov edx,LoadDrive
-  call Get_Dir
-  ret
-
 LOADDir:
   mov dl,[LoadDrive]
   mov ebx,LoadDir
@@ -1478,64 +1471,6 @@ horizonfixmsg:
 SECTION .data
 guimsgptr dd 0
 guimsgmsg db '     WELCOME TO ZSNES',0
-SECTION .text
-
-guimustrestartmsg:
-  xor ebx,ebx
-  mov ecx,256
-.a
-  cmp byte[pressed+ebx],1
-  jne .npr1
-  mov byte[pressed+ebx],2
-.npr1
-  inc ebx
-  dec ecx
-  jnz .a
-  mov byte[pressed+2Ch],0
-.again
-  GUIBox 43,87,213,151,160
-  GUIBox 43,87,213,87,162
-  GUIBox 43,87,43,151,161
-  GUIBox 213,87,213,151,159
-  GUIBox 43,151,213,151,158
-  GUIOuttext 56,92,guiqtimemsg1,220-15
-  GUIOuttext 55,91,guiqtimemsg1,220
-  GUIOuttext 56,100,guiqtimemsg2,220-15
-  GUIOuttext 55,99,guiqtimemsg2,220
-  GUIOuttext 56,108,guiqtimemsg3,220-15
-  GUIOuttext 55,107,guiqtimemsg3,220
-  GUIOuttext 56,116,guiqtimemsg4,220-15
-  GUIOuttext 55,115,guiqtimemsg4,220
-  GUIOuttext 56,139,guiqtimemsg8,220-15
-  GUIOuttext 55,138,guiqtimemsg8,220
-  call vidpastecopyscr
-  call GUIUnBuffer
-  call DisplayBoxes
-  call DisplayMenu
-  call JoyRead
-
-  mov byte[pressed+2Ch],0
-
-  call JoyRead
-  xor ebx,ebx
-  mov ecx,256+128+64
-.b
-  cmp byte[pressed+ebx],1
-  je .pressedokay
-  inc ebx
-  dec ecx
-  jnz .b
-  jmp .again
-.pressedokay
-  mov byte[GUIQuit],1
-  ret
-
-SECTION .data
-guiqtimemsg1 db 'ZSNES MUST BE RESTARTED',0
-guiqtimemsg2 db 'TO USE THIS OPTION.',0
-guiqtimemsg3 db 'THIS PROGRAM WILL NOW',0
-guiqtimemsg4 db 'EXIT.',0
-guiqtimemsg8 db 'PRESS ANY KEY.',0
 SECTION .text
 
 guiprevideo:
@@ -3770,6 +3705,8 @@ NEWSYM GUIFontData
   db 10000000b,01001000b,00001000b,00010000b,11100000b; shw n 0x8A
   db 10100000b,10100000b,00000000b,00000000b,00000000b; shw voiced 0x8B
   db 01000000b,10100000b,01000000b,00000000b,00000000b; shw halfvoiced 0x8C
+
+NEWSYM GUIFontData1, times 705 db 0
 
 ; 189 .. 220
 GUIIconDataClose:

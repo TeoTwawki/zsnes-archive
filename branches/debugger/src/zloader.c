@@ -41,7 +41,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifdef __WIN32__
 void ImportDirectX();
-extern unsigned char KitchenSync, Force60hz;
+extern unsigned char KitchenSync, KitchenSyncPAL, Force60hz;
 #endif
 
 
@@ -49,7 +49,7 @@ extern unsigned char gammalevel, romtype, MouseDis, spcon, V8Mode, ForcePal;
 extern unsigned char HacksDisable, DSPDisable, ZMVZClose, ZMVRawDump;
 extern unsigned char autoloadstate, autoloadmovie, Palette0, debugger;
 extern unsigned char debugdisble, DisplayS;
-extern char *STCart2, fname[];
+extern char *STCart2;
 
 void zstart();
 void makeextension();
@@ -72,7 +72,7 @@ static void display_help()
   put_line("   Eg : zsnes -s -r 2 game.sfc");
   put_line("");
 #ifdef __MSDOS__
-  put_line("  -0      Disable color 0 modification in 8-bit modes");
+  put_line("  -0      Force black blackground in 8-bit modes");
 #endif
   put_line("  -1 #/-2 #   Select Player 1/2 Input :");
 #ifdef __MSDOS__
@@ -81,8 +81,10 @@ static void display_help()
 #else
   put_line("                0 = None       1 = Keyboard/Gamepad");
 #endif
-#ifdef __WIN32__
+#ifndef __UNIXSDL__
   put_line("  -3      Enable triple buffering (replaces vsync)");
+#endif
+#ifdef __WIN32__
   put_line("  -6      Force 60Hz refresh rate");
 #endif
 #ifdef __MSDOS__
@@ -91,7 +93,8 @@ static void display_help()
   put_line("  -cc     Enable small screen (when available)");
 #endif
   put_line("  -d      Start with debugger enabled");
-  put_line("  -dd     Disable sound DSP emulation");
+  put_line("  -dd     Disable sound SPC700/DSP emulation which also disables sound output");
+  put_line("  -ds     Disable sound output");
   put_line("  -dh     Disable ROM-specific hacks");
   put_line("  -f #    Enable fixed frame rate [0..9]");
   put_line("  -g #    Specify gamma correction value [0..15]");
@@ -99,6 +102,7 @@ static void display_help()
   put_line("  -j      Disable mouse (Automatically turns off right mouse click)");
   put_line("  -k #    Set volume level (0 .. 100)");
 #ifdef __WIN32__
+  put_line("  -kp     Enable the KitchenSync for PAL only");
   put_line("  -ks     Enable the KitchenSync");
 #endif
   put_line("  -l      Force LoROM");
@@ -106,13 +110,13 @@ static void display_help()
   put_line("  -mc     Exit ZSNES when closing a movie (use with -zm)");
   put_line("  -md     Dump raw video (use with -zm)");
   put_line("  -n #    Enable scanlines (when available)");
-  put_line("             1 = Full, 2 = 25%, 3 = 50%");
+  put_line("             0 = None, 1 = Full, 2 = 25%, 3 = 50%");
   put_line("  -o      Disable MMX support");
   put_line("  -p #    Percentage of instructions to execute [50..150]");
   put_line("  -r #    Set sound sampling rate:");
   put_line("             0 = 8000Hz  1 = 11025Hz 2 = 22050Hz 3 = 44100Hz");
   put_line("             4 = 16000Hz 5 = 32000Hz 6 = 48000Hz");
-  put_line("  -s      Enable SPC700/DSP emulation (Sound)");
+  put_line("  -s      Enable sound output and enable SPC700/DSP emulation");
   put_line("  -sa     Show all files in GUI (*.*)");
 #ifdef __MSDOS__
   put_line("  -sp     Display sound information");
@@ -177,7 +181,9 @@ static void display_help()
   put_line("            18 = 800x600x16B (VESA2)");
 #endif
   put_line("  -v8     Grayscale mode");
+#ifndef __UNIXSDL__
   put_line("  -w      Enable vsync (disables triple buffering)");
+#endif
   put_line("  -y      Enable anti-aliasing (video interpolation)");
   put_line("  -z      Disable stereo sound");
   put_line("  -zm #   Auto load specified movie slot on startup ");
@@ -438,30 +444,57 @@ static void handle_params(int argc, char *argv[])
 
           case '1': //Player 1 Input
             i++;
+
+            #ifdef __MSDOS__
             if ((pl1contrl = zatoi(argv[i])) > 6)
             {
-              puts("Player Input must be a value from 0 to 6!");
+              puts("Player 1 Input must be a value from 0 to 6!");
               exit(1);
             }
+            #else
+            if ((pl1contrl = zatoi(argv[i])) > 1)
+            {
+              puts("Player 1 Input must be a value from 0 to 1!");
+              exit(1);
+            }
+            #endif
+
             ConvertJoyMap1();
             break;
 
           case '2': //Player 2 Input
             i++;
+
+            #ifdef __MSDOS__
             if ((pl2contrl = zatoi(argv[i])) > 6)
             {
-              puts("Player Input must be a value from 0 to 6!");
+              puts("Player 2 Input must be a value from 0 to 6!");
               exit(1);
             }
+            #else
+            if ((pl2contrl = zatoi(argv[i])) > 1)
+            {
+              puts("Player 2 Input must be a value from 0 to 1!");
+              exit(1);
+            }
+            #endif
+
             ConvertJoyMap2();
             break;
 
-          #ifdef __WIN32__
-          case '3': //Enable triple buffering
+          #ifdef __MSDOS__
+          case '3': //Enable triple buffering for DOS
             vsyncon = 0;
             Triplebufen = 1;
             break;
+          #elif __WIN32__
+          case '3': //Enable triple buffering for Windows
+            vsyncon = 0;
+            TripleBufferWin = 1;
+            break;
+          #endif
 
+          #ifdef __WIN32__
           case '6': //Force 60Hz
             Force60hz = 1;
             break;
@@ -530,7 +563,7 @@ static void handle_params(int argc, char *argv[])
             i++;
             if ((scanlines = zatoi(argv[i])) > 3)
             {
-              puts("Scanlines must be a value 1 to 3!");
+              puts("Scanlines must be a value 0 to 3!");
               exit(1);
             }
             break;
@@ -558,7 +591,7 @@ static void handle_params(int argc, char *argv[])
             }
             break;
 
-          case 's': //Enable SPC700/DSP emulation
+          case 's': //Enable sound output, and SPC700/DSP emulation
             spcon = 1;
             soundon = 1;
             break;
@@ -580,10 +613,17 @@ static void handle_params(int argc, char *argv[])
             }
             break;
 
-          case 'w': //Enable vsync
+          #ifdef __MSDOS__
+          case 'w': //Enable vsync for DOS
             Triplebufen = 0;
             vsyncon = 1;
             break;
+          #elif __WIN32__
+          case 'w': //Enable vsync for Windows
+            TripleBufferWin = 0;
+            vsyncon = 1;
+            break;
+          #endif
 
           case 'y': //Enable anti-aliasing
             antienab = 1;
@@ -605,6 +645,11 @@ static void handle_params(int argc, char *argv[])
           DSPDisable = 1;
         }
 
+        else if (tolower(argv[i][1]) == 'd' && tolower(argv[i][2]) == 's') //Disable sound output
+        {
+          soundon = 0;
+        }
+
         #ifdef __MSDOS__
         else if (tolower(argv[i][1]) == 'c' && tolower(argv[i][2]) == 'c') //Enable small screen
         {
@@ -624,12 +669,19 @@ static void handle_params(int argc, char *argv[])
         }
         #endif
 
-        else if (tolower(argv[i][1]) == 'm' && argv[i][2] == 'c') //Close ZSNES when ZMV closes
+        #ifdef __WIN32__
+        else if (tolower(argv[i][1]) == 'k' && tolower(argv[i][2]) == 'p') //Enable KitchenSync for PAL only
+        {
+          KitchenSyncPAL = 1;
+        }
+        #endif
+
+        else if (tolower(argv[i][1]) == 'm' && tolower(argv[i][2]) == 'c') //Close ZSNES when ZMV closes
         {
           ZMVZClose = 1;
         }
 
-        else if (tolower(argv[i][1]) == 'm' && argv[i][2] == 'd') //Dump raw vid with ZMV
+        else if (tolower(argv[i][1]) == 'm' && tolower(argv[i][2]) == 'd') //Dump raw vid with ZMV
         {
           ZMVRawDump = 1;
         }
@@ -651,7 +703,7 @@ static void handle_params(int argc, char *argv[])
           V8Mode = 1;
         }
 
-        else if (tolower(argv[i][1]) == 'z' && argv[i][2] == 's') //Autoload save state
+        else if (tolower(argv[i][1]) == 'z' && tolower(argv[i][2]) == 's') //Autoload save state
         {
           i++;
           if ((autoloadstate = zatoi(argv[i])+1) > 100)
@@ -661,7 +713,7 @@ static void handle_params(int argc, char *argv[])
           }
         }
 
-        else if (tolower(argv[i][1]) == 'z' && argv[i][2] == 'm') //Autoload movie
+        else if (tolower(argv[i][1]) == 'z' && tolower(argv[i][2]) == 'm') //Autoload movie
         {
           i++;
           if ((autoloadmovie = zatoi(argv[i])+1) > 10)

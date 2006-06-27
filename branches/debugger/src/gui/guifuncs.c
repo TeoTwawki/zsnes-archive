@@ -34,11 +34,216 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../md.h"
 #include "../cfg.h"
 #include "../asm_call.h"
+#include "../numconv.h"
+
+#ifdef __WIN32__
+#define strcasecmp stricmp
+#endif
 
 extern unsigned char ComboHeader[23], ComboBlHeader[23], CombinDataGlob[3300];
 extern unsigned char ShowTimer, savecfgforce;
 extern unsigned int SnowTimer, NumSnow, NumComboGlob;
+extern unsigned char GUIFontData1[705], GUIFontData[705];
 enum vtype { UB, UW, UD, SB, SW, SD };
+
+unsigned int ConvertBinaryToInt(char data[])
+{
+  int x;
+  int num = 0;
+
+  for(x = 0;x<8;x++) { if(data[x] == '1') { num |= BIT(7-x); } }
+
+  return(num);
+}
+
+void InsertFontChar(char data[], int pos)
+{
+  GUIFontData1[pos] = ConvertBinaryToInt(data);
+}
+
+extern unsigned char newfont;
+
+void LoadCustomFont()
+{
+  FILE *fp;
+  char data[100];
+  int x = 0;
+
+  fp = fopen_dir(ZCfgPath, "zfont.txt", "r");
+  if(fp)
+  {
+    while(fgets(data,100,fp))
+    {
+      if((strcmp(data,"EOF\n") == 0)||(x == 705))
+        break;
+
+      fgets(data,10,fp);		//get first line
+      InsertFontChar(data,x++);
+
+      fgets(data,10,fp);		//get second line
+      InsertFontChar(data,x++);
+
+      fgets(data,10,fp);		//get third line
+      InsertFontChar(data,x++);
+
+      fgets(data,10,fp);		//get fourth line
+      InsertFontChar(data,x++);
+
+      fgets(data,10,fp);		//get fifth line
+      InsertFontChar(data,x++);
+    }
+  }
+
+  else
+  {
+    memcpy(GUIFontData1,GUIFontData,705);
+    fp = fopen_dir(ZCfgPath, "zfont.txt", "w");
+    fputs("; empty space 0x00\n00000000\n00000000\n00000000\n00000000\n00000000\n",fp);
+    fputs("; 0 0x01\n01110000\n10011000\n10101000\n11001000\n01110000\n",fp);
+    fputs("; 1 0x02\n00100000\n01100000\n00100000\n00100000\n01110000\n",fp);
+    fputs("; 2 0x03\n01110000\n10001000\n00110000\n01000000\n11111000\n",fp);
+    fputs("; 3 0x04\n01110000\n10001000\n00110000\n10001000\n01110000\n",fp);
+    fputs("; 4 0x05\n01010000\n10010000\n11111000\n00010000\n00010000\n",fp);
+    fputs("; 5 0x06\n11111000\n10000000\n11110000\n00001000\n11110000\n",fp);
+    fputs("; 6 0x07\n01110000\n10000000\n11110000\n10001000\n01110000\n",fp);
+    fputs("; 7 0x08\n11111000\n00001000\n00010000\n00010000\n00010000\n",fp);
+    fputs("; 8 0x09\n01110000\n10001000\n01110000\n10001000\n01110000\n",fp);
+    fputs("; 9 0x0A\n01110000\n10001000\n01111000\n00001000\n01110000\n",fp);
+    fputs("; A 0x0B\n01110000\n10001000\n11111000\n10001000\n10001000\n",fp);
+    fputs("; B 0x0C\n11110000\n10001000\n11110000\n10001000\n11110000\n",fp);
+    fputs("; C 0x0D\n01110000\n10001000\n10000000\n10001000\n01110000\n",fp);
+    fputs("; D 0x0E\n11110000\n10001000\n10001000\n10001000\n11110000\n",fp);
+    fputs("; E 0x0F\n11111000\n10000000\n11110000\n10000000\n11111000\n",fp);
+    fputs("; F 0x10\n11111000\n10000000\n11110000\n10000000\n10000000\n",fp);
+    fputs("; G 0x11\n01111000\n10000000\n10011000\n10001000\n01110000\n",fp);
+    fputs("; H 0x12\n10001000\n10001000\n11111000\n10001000\n10001000\n",fp);
+    fputs("; I 0x13\n11111000\n00100000\n00100000\n00100000\n11111000\n",fp);
+    fputs("; J 0x14\n01111000\n00010000\n00010000\n10010000\n01100000\n",fp);
+    fputs("; K 0x15\n10010000\n10100000\n11100000\n10010000\n10001000\n",fp);
+    fputs("; L 0x16\n10000000\n10000000\n10000000\n10000000\n11111000\n",fp);
+    fputs("; M 0x17\n11011000\n10101000\n10101000\n10101000\n10001000\n",fp);
+    fputs("; N 0x18\n11001000\n10101000\n10101000\n10101000\n10011000\n",fp);
+    fputs("; O 0x19\n01110000\n10001000\n10001000\n10001000\n01110000\n",fp);
+    fputs("; P 0x1A\n11110000\n10001000\n11110000\n10000000\n10000000\n",fp);
+    fputs("; Q 0x1B\n01110000\n10001000\n10101000\n10010000\n01101000\n",fp);
+    fputs("; R 0x1C\n11110000\n10001000\n11110000\n10010000\n10001000\n",fp);
+    fputs("; S 0x1D\n01111000\n10000000\n01110000\n00001000\n11110000\n",fp);
+    fputs("; T 0x1E\n11111000\n00100000\n00100000\n00100000\n00100000\n",fp);
+    fputs("; U 0x1F\n10001000\n10001000\n10001000\n10001000\n01110000\n",fp);
+    fputs("; V 0x20\n10001000\n10001000\n01010000\n01010000\n00100000\n",fp);
+    fputs("; W 0x21\n10001000\n10101000\n10101000\n10101000\n01010000\n",fp);
+    fputs("; X 0x22\n10001000\n01010000\n00100000\n01010000\n10001000\n",fp);
+    fputs("; Y 0x23\n10001000\n01010000\n00100000\n00100000\n00100000\n",fp);
+    fputs("; Z 0x24\n11111000\n00010000\n00100000\n01000000\n11111000\n",fp);
+    fputs("; - 0x25\n00000000\n00000000\n11111000\n00000000\n00000000\n",fp);
+    fputs("; _ 0x26\n00000000\n00000000\n00000000\n00000000\n11111000\n",fp);
+    fputs("; ~ 0x27\n01101000\n10010000\n00000000\n00000000\n00000000\n",fp);
+    fputs("; . 0x28\n00000000\n00000000\n00000000\n00000000\n00100000\n",fp);
+    fputs("; / 0x29\n00001000\n00010000\n00100000\n01000000\n10000000\n",fp);
+    fputs("; < 0x2A\n00010000\n00100000\n01000000\n00100000\n00010000\n",fp);
+    fputs("; > 0x2B\n01000000\n00100000\n00010000\n00100000\n01000000\n",fp);
+    fputs("; [ 0x2C\n01110000\n01000000\n01000000\n01000000\n01110000\n",fp);
+    fputs("; ] 0x2D\n01110000\n00010000\n00010000\n00010000\n01110000\n",fp);
+    fputs("; : 0x2E\n00000000\n00100000\n00000000\n00100000\n00000000\n",fp);
+    fputs("; & 0x2F\n01100000\n10011000\n01110000\n10011000\n01101000\n",fp);
+    fputs("; arrow down 0x30\n00100000\n00100000\n10101000\n01110000\n00100000\n",fp);
+    fputs("; # 0x31\n01010000\n11111000\n01010000\n11111000\n01010000\n",fp);
+    fputs("; = 0x32\n00000000\n11111000\n00000000\n11111000\n00000000\n",fp);
+    fputs("; \" 0x33\n01001000\n10010000\n00000000\n00000000\n00000000\n",fp);
+    fputs("; \\ 0x34\n10000000\n01000000\n00100000\n00010000\n00001000\n",fp);
+    fputs("; * 0x35\n10101000\n01110000\n11111000\n01110000\n10101000\n",fp);
+    fputs("; ? 0x36\n01110000\n10001000\n00110000\n00000000\n00100000\n",fp);
+    fputs("; % 0x37\n10001000\n00010000\n00100000\n01000000\n10001000\n",fp);
+    fputs("; + 0x38\n00100000\n00100000\n11111000\n00100000\n00100000\n",fp);
+    fputs("; , 0x39\n00000000\n00000000\n00000000\n00100000\n01000000\n",fp);
+    fputs("; ( 0x3A\n00110000\n01000000\n01000000\n01000000\n00110000\n",fp);
+    fputs("; ) 0x3B\n01100000\n00010000\n00010000\n00010000\n01100000\n",fp);
+    fputs("; @ 0x3C\n01110000\n10011000\n10111000\n10000000\n01110000\n",fp);
+    fputs("; \' 0x3D\n00100000\n01000000\n00000000\n00000000\n00000000\n",fp);
+    fputs("; ! 0x3E\n00100000\n00100000\n00100000\n00000000\n00100000\n",fp);
+    fputs("; $ 0x3F\n01111000\n10100000\n01110000\n00101000\n11110000\n",fp);
+    fputs("; ; 0x40\n00000000\n00100000\n00000000\n00100000\n01000000\n",fp);
+    fputs("; ` 0x41\n01000000\n00100000\n00000000\n00000000\n00000000\n",fp);
+    fputs("; ^ 0x42\n00100000\n01010000\n00000000\n00000000\n00000000\n",fp);
+    fputs("; { 0x43\n00110000\n01000000\n11000000\n01000000\n00110000\n",fp);
+    fputs("; } 0x44\n01100000\n00010000\n00011000\n00010000\n01100000\n",fp);
+    fputs("; up 0x45\n00100000\n00100000\n01110000\n01110000\n11111000\n",fp);
+    fputs("; down 0x46\n11111000\n01110000\n01110000\n00100000\n00100000\n",fp);
+    fputs("; left 0x47\n00001000\n00111000\n11111000\n00111000\n00001000\n",fp);
+    fputs("; right 0x48\n10000000\n11100000\n11111000\n11100000\n10000000\n",fp);
+    fputs("; arrow left 0x49\n00100000\n01100000\n11111000\n01100000\n00100000\n",fp);
+    fputs("; .5 0x4A\n00111000\n00100000\n00110000\n00001000\n10110000\n",fp);
+    fputs("; maximize (Win) 0x4B\n11111100\n10000100\n11111100\n00000000\n00000000\n",fp);
+    fputs("; minimize (Win) 0x4C\n00000000\n11111100\n00000000\n00000000\n00000000\n",fp);
+    fputs("; maximize (SDL) 0x4D\n11111000\n10001000\n10001000\n10001000\n11111000\n",fp);
+    fputs("; shw fullstop 0x4E\n00000000\n00000000\n00100000\n01010000\n00100000\n",fp);
+    fputs("; shw left bracket 0x4F\n01110000\n01000000\n01000000\n01000000\n00000000\n",fp);
+    fputs("; shw right bracket 0x50\n00000000\n00010000\n00010000\n00010000\n01110000\n",fp);
+    fputs("; shw comma 0x51\n00000000\n00000000\n00000000\n01000000\n00100000\n",fp);
+    fputs("; shw mid-dot 0x52\n00000000\n00100000\n01110000\n00100000\n00000000\n",fp);
+    fputs("; shw wo 0x53\n11111000\n00001000\n11110000\n00100000\n11000000\n",fp);
+    fputs("; shw mini a 0x54\n00000000\n11111000\n01010000\n01100000\n01000000\n",fp);
+    fputs("; shw mini i 0x55\n00000000\n00010000\n00100000\n11100000\n00100000\n",fp);
+    fputs("; shw mini u 0x56\n00000000\n00100000\n11111000\n10001000\n00110000\n",fp);
+    fputs("; shw mini e 0x57\n00000000\n00000000\n11111000\n00100000\n11111000\n",fp);
+    fputs("; shw mini o 0x58\n00000000\n00010000\n11111000\n00110000\n11010000\n",fp);
+    fputs("; shw mini ya 0x59\n00000000\n01000000\n11111000\n01010000\n01000000\n",fp);
+    fputs("; shw mini yu 0x5A\n00000000\n00000000\n11110000\n00010000\n11111000\n",fp);
+    fputs("; shw mini yo 0x5B\n00000000\n11111000\n00001000\n01111000\n11111000\n",fp);
+    fputs("; shw mini tsu 0x5C\n00000000\n10101000\n10101000\n00010000\n01100000\n",fp);
+    fputs("; shw prolong 0x5D\n00000000\n10000000\n01111000\n00000000\n00000000\n",fp);
+    fputs("; shw a 0x5E\n11111000\n00101000\n00110000\n00100000\n11000000\n",fp);
+    fputs("; shw i 0x5F\n00001000\n00110000\n11100000\n00100000\n00100000\n",fp);
+    fputs("; shw u 0x60\n00100000\n11111000\n10001000\n00010000\n01100000\n",fp);
+    fputs("; shw e 0x61\n11111000\n00100000\n00100000\n00100000\n11111000\n",fp);
+    fputs("; shw o 0x62\n00010000\n11111000\n00110000\n01010000\n10010000\n",fp);
+    fputs("; shw ka 0x63\n01000000\n11111000\n01001000\n01001000\n10011000\n",fp);
+    fputs("; shw ki 0x64\n00100000\n11111000\n00100000\n11111000\n00100000\n",fp);
+    fputs("; shw ku 0x65\n01000000\n01111000\n10001000\n00010000\n01100000\n",fp);
+    fputs("; shw ke 0x66 ^^\n01000000\n01111000\n10010000\n00010000\n01100000\n",fp);
+    fputs("; shw ko 0x67\n11111000\n00001000\n00001000\n00001000\n11111000\n",fp);
+    fputs("; shw sa 0x68\n01010000\n11111000\n01010000\n00010000\n01100000\n",fp);
+    fputs("; shw shi 0x69\n01000000\n10101000\n01001000\n00010000\n11100000\n",fp);
+    fputs("; shw su 0x6A\n11111000\n00001000\n00010000\n00110000\n11001000\n",fp);
+    fputs("; shw se 0x6B\n01000000\n11111000\n01010000\n01000000\n00111000\n",fp);
+    fputs("; shw so 0x6C\n10001000\n01001000\n00001000\n00010000\n01100000\n",fp);
+    fputs("; shw ta 0x6D\n01000000\n01111000\n11001000\n00110000\n01100000\n",fp);
+    fputs("; shw chi 0x6E\n11111000\n00100000\n11111000\n00100000\n01000000\n",fp);
+    fputs("; shw tsu 0x6F\n10101000\n10101000\n00001000\n00010000\n01100000\n",fp);
+    fputs("; shw te 0x70\n11111000\n00000000\n11111000\n00100000\n11000000\n",fp);
+    fputs("; shw to 0x71\n01000000\n01000000\n01100000\n01010000\n01000000\n",fp);
+    fputs("; shw na 0x72\n00100000\n11111000\n00100000\n00100000\n01000000\n",fp);
+    fputs("; shw ni 0x73\n11110000\n00000000\n00000000\n00000000\n11111000\n",fp);
+    fputs("; shw nu 0x74\n11111000\n00001000\n00101000\n00010000\n01101000\n",fp);
+    fputs("; shw ne 0x75\n00100000\n11111000\n00001000\n01110000\n10101000\n",fp);
+    fputs("; shw no 0x76\n00001000\n00001000\n00001000\n00010000\n01100000\n",fp);
+    fputs("; shw ha 0x77\n01010000\n01010000\n01010000\n10001000\n10001000\n",fp);
+    fputs("; shw hi 0x78\n10000000\n10011000\n11100000\n10000000\n01111000\n",fp);
+    fputs("; shw hu 0x79\n11111000\n00001000\n00001000\n00010000\n01100000\n",fp);
+    fputs("; shw he 0x7A\n01000000\n10100000\n10010000\n00001000\n00000000\n",fp);
+    fputs("; shw ho 0x7B\n00100000\n11111000\n01110000\n10101000\n00100000\n",fp);
+    fputs("; shw ma 0x7C\n11111000\n00001000\n10010000\n01100000\n00100000\n",fp);
+    fputs("; shw mi 0x7D\n11111000\n00000000\n11111000\n00000000\n11111000\n",fp);
+    fputs("; shw mu 0x7E\n00100000\n01000000\n01000000\n10010000\n11111000\n",fp);
+    fputs("; shw me 0x7F\n00001000\n01001000\n00110000\n00110000\n11001000\n",fp);
+    fputs("; shw mo 0x80\n11111000\n00100000\n11111000\n00100000\n00111000\n",fp);
+    fputs("; shw ya 0x81\n01000000\n11111100\n01001000\n00100000\n00100000\n",fp);
+    fputs("; shw yu 0x82\n11110000\n00010000\n00010000\n00010000\n11111000\n",fp);
+    fputs("; shw yo 0x83\n11111000\n00001000\n11111000\n00001000\n11111000\n",fp);
+    fputs("; shw ra 0x84\n11111000\n00000000\n11111000\n00010000\n01100000\n",fp);
+    fputs("; shw ri 0x85\n10001000\n10001000\n10001000\n00010000\n01100000\n",fp);
+    fputs("; shw ru 0x86\n01100000\n01100000\n01101000\n01101000\n10110000\n",fp);
+    fputs("; shw re 0x87\n10000000\n10000000\n10001000\n10001000\n11110000\n",fp);
+    fputs("; shw ro 0x88\n11111000\n10001000\n10001000\n10001000\n11111000\n",fp);
+    fputs("; shw wa 0x89\n11111000\n10001000\n00001000\n00010000\n01100000\n",fp);
+    fputs("; shw n 0x8A\n10000000\n01001000\n00001000\n00010000\n11100000\n",fp);
+    fputs("; shw voiced 0x8B\n10100000\n10100000\n00000000\n00000000\n00000000\n",fp);
+    fputs("; shw halfvoiced 0x8C\n01000000\n10100000\n01000000\n00000000\n00000000\n",fp);
+    fputs("EOF\n",fp);
+  }
+
+  fclose(fp);
+}
 
 static void CheckValueBounds(void *ptr, int min, int max, int val, enum vtype type)
 {
@@ -146,6 +351,11 @@ void GUIRestoreVars()
   CheckValueBounds(&pl4contrl, 0, 1, 0, UB);
   CheckValueBounds(&pl5contrl, 0, 1, 0, UB);
 #endif
+
+#ifdef __UNIXSDL__
+  CheckValueBounds(&joy_sensitivity, 0, 32768, 16384, UW);
+#endif
+
   CheckValueBounds(&pl12s34, 0, 1, 0, UB);
   CheckValueBounds(&AllowUDLR, 0, 1, 0, UB);
 #ifdef __MSDOS__
@@ -211,7 +421,6 @@ void GUIRestoreVars()
   CheckValueBounds(&RevStereo, 0, 1, 0, UB);
 #ifdef __MSDOS__
   CheckValueBounds(&Force8b, 0, 1, 0, UB);
-  CheckValueBounds(&RaisePitch, 0, 1, 0, UB);
 #endif
   CheckValueBounds(&SPCDisable, 0, 1, 0, UB);
   CheckValueBounds(&EchoDis, 0, 1, 0, UB);
@@ -312,6 +521,15 @@ void GUIRestoreVars()
   CheckValueBounds(&MovieAudio, 0, 1, 1, UB);
   CheckValueBounds(&MovieVideoAudio, 0, 1, 1, UB);
   CheckValueBounds(&MovieAudioCompress, 0, 1, 1, UB);
+#ifdef __MSDOS__
+  CheckValueBounds(&DisplayS, 0, 1, 0, UB);
+  CheckValueBounds(&Palette0, 0, 1, 1, UB);
+#endif
+#ifdef __WIN32__
+  CheckValueBounds(&KitchenSync, 0, 1, 0, UB);
+  CheckValueBounds(&KitchenSyncPAL, 0, 1, 0, UB);
+  CheckValueBounds(&Force60hz, 0, 1, 0, UB);
+#endif
 
   if (TimeChecker == CalcCfgChecksum())
   {
@@ -334,6 +552,8 @@ void GUIRestoreVars()
 
     fclose(cfg_fp);
   }
+
+  LoadCustomFont();
 }
 
 void GUISaveVars()
@@ -569,6 +789,193 @@ void LoadCheatSearchFile()
   if ((fp = fopen_dir(ZCfgPath,"tmpchtsr.___","rb")))
   {
     fread(vidbuffer+129600, 1, 65536*2+32768, fp);
+    fclose(fp);
+  }
+}
+
+
+
+
+#define HEADER_SIZE 512
+#define INFO_LEN (0xFF - 0xC0)
+
+static bool AllASCII(char *b, int size)
+{
+  int i;
+  for (i = 0; i < size; i++)
+  {
+    if (b[i] < 32 || b[i] > 126)
+    {
+      return(false);
+    }
+  }
+  return(true);
+}
+
+static int InfoScore(char *Buffer)
+{
+  int score = 0;
+  if (Buffer[28] + (Buffer[29] << 8) + Buffer[30] + (Buffer[31] << 8) == 0xFFFF) { score += 3; }
+  if (Buffer[26] == 0x33) { score += 2; }
+  if ((Buffer[21] & 0xf) < 4) { score += 2; }
+  if (!(Buffer[61] & 0x80)) { score -= 4; }
+  if ((1 << (Buffer[23] - 7)) > 48) { score -= 1; }
+  if (Buffer[25] < 14) { score += 1; }
+  if (!AllASCII(Buffer, 20)) { score -= 1; }
+  return (score);
+}
+
+static unsigned int sum(unsigned char *array, unsigned int size)
+{
+  register unsigned int theSum = 0, i;
+  for (i = 0; i < size; i++)
+  {
+    theSum += array[i];
+  }
+  return(theSum);
+}
+
+static void get_rom_name(const char *filename, char *namebuffer)
+{
+  char *last_dot = strrchr(filename, '.');
+  if (!last_dot || (strcasecmp(last_dot, ".zip") && strcasecmp(last_dot, ".gz") && strcasecmp(last_dot, ".jma")))
+  {
+    struct stat filestats;
+    stat(filename, &filestats);
+
+    if ((filestats.st_size >= 0x8000) && (filestats.st_size <= 0x600000))
+    {
+      FILE *fp = fopen(filename, "rb");
+      if (fp)
+      {
+        unsigned char HeaderBuffer[HEADER_SIZE];
+        int HeaderSize = 0, HasHeadScore = 0, NoHeadScore = 0, HeadRemain = filestats.st_size & 0x7FFF;
+        bool EHi = false;
+
+        switch(HeadRemain)
+        {
+          case 0:
+            NoHeadScore += 3;
+            break;
+
+          case HEADER_SIZE:
+            HasHeadScore += 2;
+            break;
+        }
+
+        fread(HeaderBuffer, 1, HEADER_SIZE, fp);
+
+        if (sum(HeaderBuffer, HEADER_SIZE) < 2500) { HasHeadScore += 2; }
+
+        //SMC/SWC Header
+        if (HeaderBuffer[8] == 0xAA && HeaderBuffer[9] == 0xBB && HeaderBuffer[10]== 4)
+        {
+          HasHeadScore += 3;
+        }
+        //FIG Header
+        else if ((HeaderBuffer[4] == 0x77 && HeaderBuffer[5] == 0x83) ||
+                 (HeaderBuffer[4] == 0xDD && HeaderBuffer[5] == 0x82) ||
+                 (HeaderBuffer[4] == 0xDD && HeaderBuffer[5] == 2) ||
+                 (HeaderBuffer[4] == 0xF7 && HeaderBuffer[5] == 0x83) ||
+                 (HeaderBuffer[4] == 0xFD && HeaderBuffer[5] == 0x82) ||
+                 (HeaderBuffer[4] == 0x00 && HeaderBuffer[5] == 0x80) ||
+                 (HeaderBuffer[4] == 0x47 && HeaderBuffer[5] == 0x83) ||
+                 (HeaderBuffer[4] == 0x11 && HeaderBuffer[5] == 2))
+        {
+          HasHeadScore += 2;
+        }
+        else if (!strncmp("GAME DOCTOR SF 3", (char *)HeaderBuffer, 16))
+        {
+          HasHeadScore += 5;
+        }
+
+        HeaderSize = HasHeadScore > NoHeadScore ? HEADER_SIZE : 0;
+
+        if (filestats.st_size - HeaderSize >= 0x500000)
+        {
+          fseek(fp, 0x40FFC0 + HeaderSize, SEEK_SET);
+          fread(HeaderBuffer, 1, INFO_LEN, fp);
+          if (InfoScore((char *)HeaderBuffer) > 1)
+          {
+            EHi = true;
+            strncpy(namebuffer, (char *)HeaderBuffer, 21);
+          }
+        }
+
+        if (!EHi)
+        {
+          if (filestats.st_size - HeaderSize >= 0x10000)
+          {
+            char LoHead[INFO_LEN], HiHead[INFO_LEN];
+            int LoScore, HiScore;
+
+            fseek(fp, 0x7FC0 + HeaderSize, SEEK_SET);
+            fread(LoHead, 1, INFO_LEN, fp);
+            LoScore = InfoScore(LoHead);
+
+            fseek(fp, 0xFFC0 + HeaderSize, SEEK_SET);
+            fread(HiHead, 1, INFO_LEN, fp);
+            HiScore = InfoScore(HiHead);
+
+            strncpy(namebuffer, LoScore > HiScore ? LoHead : HiHead, 21);
+
+            if (filestats.st_size - HeaderSize >= 0x20000)
+            {
+              int IntLScore;
+              fseek(fp, (filestats.st_size - HeaderSize) / 2 + 0x7FC0 + HeaderSize, SEEK_SET);
+              fread(LoHead, 1, INFO_LEN, fp);
+              IntLScore = InfoScore(LoHead) / 2;
+
+              if (IntLScore > LoScore && IntLScore > HiScore)
+              {
+                strncpy(namebuffer, LoHead, 21);
+              }
+            }
+          }
+          else //ROM only has one block
+          {
+            fseek(fp, 0x7FC0 + HeaderSize, SEEK_SET);
+            fread(namebuffer, 21, 1, fp);
+          }
+        }
+        fclose(fp);
+      }
+      else //Couldn't open file
+      {
+        strcpy(namebuffer, "** READ FAILURE **");
+      }
+    }
+    else //Smaller than a block, or Larger than 6MB
+    {
+      strcpy(namebuffer, "** INVALID FILE **");
+    }
+  }
+  else //Compressed archive
+  {
+    strcpy(namebuffer, filename);
+  }
+}
+
+extern unsigned char spcRamcmp[65536];
+extern unsigned int GUInumentries;
+extern unsigned char *spcBuffera;
+
+void GetLoadHeader()
+{
+  unsigned int i = 0;
+  while (i < GUInumentries)
+  {
+    get_rom_name((char *)(spcRamcmp+1+i*14), (char *)(spcBuffera+1+i*32));
+    i++;
+  }
+}
+
+void dumpsound()
+{
+  FILE *fp = fopen_dir(ZSpcPath, "sounddmp.raw", "wb");
+  if (fp)
+  {
+    fwrite(spcBuffera, 1, 65536*4+4096, fp);
     fclose(fp);
   }
 }

@@ -1,8 +1,8 @@
 @ PSR-produced config file (stock default in CAPS)
 @
-@Note, if you're worried you messed up a setting, removing the line will have
-@ZSNES use the default settings for that option.
-@The next time ZSNES is ran, the line will reappear with the default settings.
+@ Note, if you're worried you messed up a setting, removing the line will have
+@ ZSNES use the default settings for that option.
+@ The next time ZSNES is ran, the line will reappear with the default settings.
 @
 @
 @  ----
@@ -15,15 +15,21 @@
 per2exec dd 100
 
 @
+@ Disable SPC emulation (0 = NO, 1 = Yes)
+@ Disabling SPC emulation can improve performance, but at the expense of emulation accuracy.
+@ If SPC emulation is disabled, there will be no sound output.
+SPCDisable db 0
+
+@
 @ Update SRAM in real-time (0 = NO, 1 = Yes)
 @ This is useful if you fear something will prevent ZSNES from exiting normally.
 @ ZSNES normally updates SRAM on exit.
 SRAMSave5Sec db 0
 
 @
-@ Use old implementation for snes mode 2 (0 = NO, 1 = Yes)
-@ Enable if you experience graphic anomolies under Mode2
-OldGfxMode2 db 0
+@  Disable Hacks (0 = NO, 1 = Yes)
+@  Set this to 1 if you want to disable game specific hacks
+HacksDisable db 0
 
 @
 @  ----
@@ -252,6 +258,14 @@ pl5DRk dd 0
 %endif
 pl5p209 db 0
 
+%ifdef __UNIXSDL__
+@
+@ Joystick Sensitivity
+@ Change this value if you have input issues. Higher values means less sensitive.
+@ If your joystick is not being read at all, try 128 or other low values.
+joy_sensitivity dw 16384
+%endif
+
 @
 @ Share player3 & 4 control inputs with Player 1 & 2 - allow 2 devices to be
 @ used for one player (this feature disables Multiplayer 5 support).
@@ -357,6 +371,7 @@ PrevFSMode db 0
 
 @
 @ Custom resolution X and Y for custom video modes [256x224..2048x1536]
+@ Variables are only used for Windows or OpenGL
 CustomResX dd 640
 CustomResY dd 480
 
@@ -366,25 +381,34 @@ CustomResY dd 480
 newengen db 1
 
 @
-@ Scanlines (0 = DISABLE, 1 = Full, 2 = 25%, 3 = 50%) - simulate TV scanlines
+@ Use older graphics engine #2 (0 = NO, 1 = Yes)
+@ Enable this to see if it helps with rendering problems
+OldGfxMode2 db 0
+
+@
+%ifdef __MSDOS__
+@ Force Black Background (0 = No, 1 = YES)
+@ This is necessary to get a black background for 8-bit modes
+%else
+@ DOS port only, don't edit
+%endif
+Palette0 db 1
+
+@
+@ Scanlines (0 = NONE, 1 = Full, 2 = 25%, 3 = 50%) - simulate TV scanlines
 #ifdef __MSDOS__
 @ 256x256 or 640x480 8bit modes only (25% and 50% in 640x480 16bit mode only)
 #endif
 scanlines db 0
 
 @
-#ifdef __MSDOS__
 @ Video interpolation (0 = OFF, 1 = On)
 @ Blends the neighboring pixels on the screen to create a blur effect,
 @ eliminating pixelation due to hardware stretching.
 @ This is disabled when other filters are used.
+#ifdef __MSDOS__
 @ Available in most VESA2 16-bit modes
 @ Note: this option controls Eagle filter in 640x480 8bit mode
-#else
-@ Video interpolation (0 = OFF, 1 = On)
-@ Blends the neighboring pixels on the screen to create a blur effect,
-@ eliminating pixelation due to hardware stretching.
-@ This is disabled when other filters are used.
 #endif
 antienab db 0
 
@@ -404,6 +428,27 @@ vsyncon db 0
 @ Win port only, don't edit
 %endif
 TripleBufferWin db 0
+
+@
+%ifdef __WIN32__
+@ Force 60Hz (0 = NO, 1 = Yes)
+@ Enable this if you are experiencing visual tearing (not the same as vsync)
+%else
+@ Win port only, don't edit
+%endif
+Force60hz db 0
+
+@
+%ifdef __WIN32__
+@ Enable KitchenSync (0 = NO, 1 = Yes)
+@ You can enable this if you are using refresh rates > 100Hz(PAL), 120Hz(NTSC)
+@ Otherwise, it probably won't work for you
+@ KitchenSyncPAL only applies to PAL games, use KitchenSync for PAL+NTSC
+%else
+@ Win port only, don't edit
+%endif
+KitchenSync db 0
+KitchenSyncPAL db 0
 
 @
 %ifdef __MSDOS__
@@ -434,34 +479,39 @@ BilinearFilter db 0
 @ These are the various Kreed filters. They are blur filters but do not exhibit
 @ the same level of blurring than interpolation/bilinear.
 @ This is disabled when other filters are used.
-@
 En2xSaI db 0
 
 @
+%ifndef __MSDOS__
 @ Use hq*x filter (0 = NO, 1 = Yes)
 @ This is a filter MaxSt has created. These are very CPU intensive filters that do
 @ very awesome blending to remove the pixelation.
-
 @ The level of HQ*x filtering depends on the current resolution used
 @ HQ2x = 512x448 but below HQ3x min res
 @ HQ3x = 768x672 but below HQ4x min res
 @ HQ4x = 1024x896 or above
 @ This is disabled when other filters are used.
+%else
+@ Non-DOS option, don't edit it
+%endif
 hqFilter db 0
 
 @
 @ Grayscale mode (0 = NO, 1 = Yes) - don't enable this for other than nostalgia
 @ The whole screen is displayed in monochrome color.
-@
 GrayscaleMode db 0
 
 @
-@ High-res mode7 (0 = NO, 1 = Yes) - enabling increases the resolution of Mode 7
+@ High-res mode7 (0 = NO, 1 = Yes)
+@ Doubles the internal resolution of the image when Mode 7 is in use
 @ However this disables most filters, except for interpolation.
 @ This is only useful in certain games and is not useful in general.
 Mode7HiRes16b dd 0
 
 @
+%ifdef __MSDOS__
+@ The NTSC filter is not available for DOS, changing the below settings will do nothing
+%endif
 @ NTSC filter (0 = OFF, 1 = On)
 @ Enable Blargg's wonderful NTSC filter which simulates the effect of an NTSC TV.
 NTSCFilter db 0
@@ -474,7 +524,7 @@ NTSCCont sb 0
 NTSCBright sb 0
 NTSCSharp sb 0
 NTSCWarp sb 0
-@ Refresh screen while changing the filter's parameters (0 = OFF, 1 = On)
+@ Refresh screen while changing the NTSC Filter's parameters (0 = OFF, 1 = On)
 NTSCRef db 0
 
 @
@@ -484,6 +534,7 @@ NTSCRef db 0
 
 @
 @ Sound emulation (0 = off, 1 = ON) - disable if you need the performance
+@ If SPC emulation is disabled, there will be no sound output.
 soundon db 1
 
 @
@@ -491,10 +542,23 @@ soundon db 1
 StereoSound db 1
 
 @
+#ifdef __MSDOS__
+@ Force 8-bit Sound (0 = NO, 1 = Yes)
+@ Enable this option if your sound card is producing nothing or static.
+@ This will limit the max frequency while using Stereo sound to 22KHz
+#else
+@ DOS-only option, don't edit
+#endif
+Force8b db 0
+
+@
 @ Sampling rate: 0 = 8000Hz, 1 = 11025Hz, 2 = 22050Hz, 3 = 44100Hz,
 @                            4 = 16000Hz, 5 = 32000Hz, 6 = 48000Hz
 @ Using any other sound frequencies other than the default 32000Hz
 @ is COMPLETELY UNACCEPTABLE in use for sound bug reports.
+#ifdef __MSDOS__
+@ Forcing 8-bit sound will limit the max sampling rate while using Stereo sound to 22KHz
+#endif
 SoundQuality dd 5
 
 @
@@ -507,21 +571,13 @@ RevStereo db 0
 
 @
 #ifdef __MSDOS__
-@ Force 8-bit Sound, Raise Pitch (0 = NO, 1 = Yes)
-@ Enable Force 8-bit Sound if your sound card is producing nothing or static.
-@ Enable Raise Pitch to raise the pitch level.
-Force8b db 0
+@ Display ZSNES sound detection info (0 = NO, 1 = Yes)
 #else
 @ DOS-only option, don't edit
 #endif
-RaisePitch db 0
+DisplayS db 0
 
 @
-@ Disable SPC emulation (0 = NO, 1 = Yes)
-@ Disabling SPC emulation can improve performance, but at the expense of emulation accuracy.
-@ It is not a good idea to disable this option.
-SPCDisable db 0
-
 @ Disable echo (0 = NO, 1 = Yes)
 @ Disables the echo effect in the sound.
 @ It is not a good idea to disable this option.
@@ -864,6 +920,11 @@ GUIClick db 0
 @
 @ Move in GUI using gamepad 1 (0 = NO, 1 = Yes)
 JoyPad1Move db 0
+
+@
+@ Use Custom Font (0 = NO, 1 = Yes)
+@ The font currently reads off a format as defined by zfile.txt
+newfont db 0
 
 @
 @  ----

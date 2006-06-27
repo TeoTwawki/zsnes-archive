@@ -20,33 +20,19 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,FPSOn,Makemode7Table,MessageOn,vesa2red10,scanlines,smallscreenon
+EXTSYM FPSOn,MessageOn,breakatsignb,cbitmode,copyvid
 EXTSYM MsgCount,Msgptr,OutputGraphicString,OutputGraphicString16b,vidbuffer
-EXTSYM PrepareSaveState,ResetState,breakatsignb,cvidmode,cbitmode,copyvid
-EXTSYM curblank,drawhline,drawhline16b,drawvline,drawvline16b,fnames,frameskip
-EXTSYM mode7tab,pressed,spcA,spcBuffera,spcNZ,spcP,spcPCRam,SPCRAM,spcS,spcX
-EXTSYM spcY,spcon,vesa2_bpos,vesa2_clbit,vesa2_gpos,vesa2_rpos,vesa2selec
-EXTSYM spritetablea,sprlefttot,newengen,spcextraram,resolutn,Open_File
-EXTSYM Close_File,Write_File,Create_File,Get_Key,Get_Date,continueprognokeys
+EXTSYM curblank,drawhline,drawhline16b,drawvline,drawvline16b,frameskip
+EXTSYM pressed,dumpsound,Grab_BMP_Data,Grab_BMP_Data_8
+EXTSYM spcon,vesa2_bpos,vesa2_clbit,vesa2_gpos,vesa2_rpos,
+EXTSYM spritetablea,sprlefttot,newengen,Get_Key,continueprognokeys
 EXTSYM ForceNonTransp,GUIOn,Check_Key,JoyRead,GetScreen,SSKeyPressed
 EXTSYM SPCKeyPressed,StopSound,StartSound,ExecExitOkay,t1cc,Clear2xSaIBuffer
-EXTSYM romdata,infoloc,ScreenShotFormat,Voice0Disable,Voice1Disable
-EXTSYM Voice2Disable,Voice3Disable,Voice4Disable,Voice5Disable,Voice6Disable
-EXTSYM Voice7Disable,SPCPath,SnapPath,CHPath,ZFileCHDir
+EXTSYM ScreenShotFormat,spcsaved,savespcdata
+
 %ifndef NO_PNG
 EXTSYM Grab_PNG_Data
 %endif
-
-%macro ChangeDir 1
-    cmp byte[%1],0
-    je %%end
-    pushad
-    mov ebx,%1
-    mov [CHPath],ebx
-    call ZFileCHDir
-    popad
-%%end
-%endmacro
 
 SECTION .text
 
@@ -105,15 +91,6 @@ NEWSYM MenuDisplace, resd 1
 NEWSYM MenuDisplace16, resd 1
 NEWSYM MenuNoExit, resb 1
 NEWSYM SPCSave, resb 1
-
-%ifdef SPCDUMP
-SECTION .data
-NEWSYM SPCSave_dump, db 0
-SECTION .bss
-
-EXTSYM SPCSave_buffer, SPCSave_ports
-NEWSYM SPCSave_handle, resd 1
-%endif
 
 SECTION .text
 
@@ -180,14 +157,14 @@ NEWSYM showmenu
     cmp byte[SSKeyPressed],1
     jne .nosskey
     mov byte[SSKeyPressed],0
-    call savepcx
+    call saveimage
     jmp .nopalwrite
 .nosskey
     cmp byte[SPCKeyPressed],1
     je near .savespckey
     test byte[pressed+14],1
     jz .nof12
-    call savepcx
+    call saveimage
     jmp .nopalwrite
 .nof12
     mov dword[menucloc],0
@@ -215,10 +192,6 @@ NEWSYM showmenu
     mov dword[menudrawbox8b.stringi+13],' PNG'
 %endif
 .normalscrn
-    cmp byte[cbitmode],1
-    je near .nopcx
-    mov dword[menudrawbox8b.stringi+13],' PCX'
-.nopcx
     mov byte[nextmenupopup],0
     mov byte[menu16btrans],0
     mov byte[pressed+1],0
@@ -298,18 +271,18 @@ NEWSYM showmenu
 ;    pop eax
 ;    mov [newengen],al
     cmp dword[menucloc],0
-    jne .nosavepcx
-    call savepcx
-.nosavepcx
+    jne .nosaveimg
+    call saveimage
+.nosaveimg
     cmp dword[menucloc],40*288
-    jne .nosavepcx2
-    call savepcx
+    jne .nosaveimg2
+    call saveimage
     mov byte[ExecExitOkay],0
     mov byte[nextmenupopup],3
     mov byte[NoInputRead],1
     mov byte[t1cc],0
     mov byte[PrevMenuPos],0
-.nosavepcx2
+.nosaveimg2
     cmp dword[menucloc],50*288
     jne .noskipframe
     mov byte[ExecExitOkay],0
@@ -364,22 +337,6 @@ NEWSYM showmenu
     cmp byte[spcon],0
     je .nospc
 
-%ifdef SPCDUMP
-	cmp byte[SPCSave_dump], 1
-	jne .start_dump
-
-	mov ebx, [SPCSave_handle]
-	mov eax, -1
-	mov [SPCSave_buffer], eax
-	mov ecx, 4
-	mov edx, SPCSave_buffer
-	call Write_File
-	call Close_File
-	mov byte[SPCSave_dump], 0
-	jmp .nospcsave
-.start_dump
-%endif
-
     mov dword[Msgptr],.search
     mov eax,[MsgCount]
     mov [MessageOn],eax
@@ -387,10 +344,12 @@ NEWSYM showmenu
     mov byte[SPCSave],1
     call breakatsignb
     mov byte[SPCSave],0
+    pushad
     call savespcdata
+    popad
 
     mov byte[curblank],40h
-    mov dword[Msgptr],.saved
+    mov dword[Msgptr],spcsaved
     mov eax,[MsgCount]
     mov [MessageOn],eax
     jmp .nospcsave
@@ -411,7 +370,9 @@ NEWSYM showmenu
 .nospcsave
     cmp dword[menucloc],30*288
     jne .nosnddmp
+    pushad
     call dumpsound
+    popad
     mov dword[Msgptr],.sndbufsav
     mov eax,[MsgCount]
     mov [MessageOn],eax
@@ -485,7 +446,7 @@ SECTION .data
 .nosound   db 'SOUND MUST BE ENABLED.',0
 .unable    db 'CANNOT USE IN NEW GFX ENGINE.',0
 .escpress  db 'ESC TERMINATED SEARCH.',0
-.saved     db '.SPC FILE SAVED.',0
+EXTSYM spcsaved
 SECTION .text
 
 NEWSYM menudrawbox8b
@@ -813,341 +774,13 @@ NEWSYM menudrawcursor16b
     mov al,128
     ret
 
-NEWSYM savespcdata
-    sub dword[spcPCRam],SPCRAM
-    ; Assemble N/Z flags into P
-    and byte[spcP],0FDh
-    test byte[spcNZ],0FFh
-    jnz .nozero
-    or byte[spcP],02h
-.nozero
-    and byte[spcP],07Fh
-    test byte[spcNZ],80h
-    jz .noneg
-    or byte[spcP],80h
-.noneg
-    mov ax,[spcPCRam]
-    mov [ssdatst+37],ax
-    mov al,[spcA]
-    mov [ssdatst+39],al
-    mov al,[spcX]
-    mov [ssdatst+40],al
-    mov al,[spcY]
-    mov [ssdatst+41],al
-    mov al,[spcP]
-    mov [ssdatst+42],al
-    mov al,[spcS]
-    mov [ssdatst+43],al
-    add dword[spcPCRam],SPCRAM
-;.savestuff
-    ChangeDir SPCPath
-    pushad
-    call PrepareSaveState
-    popad
-    ; Copy from fnames to .spcfname, replacing .srm with .spc
-    mov esi,fnames+1
-    mov edi,.spcfname
-.next
-    mov al,[esi]
-    mov [edi],al
-    inc esi
-    inc edi
-    cmp byte[esi+3],0       ;Check for end of filename
-    jne .next
-    ; Save stuff
-    mov dword[edi],'spc '
-    mov byte[edi+3],0
-    ; Find an unoccupied file
-.tryagainspc
-    mov edx,.spcfname
-    call Open_File
-    jc .nofileopen
-    mov bx,ax
-    call Close_File
-    cmp byte[edi+2],'c'
-    jne .notc
-    mov byte[edi+2],'1'
-    jmp .tryagainspc
-.notc
-    cmp byte[edi+2],'9'
-    je .donext10
-    inc byte[edi+2]
-    jmp .tryagainspc
-.donext10
-    mov al,[edi+1]
-    cmp al,[edi+2]
-    je .nofileopen
-    cmp byte[edi+1],'p'
-    jne .notp
-    mov byte[edi+1],'0'
-.notp
-    inc byte[edi+1]
-    mov byte[edi+2],'0'
-    jmp .tryagainspc
-.nofileopen
-    xor al,al
-    mov al,[edi+1]
-    mov [showmenu.saved+2],al
-    mov al,[edi+2]
-    mov [showmenu.saved+3],al
-    ; copy spcextra ram to dspmem+192
-    mov esi,spcextraram
-    mov edi,DSPMem+192
-    mov ecx,64
-.loop
-    mov al,[esi]
-    mov [edi],al
-    inc esi
-    inc edi
-    dec ecx
-    jnz .loop
+saveimage:
+    mov byte[pressed+1],0
+    mov byte[pressed+59],0
 
-    ; Copy Game Title
-
-    mov esi,[romdata]
-    add esi,[infoloc]
-    cmp dword[infoloc],40ffc0h
-    jne .noehi
-    sub esi,408000h
-.noehi
-    mov ecx,20
-    mov edi,ssdatst+46+32
-.romloop
-    mov al,[esi]
-    mov [edi],al
-    inc esi
-    inc edi
-    dec ecx
-    jnz .romloop
-    ; Copy Date of spc dumped
-    call Get_Date
-    mov [ssdatst+09Eh],dl
-    mov [ssdatst+09Fh],dh
-    mov [ssdatst+0A0h],cx
-
-    ; Set Channel Disables
-    mov byte[ssdatst+0D0h],0
-    cmp byte[Voice0Disable],1
-    je .enable0
-    or byte[ssdatst+0D0h],1
-.enable0
-    cmp byte[Voice1Disable],1
-    je .enable1
-    or byte[ssdatst+0D0h],2
-.enable1
-    cmp byte[Voice2Disable],1
-    je .enable2
-    or byte[ssdatst+0D0h],4
-.enable2
-    cmp byte[Voice3Disable],1
-    je .enable3
-    or byte[ssdatst+0D0h],8
-.enable3
-    cmp byte[Voice4Disable],1
-    je .enable4
-    or byte[ssdatst+0D0h],16
-.enable4
-    cmp byte[Voice5Disable],1
-    je .enable5
-    or byte[ssdatst+0D0h],32
-.enable5
-    cmp byte[Voice6Disable],1
-    je .enable6
-    or byte[ssdatst+0D0h],64
-.enable6
-    cmp byte[Voice7Disable],1
-    je .enable7
-    or byte[ssdatst+0D0h],128
-.enable7
-
-;  times 32  ; Title of game (Offset 48)
-;  times 32  ; Song Name
-;  times 32  ; Author of Song
-;  times 32  ; Name of dumper
-;  times 32  ; Comments
-;  times 4   ; date of spc dumped
-;  times 4   ; time in milliseconds before fading out
-;  times 2   ; fade-out length in milliseconds
-;  0         ; default channel enables
-
-    mov edx,.spcfname
-    call Create_File
-    mov bx,ax
-    mov ecx,256
-    mov edx,ssdatst
-    call Write_File
-
-    ; Save SPC stuff
-    mov ecx,65536
-    mov edx,SPCRAM
-    call Write_File
-    mov ecx,256
-    mov edx,DSPMem
-    call Write_File
-
-%ifdef SPCDUMP
-	mov [SPCSave_handle], ebx
-%else
-    call Close_File
-%endif
-
-    pushad
-    call ResetState
-    popad
-
-%ifdef SPCDUMP
-
-; w00t, reg dump crapola
-; using a time reference because I don't feel like adding
-; cycle counting to the SPC emulation just for this
-
-	mov byte[SPCSave_dump],1
-
-	mov eax, [SPCRAM+0F4h]
-	mov [SPCSave_ports], eax
-	xor eax, eax
-	mov [SPCSave_buffer], eax
-
-%endif
-    ret
-
-SECTION .bss
-.spcfname resb 128
-
-SECTION .data
-;.SPC File Format
-
-;Offset 00000h - File Header : SNES-SPC700 Sound File Data v0.10
-;Offset 00021h - 0x26,0x26,0x26
-;Offset 00024h - Version #(/100)
-;Offset 00025h - PC Register value (1 Word)
-;Offset 00027h - A Register Value (1 byte)
-;Offset 00028h - X Register Value (1 byte)
-;Offset 00029h - Y Register Value (1 byte)
-
-;Offset 0002Ah - Status Flags Value (1 byte)
-;Offset 0002Bh - Stack Register Value (1 byte)
-;Offset 0002Ch-000FFh - Reserved For Future Use
-;Offset 00100h-100FFh - SPCRam
-;Offset 10100h-101FFh - DSPRam
-
-;Offset 0002Eh-0004Dh - SubTitle/Song Name
-;Offset 0004Eh-0006Dh - Title of Game
-;Offset 0006Eh-0007Dh - Name of Dumper
-;Offset 0007Eh-0009Dh - Comments
-;Offset 0009Eh-000A4h - Date of SPC Dumped in decimal (DD/MM/YYYY)
-;Offset 000A9h-000ABh - Time in seconds for the spc to play before fading
-;Offset 000ACh-000AFh - Fade out time in milliseconds
-;Offset 000B0h-000CFh - Author of Song
-;Offset 000D0h        - Default Channel Disables (0 = enable, 1 = disable)
-;Offset 000D1h        - Emulator used to dump .spc file
-;                       (0 = UNKNOWN, 1 = ZSNES, 2 = SNES9X)
-;                       (Note : Contact the authors if you're an snes emu
-;                       author with an .spc capture in order to assign
-;                       you a number)
-
-;Offset 0002Eh-0004Dh - Name of SPC (32 bytes)
-;Offset 0004Eh-0005Dh - Name of Game (16 bytes)
-;Offset 0006Eh-0007Dh - Name of SPC dumper (16 bytes)
-;Offset 0007Eh-0009Dh - Comments (32 bytes)
-;Offset 0009Eh-000A8h - Date the SPC was Dumped (10 bytes)
-;Offset 000A9h-000ABh - Internal SPC timer (3 bytes)
-
-NEWSYM ssdatst
-  db 'SNES-SPC700 Sound File Data v0.30',26,26,26     ; offset 0
-  db 10 ; Version #(/100), offset 36
-  ; SPC Registers
-  dw 0  ; PC, offset 37
-  db 0  ; A, offset 39
-  db 0  ; X, offset 40
-  db 0  ; Y, offset 41
-  db 0  ; P, offset 42
-  db 0  ; S, offset 43
-  db 0,0 ; offset 44 (reserved)
-
-  times 32 db 0 ; Title of game (Offset 46)
-  times 32 db 0 ; Song Name
-  times 16 db 0 ; Name of dumper
-  times 32 db 0 ; Comments
-  times 10 db 0 ; date of spc dumped
-  times 4  db 0 ; time in seconds before fading out
-  times 4  db 0 ; fade-out length in milliseconds
-  times 32 db 0 ; Author of Song
-  db 0          ; default channel enables
-  db 1          ; emulator used to dump .spc files
-  ; 32*5+20 = 180
-
-  times 48 db 0        ;(reserved), offset 224
-  ; SPCRAM (offset 256), 64k
-  ; DSPRAM (offset 256+65536), 256 bytes
-
-SECTION .text
-
-NEWSYM dumpsound
-    mov cx,0
-    mov edx,.filename
-    call Create_File
-    ; Process sound data
-    mov bx,ax
-    xor ecx,ecx
-    xor esi,esi
-.loop
-    push eax
-    mov eax,[spcBuffera]
-    mov edx,[eax+ecx*4]
-    pop eax
-    cmp edx,0
-    je .nowrite
-    mov [mode7tab+esi],edx
-    add esi,4
-    cmp esi,65536
-    je .savenow
-.return
-.nowrite
-    inc cx
-    jnz .loop
-    cmp esi,0
-    je .nosave
-    mov ecx,esi
-    mov edx,mode7tab
-    call Write_File
-.nosave
-    call Close_File
-    call Makemode7Table
-    ret
-
-.savenow
-    push ecx
-    mov ecx,65536
-    mov edx,mode7tab
-    call Write_File
-    pop ecx
-    xor esi,esi
-    jmp .return
-
-SECTION .data
-.filename db 'SOUNDDMP.RAW',0
-
-NEWSYM pcxheader
-          db 10,5,1,8
-          dw 0,0,255,223
-          dw 256,224
-          times 48 db 0
-          db 0,1
-.bpline   dw 256
-          times 128-68 db 0
-
-SECTION .bss
-
-NEWSYM picnum, resw 1
-
-SECTION .text
-
-NEWSYM savepcx
 %ifndef NO_PNG
     cmp byte[ScreenShotFormat],1
     jne .notpng
-    ChangeDir SnapPath
     pushad
     call Grab_PNG_Data
     popad
@@ -1155,422 +788,15 @@ NEWSYM savepcx
 .notpng
 %endif
 
-    mov byte[pressed+1],0
-    mov byte[pressed+59],0
     cmp byte[cbitmode],1
     je near .save16b
-    mov edi,pcxheader
-    mov ecx,128
-.clearhead
-    mov byte[edi],0
-    inc edi
-    dec ecx
-    jnz .clearhead
-    mov byte[pcxheader+0],10
-    mov byte[pcxheader+1],5
-    mov byte[pcxheader+2],1
-    mov byte[pcxheader+3],8
-    mov word[pcxheader+8],255
-    mov word[pcxheader+10],222
-    mov byte[pcxheader.bpline-1],1
-    mov word[pcxheader.bpline],256
-    cmp byte[resolutn],224
-    je .res224ph
-    mov word[pcxheader+10],237
-.res224ph
-
-    ChangeDir SnapPath
-
-    mov ecx,0    ;GetFreeFile use ecx==0 to tell if it's PCX
-    call GetFreeFile
-
-    call Create_File
-    ; Save header
-    mov bx,ax
-    mov ecx,128
-    mov edx,pcxheader
-    call Write_File
-    ; Save picture Data
-    mov byte[.rowsleft],223
-    cmp byte[resolutn],224
-    je .res224p
-    mov byte[.rowsleft],238
-.res224p
-    mov ecx,256
-    mov edx,[vidbuffer]
-    add edx,16+288
-.a
-    xor ecx,ecx
-    mov esi,edx
-    mov edi,mode7tab
-    push ebx
-    mov ebx,256
-.loopp
-    mov al,[esi]
-    mov [edi],al
-    mov ah,al
-    and ah,0C0h
-    cmp ah,0C0h
-    jne .norep
-    mov byte[edi],0C1h
-    inc edi
-    inc ecx
-    mov [edi],al
-.norep
-    inc ecx
-    inc esi
-    inc edi
-    dec ebx
-    jnz .loopp
-    pop ebx
-    xor al,al
-    push edx
-    mov edx,mode7tab
-    call Write_File
-    pop edx
-    add edx,288
-    dec byte[.rowsleft]
-    jnz .a
-    ; Save Palette
-    mov ecx,769
-    mov edx,[vidbuffer]
-    add edx,100000
-    call Write_File
-    call Makemode7Table
-    call Close_File
-;    mov dword[Msgptr],.pcxsaved
-;    mov eax,[MsgCount]
-;    mov [MessageOn],eax
+    pushad
+    call Grab_BMP_Data_8
+    popad
     ret
 
 .save16b
-    test byte[pressed+14],1
-    jnz near save16b2
-    call prepare16b
-    mov edi,pcxheader
-    mov ecx,128
-.clearhead2
-    mov byte[edi],0
-    inc edi
-    dec ecx
-    jnz .clearhead2
-    ; Initial header = 14 bytes
-    mov word[pcxheader],'BM'
-    mov dword[pcxheader+2],02A01Ah-768
-    mov dword[pcxheader+10],26
-
-    mov dword[pcxheader+14],12
-    mov word[pcxheader+18],256
-    mov word[pcxheader+20],223
-    mov word[pcxheader+22],1
-    mov word[pcxheader+24],24
-
-    cmp byte[resolutn],224
-    je .res224b
-    add dword[pcxheader+2],768*15
-    mov word[pcxheader+20],238
-.res224b
-
-    ChangeDir SnapPath
-
-    mov ecx,1    ;GetFreeFile use ecx==1 to tell if it's BMP
-    call GetFreeFile
-
-    call Create_File
-    ; Save header
-    mov bx,ax
-    mov ecx,26
-    mov edx,pcxheader
-    call Write_File
-    ; Save picture Data
-    mov byte[.rowsleft],223
-    mov esi,[vidbuffer]
-    add esi,32+288*2*223
-    cmp byte[resolutn],224
-    je .res224b2
-    mov byte[.rowsleft],238
-    add esi,288*2*15
-.res224b2
-    mov [.curdptr],esi
-.a2
-    mov ecx,256
-    mov edi,mode7tab
-    mov esi,[.curdptr]
-    sub dword[.curdptr],288*2
-.b2
-    push ecx
-    mov ax,[esi]
-    mov cl,[vesa2_bpos]
-    shr ax,cl
-    and ax,1Fh
-    shl al,3
-    mov [edi],al
-    mov ax,[esi]
-    mov cl,[vesa2_gpos]
-    shr ax,cl
-    and ax,1Fh
-    shl al,3
-    mov [edi+1],al
-    mov ax,[esi]
-    mov cl,[vesa2_rpos]
-    shr ax,cl
-    and ax,1Fh
-    shl al,3
-    mov [edi+2],al
-    pop ecx
-    add edi,3
-    add esi,2
-    dec ecx
-    jnz .b2
-    push edx
-    mov ecx,768
-    mov edx,mode7tab
-    call Write_File
-    pop edx
-    add edx,288*2
-    dec byte[.rowsleft]
-    jnz near .a2
-    call Makemode7Table
-    call Close_File
-;    mov dword[Msgptr],.rawsaved
-;    mov eax,[MsgCount]
-;    mov [MessageOn],eax
-    call restore16b
+    pushad
+    call Grab_BMP_Data
+    popad
     ret
-
-
-SECTION .bss
-.rowsleft resb 1
-.curdptr resd 1
-
-SECTION .text
-
-NEWSYM GetFreeFile
-%ifdef __MSDOS__
-    cmp ecx,0
-    jne .isbmp
-    mov dword[.filename+9],'pcx '
-    jmp .doneextselect
-.isbmp
-    mov dword[.filename+9],'bmp '
-.doneextselect
-    mov byte[.filename+12],0
-    mov word[picnum],0
-.findagain
-    mov edx,.filename
-    call Open_File
-    jc near .nofile
-    mov bx,ax
-    call Close_File
-
-    inc word[picnum]
-    cmp word[picnum],1000
-    je .nofile
-
-    mov ax,[picnum]
-    xor edx,edx
-    mov bx,100
-    div bx
-    mov cl,al
-    mov ax,dx
-    xor edx,edx
-    mov bx,10
-    div bx
-    mov esi,.filename+5
-    add cl,48
-    add al,48
-    add dl,48
-    mov esi,.filename+5
-    mov [esi],cl
-    mov [esi+1],al
-    mov [esi+2],dl
-    jmp .findagain
-.nofile
-    mov edx,.filename
-
-%else
-    mov esi,fnames+1
-    mov ebx,.imagefname
-.end1
-    inc esi
-    cmp byte[esi+4],0       ;Check for end of filename
-    jne .end1
-    mov edx,fnames+1
-.next
-    mov al,[edx]
-    mov [ebx],al
-    inc edx
-    inc ebx
-    cmp edx,esi
-    jne .next
-    mov esi,ebx
-    mov dword[esi],' 000'
-    mov word[esi+4],'0.'
-    cmp ecx,0
-    jne .isbmp
-    mov dword[esi+6],'pcx '
-    jmp .doneextselect
-.isbmp
-    mov dword[esi+6],'bmp '
-.doneextselect
-    mov byte[esi+9],0
-
-    mov word[picnum],0
-.findagain
-    mov edx,.imagefname
-    call Open_File
-    jc near .nofile
-    mov bx,ax
-    call Close_File
-
-    inc word[picnum]
-    cmp word[picnum],10000
-    je .nofile
-    mov ax,[picnum]
-    xor edx,edx
-    mov bx,1000
-    div bx
-    add al,48
-    mov [esi+1],al
-    mov ax,dx
-    xor edx,edx
-    mov bx,100
-    div bx
-    add al,48
-    mov [esi+2],al
-    mov ax,dx
-    xor edx,edx
-    mov bx,10
-    div bx
-    add al,48
-    add dl,48
-    mov [esi+3],al
-    mov [esi+4],dl
-    jmp .findagain
-.nofile
-    mov edx,.imagefname
-%endif
-    ret
-
-SECTION .data
-.filename db 'image000.pcx',0,0,0,0
-;.pcxsaved db 'SNAPSHOT SAVED TO '
-;.rawsaved db 'SNAPSHOT SAVED TO '
-SECTION .bss
-.imagefname resb 128
-SECTION .text
-
-
-NEWSYM save16b2
-    call prepare16b
-    mov byte[pressed+14],2
-    push es
-    mov edi,pcxheader
-    mov ecx,128
-.clearhead2
-    mov byte[edi],0
-    inc edi
-    dec ecx
-    jnz .clearhead2
-    ; Initial header = 14 bytes
-    mov word[pcxheader],'BM'
-    mov dword[pcxheader+2],02A01Ah-256*224*3+512*448*3
-    mov dword[pcxheader+10],26
-    mov dword[pcxheader+14],12
-    mov word[pcxheader+18],512
-    mov word[pcxheader+20],448
-    mov word[pcxheader+22],1
-    mov word[pcxheader+24],24
-
-    ChangeDir SnapPath
-
-    mov ecx,1    ;GetFreeFile use ecx==1 to tell if it's BMP
-    call GetFreeFile
-
-    mov cx,0
-    call Create_File
-    ; Save header
-    mov bx,ax
-    mov ecx,26
-    mov edx,pcxheader
-    call Write_File
-    ; Save picture Data
-    mov dword[.rowsleft],448
-    mov ax,[vesa2selec]
-    mov es,ax
-    mov esi,32*2+640*2*223*2+640*2
-    mov [.curdptr],esi
-.a2
-    mov ecx,512
-    mov edi,mode7tab
-    mov esi,[.curdptr]
-    sub dword[.curdptr],640*2
-.b2
-    push ecx
-    mov ax,[es:esi]
-    mov cl,[vesa2_bpos]
-    shr ax,cl
-    and ax,1Fh
-    shl al,3
-    mov [edi],al
-    mov ax,[es:esi]
-    mov cl,[vesa2_gpos]
-    shr ax,cl
-    and ax,1Fh
-    shl al,3
-    mov [edi+1],al
-    mov ax,[es:esi]
-    mov cl,[vesa2_rpos]
-    shr ax,cl
-    and ax,1Fh
-    shl al,3
-    mov [edi+2],al
-    pop ecx
-    add edi,3
-    add esi,2
-    dec ecx
-    jnz .b2
-    push edx
-    mov ecx,768*2
-    mov edx,mode7tab
-    call Write_File
-    pop edx
-    add edx,288*2
-    dec dword[.rowsleft]
-    jnz near .a2
-    call Makemode7Table
-    call Close_File
-;    mov dword[Msgptr],.rawsaved
-;    mov eax,[MsgCount]
-;    mov [MessageOn],eax
-    pop es
-    call restore16b
-    ret
-
-SECTION .data
-;.rawsaved db 'SNAPSHOT SAVED TO '
-SECTION .bss
-.rowsleft resd 1
-.curdptr resd 1
-SECTION .text
-
-prepare16b:
-   cmp byte[vesa2red10],1
-   jne .nored
-   cmp byte[cvidmode],5
-   jne .nored
-   cmp byte[scanlines],1
-   je .nored
-   cmp byte[smallscreenon],1
-   je .nored
-   mov byte[vesa2_rpos],10
-   mov byte[vesa2_gpos],5
-.nored
-   ret
-restore16b:
-   cmp byte[vesa2red10],1
-   jne .nored
-   mov byte[vesa2_rpos],11
-   mov byte[vesa2_gpos],6
-.nored
-   ret

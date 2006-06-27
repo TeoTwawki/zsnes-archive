@@ -2022,9 +2022,6 @@ DisplayGUISound:                     ; Sound Related Options
   GUIDisplayCheckboxu 6,102,21,Force8b,GUISoundTextA4,1
 %endif
   GUIDisplayCheckboxu 6,11,30,StereoSound,GUISoundTextA2,0
-%ifdef __MSDOS__
-  GUIDisplayCheckboxu 6,11,39,RaisePitch,GUISoundTextA3,1
-%endif
   GUIDisplayTextY 6,6,53,GUISoundTextB
   GUIDisplayTextY 6,6,76,GUISoundTextC
 %ifdef __WIN32__
@@ -2038,28 +2035,41 @@ DisplayGUISound:                     ; Sound Related Options
   GUIDisplayTextY 6,6,158,GUISoundTextE
   GUIDisplayCheckboxun 6,11,163,SoundInterpType,1,GUISoundTextE1,0
   GUIDisplayCheckboxun 6,11,173,SoundInterpType,2,GUISoundTextE2,0
-%ifndef __MSDOS__
   cmp byte[MMXSupport],0
   je near .no8ptinterp
   GUIDisplayCheckboxun 6,11,183,SoundInterpType,3,GUISoundTextE3,0
 .no8ptinterp
-%endif
 
   GUIDisplayTextY 6,106,158,GUISoundTextF
   GUIDisplayCheckboxun 6,111,163,LowPassFilterType,1,GUISoundTextF1,1
   GUIDisplayCheckboxun 6,111,173,LowPassFilterType,2,GUISoundTextF2,1
-%ifndef __MSDOS__
   cmp byte[MMXSupport],0
   je near .nohiqualityfilter
   GUIDisplayCheckboxun 6,111,183,LowPassFilterType,3,GUISoundTextF3,0
 .nohiqualityfilter
-%endif
 
+%ifdef __MSDOS__
+  cmp byte[SoundQuality],2
+  jbe .okay
+  cmp byte[SoundQuality],4
+  je .okay
+  cmp byte[StereoSound],1
+  jne .okay
+  cmp byte[SBHDMA],0
+  jne .okay
+  cmp byte[vibracard], 1
+  je .okay
+  GUIDisplayBBox 6,15,61,69,69,167
+  GUIDisplayTextG 6,23,64,GUISoundTextB0
+  jmp .nosrate
+.okay
+%endif
   GUIDisplayBBox 6,15,61,69,69,167            ;Sampling Rate Box
   mov eax,[SoundQuality]
   lea eax,[eax*8+GUISoundTextB1]
   mov [GUITemp],eax
   GUIDisplayTextG 6,23,64,[GUITemp]
+.nosrate
 
   GUIDrawSlider 6,15,100,91,MusicRelVol,GUISoundTextC1,VolslidSet,VolslidText
   ret
@@ -2072,6 +2082,7 @@ GUISoundTextA3 db 'RAISE PITCH LEVEL',0  ; DOS Only
 GUISoundTextA4 db 'FORCE 8-BIT',0        ; DOS Only
 
 GUISoundTextB db 'SAMPLING RATE:',0
+GUISoundTextB0 db 'N/A',0
 GUISoundTextB1 db ' 8000HZ',0
 GUISoundTextB2 db '11025HZ',0
 GUISoundTextB3 db '22050HZ',0
@@ -3159,6 +3170,9 @@ DisplayGUIOptns:              ; GUI Options
   GUIDrawSlider 10,25,127,148,TBVal2,GUIGUIOptnsTextD2,GUICslidSet,GUICslidText
 
   GUIDisplayTextY 10,6,16,GUIGUIOptnsTextA
+
+  GUIDisplayCheckboxu 10,124,13,newfont,GUIGUIOptnsTextFont,12
+
   GUIDisplayCheckboxu 10,12,23,mousewrap,GUIGUIOptnsTextA1a,0     ; Checkboxes
   GUIDisplayCheckboxu 10,12,33,mouseshad,GUIGUIOptnsTextA1b,6
   GUIDisplayCheckboxu 10,12,43,lastcursres,GUIGUIOptnsTextA1c,0
@@ -3229,6 +3243,8 @@ GUIGUIOptnsTextC3 db 'ALLOW MULTIPLE INSTANCES',0
 
 GUIGUIOptnsTextD1 db '@',0
 GUIGUIOptnsTextD2 db '  ',0
+
+GUIGUIOptnsTextFont db 'USE CUSTOM FONT',0
 
 SECTION .text
 

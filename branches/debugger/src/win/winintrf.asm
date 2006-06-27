@@ -25,11 +25,10 @@ EXTSYM putchar,getch,ZOpenFile,ZOpenMode,ZFileSeek,ZOpenFileName
 EXTSYM ZFileSeekMode,ZFileSeekPos,ZFileSeekHandle,ZFileWriteHandle
 EXTSYM ZFileWriteSize,ZFileWriteBlock,ZFileWrite,ZFileReadHandle,ZFileReadSize
 EXTSYM ZFileReadBlock,ZFileRead,ZCloseFileHandle
-EXTSYM ZCloseFile,ZFileTellHandle,ZFileTell
-EXTSYM GetTime,GetDate,GUIkeydelay2,_chdrive,ZFileCHDir
+EXTSYM ZCloseFile,GetTime,GetDate,GUIkeydelay2,_chdrive,ZFileCHDir
 EXTSYM CHPath,ZFileGetDir,DirName,_getdrive,DTALoc
 EXTSYM DTALocPos,ZFileFindATTRIB,ZFileFindFirst,ZFileFindNext,ZFileFindPATH
-EXTSYM soundon,DSPDisable,Start60HZ,pressed,RaisePitch,AdjustFrequency
+EXTSYM soundon,DSPDisable,Start60HZ,pressed
 EXTSYM vidbufferofsb,vidbuffer,clearwin,Stop60HZ,initwinvideo,vesa2_rpos
 EXTSYM vesa2_gpos,vesa2_bpos,vesa2_rposng,vesa2_gposng,vesa2_bposng,vesa2_usbit
 EXTSYM vesa2_clbit,vesa2_clbitng,vesa2_clbitng2,vesa2_clbitng3,vesa2red10,res640
@@ -221,44 +220,6 @@ NEWSYM Close_File
     clc
     ret
 ;    mov ah,3Eh
-;    int 21h
-;    ret
-
-NEWSYM File_Seek
-    mov [ZFileSeekPos+2],cx
-    mov [ZFileSeekPos],dx
-    mov dword[ZFileSeekMode],0
-    mov dword[ZFileSeekHandle],0
-    mov [ZFileSeekHandle],bx
-    pushad
-    call ZFileSeek
-    popad
-    mov ax,dx
-    mov dx,cx
-    ret
-    ; seek to cx:dx from 0 position, return carry as error
-;    mov ax,4200h
-;    int 21h
-;    ret
-
-NEWSYM File_Seek_End
-    mov [ZFileSeekPos+2],cx
-    mov [ZFileSeekPos],dx
-    mov dword[ZFileSeekHandle],0
-    mov [ZFileSeekHandle],bx
-    mov dword[ZFileSeekMode],1
-    mov dword[ZFileTellHandle],0
-    mov [ZFileTellHandle],bx
-    pushad
-    call ZFileSeek
-    call ZFileTell
-    mov [TempVarSeek],eax
-    popad
-    mov ax,[TempVarSeek]
-    mov dx,[TempVarSeek+2]
-    ret
-    ; seek to cx:dx from end position, and return file location in dx:ax
-;    mov ax,4202h
 ;    int 21h
 ;    ret
 
@@ -662,11 +623,6 @@ NEWSYM InitPreGame   ; Executes before starting/continuing a game
     xor al,al
 .nochangemode
 
-    mov byte[RaisePitch],1
-    pushad
-    call AdjustFrequency
-    popad
-
     pushad
     xor eax,eax
     mov edi,[vidbufferofsb]
@@ -907,9 +863,9 @@ NEWSYM GUIBIFIL,  db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 NEWSYM GUITBWVID, db 0,1,0,0,0,0,1,1,1,0,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,1,1,1,0,0,1,1,1,0,0,1,1,0,1,0,1 ; Win Triple Buffer
 NEWSYM GUISMODE,  db 0,0,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,0,0,1,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,1,1 ; Win Stretched modes
 NEWSYM GUIDSMODE, db 0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,1,1,1,0,0 ; Win D-Stretched modes
-NEWSYM GUIHQ2X,   db 0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0 ; hq2x filter
+NEWSYM GUIHQ2X,   db 0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; hq2x filter
 NEWSYM GUIHQ3X,   db 0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; hq3x filter
-NEWSYM GUIHQ4X,   db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,0,1,0,1,1,0,1,1,1,1,0,0,0 ; hq4x filter
+NEWSYM GUIHQ4X,   db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,0,1,0,1,1,0,1,1,1,0,0,0,0 ; hq4x filter
 NEWSYM GUINTVID,  db 0,0,0,0,0,1,1,1,0,0,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,0,1,1,0,1,1,1,1,1,0,0 ; NTSC Filter
 
 SECTION .text

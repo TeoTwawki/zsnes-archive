@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifndef NO_PNG
 #include <png.h>
+#endif
 
 #ifdef __UNIXSDL__
 #include "../gblhdr.h"
@@ -32,12 +33,51 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #endif
 #include "../zpath.h"
+#include "../numconv.h"
 
 #ifdef __MSDOS__
 #define MAX_PNGNAME_LEN 13
 #else
 #define MAX_PNGNAME_LEN (strlen(ZCartName)+11) //11 = _12345.png\0
 #endif
+
+char *generate_image_filename(const char *image_suffix)
+{
+  char *filename = (char *)malloc(MAX_PNGNAME_LEN);
+  if (filename)
+  {
+    unsigned int i;
+#ifdef __MSDOS__
+    char *p = filename+3;
+    strcpy(filename, "img");
+#else
+    char *p;
+    strcpy(filename, ZCartName);
+    p = strrchr(filename, '.');
+    if (!p) { p = filename+strlen(filename); }
+    *p++ = '_';
+#endif
+    for (i = 0; i < 100000; i++)
+    {
+      sprintf(p, "%05d.%s", i, image_suffix);
+      if (access_dir(ZSnapPath, filename, F_OK))
+      {
+        break;
+      }
+    }
+    if (i == 100000)
+    {
+      free(filename);
+      filename = 0;
+    }
+  }
+  return(filename);
+}
+
+extern unsigned short *vidbuffer;
+#define PIXEL (vidbuffer[(i*288) + j + 16])
+
+#ifndef NO_PNG
 
 int Png_Dump(const char *filename, unsigned short width, unsigned short height, unsigned char *image_data, bool usebgr)
 {
@@ -76,7 +116,7 @@ int Png_Dump(const char *filename, unsigned short width, unsigned short height, 
         unsigned int i;
 
         //set a lot of image info (code adapted from libpng documentation!)
-        png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
+        png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
                      PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
         info_ptr->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 
@@ -115,47 +155,12 @@ int Png_Dump(const char *filename, unsigned short width, unsigned short height, 
   return(-1);
 }
 
-static char *generate_filename()
-{
-  char *filename = (char *)malloc(MAX_PNGNAME_LEN);
-  if (filename)
-  {
-    unsigned int i;
-#ifdef __MSDOS__
-    char *p = filename+3;
-    strcpy(filename, "img");
-#else
-    char *p;
-    strcpy(filename, ZCartName);
-    p = strrchr(filename, '.');
-    if (!p) { p = filename+strlen(filename); }
-    *p++ = '_';
-#endif
-    for (i = 0; i < 100000; i++)
-    {
-      sprintf(p, "%05d.png", i);
-      if (access_dir(ZSnapPath, filename, F_OK))
-      {
-        break;
-      }
-    }
-    if (i == 100000)
-    {
-      free(filename);
-      filename = 0;
-    }
-  }
-  return(filename);
-}
-
-extern unsigned short *vidbuffer;
-
 #define SNAP_HEIGHT 224
 #define SNAP_WIDTH 256
 #define PIXEL_SIZE 4
 void Grab_PNG_Data()
 {
-  char *filename = generate_filename();
+  char *filename = generate_image_filename("png");
   if (filename)
   {
     unsigned int *DBits = (unsigned int *)malloc(SNAP_HEIGHT*SNAP_WIDTH*PIXEL_SIZE);
@@ -163,17 +168,12 @@ void Grab_PNG_Data()
     {
       //These are the variables used to perform the 32-bit conversion
       int i,j;
-      unsigned short *pixel;
-      unsigned short conv_pixel;
 
-      //Use zsKnight's 16 to 32 bit color conversion
-      pixel = vidbuffer;
       for (i = 0; i < SNAP_HEIGHT; i++)
       {
         for(j = 0; j < SNAP_WIDTH; j++)
         {
-          conv_pixel = pixel[(i*288)+j+16];
-          DBits[i*SNAP_WIDTH+j] = ((conv_pixel&0xF800)<<8) | ((conv_pixel&0x07E0)<<5) | ((conv_pixel&0x001F)<<3) | 0xFF000000;
+          DBits[i*SNAP_WIDTH+j] = ((PIXEL&0xF800)<<8) | ((PIXEL&0x07E0)<<5) | ((PIXEL&0x001F)<<3) | 0xFF000000;
         }
       }
 
@@ -186,3 +186,91 @@ void Grab_PNG_Data()
 }
 
 #endif
+
+extern unsigned short resolutn;
+void Grab_BMP_Data()
+{
+  char *filename = generate_image_filename("bmp");
+  if (filename)
+  {
+    FILE *fp = fopen_dir(ZSnapPath, filename, "wb");
+    if (fp)
+    {
+      const unsigned int header_size = 26;
+      const unsigned short width = 256;
+      const unsigned short height = resolutn;
+      unsigned short i, j;
+
+      fputs("BM", fp);                            //Header
+      fwrite4(width*height*3+header_size, fp);    //File size
+      fwrite4(0, fp);                             //Reserved
+      fwrite4(header_size, fp);                   //Offset to bitmap
+      fwrite4(12, fp);                            //Length of color explain field;
+      fwrite2(width, fp);                         //Width
+      fwrite2(height, fp);                        //Height
+      fwrite2(1, fp);                             //Planes
+      fwrite2(24, fp);                            //Bits per pixel
+      for (i = height-1; i < height; i--) //Have to write image upside down
+      {
+        for (j = 0; j < width; j++)
+        {
+          fwrite3(((PIXEL&0xF800) << 8) | ((PIXEL&0x07E0) << 5) | ((PIXEL&0x001F) << 3), fp);
+        }
+      }
+      fclose(fp);
+    }
+    free(filename);
+  }
+}
+
+void Grab_BMP_Data_8()
+{
+  char *filename = generate_image_filename("bmp");
+  if (filename)
+  {
+    FILE *fp = fopen_dir(ZSnapPath, filename, "wb");
+    if (fp)
+    {
+      const unsigned int colors = 256;
+      const unsigned int palette_size = colors*4;
+      const unsigned int header_size = palette_size+54;
+      const unsigned short width = 256;
+      const unsigned short height = resolutn;
+      unsigned short i, j;
+
+      fputs("BM", fp);                          //Header
+      fwrite4(width*height+header_size, fp);    //File size
+      fwrite4(0, fp);                           //Reserved
+      fwrite4(header_size, fp);                 //Offset to bitmap
+      fwrite4(40, fp);                          //Length of color explain field;
+      fwrite4(width, fp);                       //Width
+      fwrite4(height, fp);                      //Height
+      fwrite2(1, fp);                           //Planes
+      fwrite2(8, fp);                           //Bits per pixel
+      fwrite4(0, fp);                           //Compression Format
+      fwrite4(width*height, fp);                //Bitmap data size
+      fwrite4(0, fp);                           //H-Res?
+      fwrite4(0, fp);                           //V-Res?
+      fwrite4(colors, fp);                      //Colors
+      fwrite4(colors, fp);                      //Important Colors
+
+      for (i = 0; i < colors; i++)
+      {
+        unsigned char byte = 0;
+        fwrite((unsigned char *)vidbuffer+100000+i*3+3, 1, 1, fp);
+        fwrite((unsigned char *)vidbuffer+100000+i*3+2, 1, 1, fp);
+        fwrite((unsigned char *)vidbuffer+100000+i*3+1, 1, 1, fp);
+        fwrite(&byte, 1, 1, fp);
+      }
+      for (i = height-1; i < height; i--) //Have to write image upside down
+      {
+        for (j = 0; j < width; j++)
+        {
+          fwrite((unsigned char *)vidbuffer+i*288+j+16, 1, 1, fp);
+        }
+      }
+      fclose(fp);
+    }
+    free(filename);
+  }
+}

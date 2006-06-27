@@ -107,8 +107,6 @@ unsigned char fastmemptr    = 0;
 unsigned char ForcePal      = 0;    // 1 = NTSC, 2 = PAL
 unsigned char finterleave   = 0;
 unsigned char DSPDisable    = 0;	// Disable DSP emulation
-unsigned char Palette0      = 0;
-unsigned char DisplayS      = 0;
 unsigned char *spc7110romptr;
 unsigned char MusicVol      = 0;
 unsigned char MMXextSupport = 0;
@@ -315,7 +313,6 @@ void zstart()
 extern unsigned int statefileloc;
 void GetFilename();
 extern unsigned char firstsaveinc,LatestSave,newestfileloc;
-void SRAMChdir();
 void DetermineNew();
 
 extern time_t newestfiledate;
@@ -470,7 +467,7 @@ unsigned short MouseButtons[2];
 
 static bool MouseWaiting[2];
 
-void MultiMouseShutdown()
+void MultiMouseShutdown(void)
 {
    MouseCount = 0;
    ManyMouse_Quit();

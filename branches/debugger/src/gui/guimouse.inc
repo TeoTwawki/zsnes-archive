@@ -2431,23 +2431,16 @@ DisplayGUISoundClick:
   GUIClickCButton 102,21,byte[Force8b]
 %endif
   GUIClickCButton 11,30,byte[StereoSound]
-%ifdef __MSDOS__
-  GUIClickCButton 11,39,byte[RaisePitch]
-%endif
   GUIClickCButton 11,111,byte[RevStereo]
   GUIClickCButton 11,121,byte[Surround]
   GUIClickCButton 11,131,byte[SoundBufEn]
   GUIClickCButton 11,141,byte[SPCDisable]
   GUIClickCButton5 11,163,byte[SoundInterpType],1
   GUIClickCButton5 11,173,byte[SoundInterpType],2
-%ifndef __MSDOS__
   GUIClickCButton5MMXC 11,183,byte[SoundInterpType],3
-%endif
   GUIClickCButton5 111,163,byte[LowPassFilterType],1
   GUIClickCButton5 111,173,byte[LowPassFilterType],2
-%ifndef __MSDOS__
   GUIClickCButton5MMXC 111,183,byte[LowPassFilterType],3
-%endif
 %ifdef __WIN32__
   GUIClickCButton 11,101,byte[PrimaryBuffer]
 %endif
@@ -2722,6 +2715,7 @@ DisplayGUIOptnsClick:
   sub eax,[GUIwinposx+10*4]
   mov edx,[GUImouseposy]
   sub edx,[GUIwinposy+10*4]
+  GUIClickCButton 124,13,byte[newfont]
   GUIClickCButton 12,23,byte[mousewrap]     ; Checkboxes
   GUIClickCButton 12,33,byte[mouseshad]
   GUIClickCButton 12,43,byte[lastcursres]

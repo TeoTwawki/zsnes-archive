@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #else
 #ifdef __WIN32__
 #include <io.h>
+#include <direct.h>
 #else
 #include <unistd.h>
 #endif
@@ -247,8 +248,16 @@ char *realpath(const char *path, char *resolved_path)
 
 #endif
 
-void deinit_paths()
+void deinit_paths(void)
 {
+  //Save data that depends on paths before deinit of them
+  void SaveSramData();
+  void GUISaveVars();
+
+  SaveSramData();
+  GUISaveVars();
+
+  //Now deallocate the paths
   if (ZStartAlloc && ZStartPath) { free(ZStartPath); }
   if (ZCfgAlloc && ZCfgPath) { free(ZCfgPath); }
   if (ZSramAlloc && ZSramPath) { free(ZSramPath); }
@@ -396,23 +405,43 @@ static const char *strdupcat_internal(const char *str1, const char *str2)
 
 #else
 
-static const char *strdupcat_internal(const char *str1, const char *str2, const char *func)
+static const char *strdupcat_internal(const char *str1, const char *str2, const char *func, const char *mode)
 {
   static char buffer_dir[PATH_SIZE*2];
   strcpy(buffer_dir, str1);
   strcat(buffer_dir, str2);
 
-  printf("%s: %s\n", func, buffer_dir);
+  if (mode)
+  {
+    printf("%s_%s: %s\n", func, mode, buffer_dir);
+  }
+  else
+  {
+    printf("%s: %s\n", func, buffer_dir);
+  }
 
   return(buffer_dir);
 }
 
-#define strdupcat_internal(x, y) strdupcat_internal(x, y, __func__)
+//This is to keep the modeless functions working right
+static const char *mode = 0;
+static const char *mode_text = 0;
+
+#define strdupcat_internal(x, y) strdupcat_internal(x, y, __func__, mode ? mode : mode_text)
 #endif
 
-int access_dir(const char *path, const char *file, int mode)
+
+int access_dir(const char *path, const char *file, int amode)
 {
-  return(access(strdupcat_internal(path, file), mode));
+#ifdef DEBUG
+  char mode_text[5];
+  strcpy(mode_text, "f");
+  if (amode & R_OK) { strcat(mode_text, "r"); }
+  if (amode & W_OK) { strcat(mode_text, "w"); }
+  if (amode & X_OK) { strcat(mode_text, "x"); }
+#endif
+
+  return(access(strdupcat_internal(path, file), amode));
 }
 
 int stat_dir(const char *path, const char *file, struct stat *buf)

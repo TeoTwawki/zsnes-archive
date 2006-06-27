@@ -39,7 +39,7 @@ unsigned char TextFile;
 // return 0
 
 // ZOpenFile info :
-unsigned char * ZOpenFileName;
+char * ZOpenFileName;
 unsigned int ZOpenMode;
 // Open modes :   0 read/write in
 //                1 write (create file, overwrite)
@@ -67,16 +67,11 @@ unsigned int ZFileWriteSize;
 unsigned int ZFileWriteHandle;
 // return 0
 
-// ZFileTell
-unsigned int ZFileTellHandle;
-
 // MKDir/CHDir
-unsigned char * MKPath;
-unsigned char * CHPath;
-unsigned char * RMPath;
+char * CHPath;
 
 // GetDir
-unsigned char * DirName;
+char * DirName;
 unsigned int DriveNumber;
 
 // return current position
@@ -190,30 +185,9 @@ unsigned int ZFileWrite()
   return(0);
 }
 
-unsigned int ZFileTell()
-{
-  int res = 0;
-  if (TextFile) {
-    res = ftell(FILEHANDLE[ZFileTellHandle]);
-    if (res == -1) fprintf(stderr, "Oups!! gzTell\n");
-    return(res);
-  } else return gztell(FILEHANDLE[ZFileTellHandle]);
-}
-
-
-unsigned int ZFileMKDir()
-{
-  return(mkdir(MKPath));
-}
-
 unsigned int ZFileCHDir()
 {
   return(chdir(CHPath));
-}
-
-unsigned int ZFileRMDir()
-{
-  return(rmdir(RMPath));
 }
 
 unsigned int ZFileGetDir()
@@ -221,7 +195,7 @@ unsigned int ZFileGetDir()
   return (unsigned int) (getcwd(DirName,128));
 }
 
-unsigned char * ZFileFindPATH;
+char * ZFileFindPATH;
 unsigned int ZFileFindATTRIB;
 unsigned int DTALocPos;
 

@@ -113,8 +113,6 @@ HANDLE debugWindow = 0;
 extern "C"
 {
 HINSTANCE hInst;
-unsigned char KitchenSync = 0;
-unsigned char Force60hz = 0;
 }
 
 LPDIRECTSOUND8          lpDirectSound = NULL;
@@ -341,15 +339,17 @@ void DDrawError(){
 
 extern "C" BYTE vsyncon;
 extern "C" BYTE curblank;
-extern "C" BYTE KitchenSync;
 extern "C" BYTE TripleBufferWin;
 extern "C" BYTE PauseFocusChange;
+extern "C" BYTE KitchenSync;
+extern "C" BYTE KitchenSyncPAL;
+extern "C" BYTE Force60hz;
 
 void DrawScreen()
 {
    if (FullScreen == 1)
    {
-      if (TripleBufferWin == 1 || KitchenSync == 1)
+      if (TripleBufferWin == 1 || KitchenSync == 1 || KitchenSyncPAL == 1)
       {
          if (DD_BackBuffer->Blt(&rcWindow, DD_CFB, &BlitArea, DDBLT_WAIT, NULL) == DDERR_SURFACELOST)
            DD_Primary->Restore();
@@ -357,7 +357,7 @@ void DrawScreen()
          if (DD_Primary->Flip(NULL, DDFLIP_WAIT) == DDERR_SURFACELOST)
            DD_Primary->Restore();
 
-         if (KitchenSync == 1)
+         if (KitchenSync == 1 || KitchenSyncPAL == 1)
          {
             if (DD_BackBuffer->Blt(&rcWindow, DD_CFB, &BlitArea, DDBLT_WAIT, NULL) == DDERR_SURFACELOST)
               DD_Primary->Restore();
@@ -529,14 +529,8 @@ BOOL InputRead(void)
 	return TRUE;
 }
 
-extern "C" void SaveSramData(void);
-extern "C" void GUISaveVars(void);
-
 void ExitFunction()
 {
-   SaveSramData();
-   GUISaveVars();
-
    // We need to clean up the debug window if it's running
 
    if (debugWindow) FreeConsole();
@@ -1240,7 +1234,7 @@ void ReleaseDirectDraw()
 void DInputError(){
    char message1[256];
 
-   sprintf(message1,"Error initializing DirectInput\nYou may need to install DirectX 8.0a or higher located at www.microsoft.com/directx\0");
+   sprintf(message1,"Error initializing DirectInput\nYou may need to install DirectX 8.0a or higher located at www.microsoft.com/directx%c", 0);
    MessageBox (NULL, message1, "DirectInput Error" , MB_ICONERROR );
 }
 
@@ -1251,7 +1245,7 @@ bool InitInput()
 
    if (FAILED(hr=pDirectInput8Create(hInst,DIRECTINPUT_VERSION,IID_IDirectInput8A,(void **) &DInput,NULL)))
    {
-      sprintf(message1,"Error initializing DirectInput\nYou may need to install DirectX 8.0a or higher located at www.microsoft.com/directx\0");
+      sprintf(message1,"Error initializing DirectInput\nYou may need to install DirectX 8.0a or higher located at www.microsoft.com/directx%c", 0);
       MessageBox (NULL, message1, "DirectInput Error" , MB_ICONERROR );
 
       switch (hr)
@@ -1537,6 +1531,7 @@ int InitDirectDraw()
          else
          {
            KitchenSync = 0;
+           KitchenSyncPAL = 0;
            Refresh = 0;
          }
       }
@@ -1872,6 +1867,61 @@ extern void NTSCFilterDraw(int SurfaceX, int SurfaceY, int pitch, unsigned char*
 extern "C" unsigned int CustomResX;
 extern "C" unsigned int CustomResY;
 
+extern "C" char GUIM7VID[];
+
+void SetHQx()
+{
+	int maxHQ;
+	if(CustomResX/256 < CustomResY/224)
+		maxHQ = CustomResX/256;
+	else
+		maxHQ = CustomResY/224;
+
+	if(maxHQ >= 4)
+	{
+		GUIHQ2X[cvidmode] = 0;
+		GUIHQ3X[cvidmode] = 0;
+		GUIHQ4X[cvidmode] = 1;
+	}
+
+	else if(maxHQ == 3)
+	{
+		GUIHQ2X[cvidmode] = 0;
+		GUIHQ3X[cvidmode] = 1;
+		GUIHQ4X[cvidmode] = 0;
+	}
+
+	else if(maxHQ == 2)
+	{
+		GUIHQ2X[cvidmode] = 1;
+		GUIHQ3X[cvidmode] = 0;
+		GUIHQ4X[cvidmode] = 0;
+	}
+
+	else
+	{
+		GUIHQ2X[cvidmode] = 0;
+		GUIHQ3X[cvidmode] = 0;
+		GUIHQ4X[cvidmode] = 0;
+	}
+}
+
+void SetNTSCFOpt()
+{
+	if(CustomResX >= 640 && CustomResY >= 480)
+		GUINTVID[cvidmode] = 1;
+	else
+		GUINTVID[cvidmode] = 0;
+}
+
+void SetHiresOpt()
+{
+	if(CustomResX >= 512 && CustomResY >= 448)
+		GUIM7VID[cvidmode] = 1;
+	else
+		GUIM7VID[cvidmode] = 0;
+}
+
 void initwinvideo(void)
 {
    WINDOWPLACEMENT wndpl;
@@ -1978,6 +2028,9 @@ void initwinvideo(void)
          break;
       case 37:
       case 38:
+         SetHQx();
+         SetNTSCFOpt();
+         SetHiresOpt();
       case 39:
       case 40:
          WindowWidth=CustomResX;
@@ -2550,7 +2603,7 @@ void drawscreenwin(void)
    SurfBufD=(DWORD) &SurfBuf[0];
    SURFDW=(DWORD *) &SurfBuf[0];
 
-   if (!KitchenSync && Refresh !=0 && !Force60hz)
+   if ((!KitchenSync || !KitchenSyncPAL) && Refresh !=0 && !Force60hz)
    {
       Refresh = 0;
       InitDirectDraw();
@@ -2562,7 +2615,7 @@ void drawscreenwin(void)
       InitDirectDraw();
    }
 
-   if (KitchenSync && Refresh != 100 && totlines == 314)
+   if ((KitchenSync||KitchenSyncPAL) && Refresh != 100 && totlines == 314)
    {
       Refresh = 100;
       InitDirectDraw();

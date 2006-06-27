@@ -1443,7 +1443,6 @@ extern unsigned char  opexec268cph;
 extern unsigned char  opexec358cph;
 extern unsigned char  opexec268cphb;
 extern unsigned char  opexec358cphb;
-extern unsigned char  DSP1Type;
 unsigned char HacksDisable;
 
 void headerhack()
@@ -1453,7 +1452,7 @@ void headerhack()
   hdmaearlstart = 0;
   ENVDisable = 0;
 
-  if ((curromspace < Lo) || (HacksDisable && !DSP1Type))
+  if ((curromspace < Lo) || HacksDisable)
   {
     return;
   }
@@ -1555,36 +1554,6 @@ void headerhack()
     cycpblt  = 157;
   }
 
-  //Clay Fighter (U), other versions are CLAYFIGHTER with no space
-  //Hangs in the intro. Missing sound in battles.
-  if (!strncmp((RomData+Hi),"CLAY FIGHTER    " ,16))
-  {
-    //Intro
-    RomData[0x1A10B9] = 0xDE;
-    //In Game
-    RomData[0x1A1996] = 0xDE;
-    RomData[0x1AE563] = 0xDE;
-    RomData[0x1AE600] = 0xDE;
-  }
-
-  //Bahamut Lagoon (J) and all known translations
-  //Garbled lines in the intro at some point on the bottom.
-  if (!strncmp((RomData+Hi),"Bahamut Lago" ,12))
-  {
-    RomData[0x10254] = 0xEE;
-  }
-
-  //Mortal Kombat (J/U/E), Super Punch-Out, Dragon Quest 5 (J)
-  //Messed up damage bar in battles. (Mortal Kombat)
-  //Messed up countdown. (Super Punch-Out)
-  //Flickering clouds in intro after starting a new game. (DQ5)
-  if (!strncmp((RomData+Lo),"DRAGONQUEST5" ,12) ||
-      !strncmp((RomData+Lo),"MORTAL KOMBAT   " ,16) ||
-      !strncmp((RomData+Lo),"Super Punch-Out!!   ", 20))
-  {
-    disablehdma = true;
-  }
-
   //Tuff E Nuff (U/E), Dead Dance (J),
   //Cyber Knight II - Tikyu Teikoku no Yabou (J)
   //Shows black screen after loading the ROM. (Tuff E Nuff, Dead Dance)
@@ -1602,7 +1571,7 @@ void headerhack()
   }
 
   //Okaaay...
-  if(DSP1Type) { disablehdma = true; }
+  if(!strncmp((RomData+Lo),"PILOTWINGS  ",12)) { disablehdma = true; }
 
   //Addams Family Values (U/E)
   //Restarts or shows a black screen after starting a new game.
@@ -1733,11 +1702,12 @@ void SPC7_Data_Load()
   {
     SPC7_Convert_Upper();
     fp = fopen_dir(SPC7110path, SPC7110fname, "rb");
-  }
-  if (!fp)
-  {
-    SPC7_Convert_Lower();
-    fp = fopen_dir(SPC7110path, SPC7110fname, "rb");
+
+    if (!fp)
+    {
+      SPC7_Convert_Lower();
+      fp = fopen_dir(SPC7110path, SPC7110fname, "rb");
+    }
   }
 
   if (fp)
@@ -1746,6 +1716,7 @@ void SPC7_Data_Load()
 
     fseek(fp, SPC7110TempPosition, SEEK_SET);
     fread(ROM+0x510000+SPCDecmPtr, 1, SPC7110TempLength, fp);
+    fclose(fp);
   }
 }
 
@@ -1943,7 +1914,7 @@ void initpitch()
 extern unsigned int SfxR1, SfxR2, SetaCmdEnable, SfxSFR, SfxSCMR;
 extern unsigned char disablespcclr, *sfxramdata, SramExists;
 extern unsigned char *setaramdata, *wramdata, *SA1RAMArea, cbitmode;
-extern unsigned char ForcePal, ForceROMTiming, romispal, MovieWaiting;
+extern unsigned char ForcePal, ForceROMTiming, romispal, MovieWaiting, DSP1Type;
 extern unsigned short totlines;
 void SetAddressingModes(), GenerateBank0Table();
 void SetAddressingModesSA1(), GenerateBank0TableSA1();
@@ -2312,7 +2283,7 @@ void OpenSramFile()
   }
 }
 
-void map_set(void **dest, void *src, size_t count, size_t step)
+void map_set(void **dest, unsigned char *src, size_t count, size_t step)
 {
   while (count--)
   {
@@ -2338,6 +2309,7 @@ extern void (*memtabler8[256])();
 extern void (*memtabler16[256])();
 void memaccessbankr848mb();
 void memaccessbankr1648mb();
+void preparesfx();
 
 
 void map_lorom()

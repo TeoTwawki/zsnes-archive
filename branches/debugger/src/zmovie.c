@@ -2282,8 +2282,6 @@ bool PrevSRAMState;
 extern unsigned char ComboCounter, MovieRecordWinVal, AllocatedRewindStates;
 extern unsigned char SloMo, EMUPause;
 char MovieFrameStr[10];
-void SRAMChdir();
-void ChangetoLOADdir();
 
 /*
 
@@ -2689,7 +2687,6 @@ void MoviePlay()
     }
 
     memcpy(&fnamest[fname_len-3], FileExt, 4);
-    asm_call(ChangetoLOADdir);
   }
 }
 
@@ -2713,7 +2710,7 @@ void MovieRecord()
 
     if (MovieRecordWinVal == 1)
     {
-      remove(fnamest+1);
+      remove_dir(ZSramPath, fnamest+1);
       MovieRecordWinVal = 0;
     }
 
@@ -2739,9 +2736,7 @@ void MovieRecord()
       MovieRecordWinVal = 1;
     }
 
-    asm_call(ChangetoLOADdir);
-
-    memcpy (&fnamest[fname_len-3], FileExt, 4);
+    memcpy(&fnamest[fname_len-3], FileExt, 4);
   }
 }
 
