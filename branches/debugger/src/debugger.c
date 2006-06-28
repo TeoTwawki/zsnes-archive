@@ -242,6 +242,14 @@ void debugloop() {
        goto b;
    }
 
+   case '1': // toggle SPC
+       debugds ^= 1;
+       break;
+
+   case '2': // toggle 65816
+       debugds ^= 2;
+       break;
+   
    default:
        wprintw(debugwin, "Unknown key code: %d\n", key);
        goto b;
