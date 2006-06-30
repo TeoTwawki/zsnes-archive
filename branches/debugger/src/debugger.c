@@ -219,7 +219,7 @@ void debugloop() {
 
    case KEY_F(4): // debugloadstate
        debugloadstate();
-       goto b;
+       goto a;
        
    case 27:       // exit
        return;
