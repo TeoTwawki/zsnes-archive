@@ -44,6 +44,9 @@ extern void breakops_wrapper(unsigned char, unsigned short);
 extern void regaccessbankr8();
 extern void start65816();
 
+// should be in "zstate.h"
+extern void debugloadstate();
+extern void statesaver();
 
 char *ocname;
 unsigned char addrmode[];
@@ -135,6 +138,11 @@ void startdebugger() {
     idlok(debugwin, TRUE);
     
     firsttime = 0;
+    } else {
+	touchwin(stdscr);
+	touchwin(debugwin);
+	refresh();
+	wrefresh(debugwin);
     }
 
     debugloop();
@@ -191,22 +199,34 @@ void debugloop() {
     if (!(debugds & 1))
 	nextspcopcode();
 
-    // redrawing the display is always a good idea
-    wrefresh(debugwin);
-    refresh();
-  
   b:
+    // redrawing the display is always a good idea
+    refresh();
+    wrefresh(debugwin);
+  
    key = getch();
    if (key >= 0 && key < 256)
        key = toupper(key);
+
    switch (key) {
    case KEY_F(1): // run
        execut = 1;
        return;
+
+   case KEY_F(2): // debugsavestate
+       statesaver();
+       goto b;
+
+   case KEY_F(4): // debugloadstate
+       debugloadstate();
+       goto b;
+       
    case 27:       // exit
        return;
+
    case '\n':     // step
        goto e;
+
    /*
    case '-':      // skip opcode
    case 'C':      // clear ???
