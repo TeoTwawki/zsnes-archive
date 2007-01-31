@@ -133,10 +133,10 @@ UpdateVolume:
 .noof
     mov [MusicVol],dl
 
-    mov al,[DSPMem+0Ch]
-    call WDSPReg0C
-    mov al,[DSPMem+1Ch]
-    call WDSPReg1C
+;    mov al,[DSPMem+0Ch]
+;    call WDSPReg0C
+;    mov al,[DSPMem+1Ch]
+;    call WDSPReg1C
 
     mov dword[vollv+14],20202020h
     mov edx,vollv+15
@@ -819,14 +819,14 @@ NEWSYM cachevideo
 .nousepl1234
 
     ; do sound disables
-    soundselcomp KeyDisableSC0,Voice0Disable,Voice0Status,'1'
-    soundselcomp KeyDisableSC1,Voice1Disable,Voice1Status,'2'
-    soundselcomp KeyDisableSC2,Voice2Disable,Voice2Status,'3'
-    soundselcomp KeyDisableSC3,Voice3Disable,Voice3Status,'4'
-    soundselcomp KeyDisableSC4,Voice4Disable,Voice4Status,'5'
-    soundselcomp KeyDisableSC5,Voice5Disable,Voice5Status,'6'
-    soundselcomp KeyDisableSC6,Voice6Disable,Voice6Status,'7'
-    soundselcomp KeyDisableSC7,Voice7Disable,Voice7Status,'8'
+;    soundselcomp KeyDisableSC0,Voice0Disable,Voice0Status,'1'
+;    soundselcomp KeyDisableSC1,Voice1Disable,Voice1Status,'2'
+;    soundselcomp KeyDisableSC2,Voice2Disable,Voice2Status,'3'
+;    soundselcomp KeyDisableSC3,Voice3Disable,Voice3Status,'4'
+;    soundselcomp KeyDisableSC4,Voice4Disable,Voice4Status,'5'
+;    soundselcomp KeyDisableSC5,Voice5Disable,Voice5Status,'6'
+;    soundselcomp KeyDisableSC6,Voice6Disable,Voice6Status,'7'
+;    soundselcomp KeyDisableSC7,Voice7Disable,Voice7Status,'8'
 
     cmp byte[curblank],0h
     jne near yesblank

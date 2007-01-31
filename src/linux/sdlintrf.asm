@@ -63,7 +63,7 @@ NEWSYM StartUp
 
 NEWSYM SystemInit
     ; Be sure to set SBHDMA to a value other than 0 if 16bit sound exists
-    mov byte[SBHDMA],1
+;    mov byte[SBHDMA],1
     ret
 
 NEWSYM PrintStr          ; Print ASCIIZ string
@@ -176,9 +176,9 @@ NEWSYM InitPreGame   ; Executes before starting/continuing a game
     xor al,al
 .nochangemode
 
-    pushad
-    call AdjustFrequency
-    popad
+;    pushad
+;    call AdjustFrequency
+;    popad
 
     pushad
     xor eax,eax

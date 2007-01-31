@@ -149,7 +149,7 @@ void repackfunct()
   unsigned char block;
 
   // Global/Echo Volumes
-  GlobalVL = (VolumeConvTable[(MusicVol << 8) + VolumeTableb[DSPMem[0x0C]]] & 0xFF);
+/*  GlobalVL = (VolumeConvTable[(MusicVol << 8) + VolumeTableb[DSPMem[0x0C]]] & 0xFF);
   GlobalVR = (VolumeConvTable[(MusicVol << 8) + VolumeTableb[DSPMem[0x1C]]] & 0xFF);
   EchoVL = (VolumeConvTable[(MusicVol << 8) + VolumeTableb[DSPMem[0x2C]]] & 0xFF);
   EchoVR = (VolumeConvTable[(MusicVol << 8) + VolumeTableb[DSPMem[0x3C]]] & 0xFF);
@@ -187,7 +187,7 @@ void repackfunct()
   Voice4Noise = bit_test(DSPMem[0x3D], 4);
   Voice5Noise = bit_test(DSPMem[0x3D], 5);
   Voice6Noise = bit_test(DSPMem[0x3D], 6);
-  Voice7Noise = bit_test(DSPMem[0x3D], 7);
+  Voice7Noise = bit_test(DSPMem[0x3D], 7);*/
 
   bg1ptrx = bg1ptrb - bg1ptr;
   bg1ptry = bg1ptrc - bg1ptr;

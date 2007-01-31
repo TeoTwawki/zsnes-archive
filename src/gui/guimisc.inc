@@ -494,14 +494,14 @@ NEWSYM GUIDoReset
     mov byte[spcY],0
     mov byte[spcP],0
     mov byte[spcNZ],0
-    mov byte[Voice0Status],0
-    mov byte[Voice1Status],0
-    mov byte[Voice2Status],0
-    mov byte[Voice3Status],0
-    mov byte[Voice4Status],0
-    mov byte[Voice5Status],0
-    mov byte[Voice6Status],0
-    mov byte[Voice7Status],0
+;    mov byte[Voice0Status],0
+;    mov byte[Voice1Status],0
+;    mov byte[Voice2Status],0
+;    mov byte[Voice3Status],0
+;    mov byte[Voice4Status],0
+;    mov byte[Voice5Status],0
+;    mov byte[Voice6Status],0
+;    mov byte[Voice7Status],0
     mov byte[GUIQuit],2
     ret
 

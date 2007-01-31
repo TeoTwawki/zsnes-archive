@@ -1174,7 +1174,7 @@ NEWSYM StartGUI
   dec ecx
   jnz .loopcl
 
-  call AdjustFrequency
+;  call AdjustFrequency
   mov byte[GUIOn],0
   mov byte[GUIOn2],0
   mov byte[GUIReset],0
