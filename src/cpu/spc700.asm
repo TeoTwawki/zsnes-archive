@@ -127,8 +127,6 @@ SECTION .text
   ja %%extramem
   cmp ebx,0f0h+SPCRAM
   jb %%normalmem
-  sub ebx,SPCRAM
-;  call dword near [spcWptr+ebx*4-0f0h*4]
   jmp %%finished
 %%extramem
   cmp ebx,0ffc0h+SPCRAM
@@ -146,8 +144,6 @@ SECTION .text
   jb %%normalmem
   cmp ebx,0ffh+SPCRAM
   ja %%normalmem
-  sub ebx,SPCRAM
-;  call dword near [spcRptr+ebx*4-0f0h*4]
   jmp %%finished
 %%normalmem
    mov al,[ebx]
@@ -160,8 +156,6 @@ SECTION .text
   cmp ebx,0ffh+SPCRAM
   ja %%normalmem
   sub ebx,SPCRAM
-;  call dword near [spcRptr+ebx*4-0f0h*4]
-  add ebx,SPCRAM
   jmp %%finished
 %%normalmem
    mov al,[ebx]
