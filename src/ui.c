@@ -392,7 +392,7 @@ void zstart()
   OSPC_Init();
 #else
   setnoise();
-//  asm_call(InitSPC);
+  asm_call(InitSPC);
 #endif
 
   allocmem();
