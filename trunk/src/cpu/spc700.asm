@@ -21,8 +21,9 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,spcWptr,disablespcclr,SPCSkipXtraROM,cycpbl,spcRptr
-EXTSYM spc700read,dspWptr,curexecstate,tableadc
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl
+EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
+
 
 %include "cpu/regsw.mac"
 %include "cpu/spcdef.inc"
@@ -36,8 +37,11 @@ EXTSYM spc700read,dspWptr,curexecstate,tableadc
 ; Read byte : read al from [ebx]
 ; update timer : update the timers, called every scanline
 
-SECTION .data
+SECTION .bss
+NEWSYM spcWptr,  resd 16    ; SPC Write pointers (point to their own functions)
+NEWSYM spcRptr,  resd 16    ; SPC Read pointers (point to their own functions)
 
+SECTION .data
 ALIGN32
 
 ;spcBuffer times 65536*4 db 0    ; The buffer of brr blocks... 4 bits -> 16 bits
@@ -127,6 +131,8 @@ SECTION .text
   ja %%extramem
   cmp ebx,0f0h+SPCRAM
   jb %%normalmem
+  sub ebx,SPCRAM
+  call dword near [spcWptr+ebx*4-0f0h*4]
   jmp %%finished
 %%extramem
   cmp ebx,0ffc0h+SPCRAM
@@ -144,6 +150,8 @@ SECTION .text
   jb %%normalmem
   cmp ebx,0ffh+SPCRAM
   ja %%normalmem
+  sub ebx,SPCRAM
+  call dword near [spcRptr+ebx*4-0f0h*4]
   jmp %%finished
 %%normalmem
    mov al,[ebx]
@@ -152,12 +160,13 @@ SECTION .text
 
 %macro ReadByte2 0
   cmp ebx,0f0h+SPCRAM
-  jb %%normalmem
+  jb %%normalmem2
   cmp ebx,0ffh+SPCRAM
-  ja %%normalmem
+  ja %%normalmem2
   sub ebx,SPCRAM
+  call dword near [spcRptr+ebx*4-0f0h*4]
   jmp %%finished
-%%normalmem
+%%normalmem2
    mov al,[ebx]
 %%finished
 %endmacro
@@ -165,6 +174,316 @@ SECTION .text
 SECTION .data
 NEWSYM timer2upd, dd 0
 SECTION .text
+
+NEWSYM InitSPC
+      mov eax,SPCRAM
+      mov ebx,0EFh
+.loop2
+      mov byte[eax],0
+      inc eax
+      dec ebx
+      jnz .loop2
+      mov byte[spcX],0
+
+      xor eax,eax
+      xor ebx,ebx
+      mov ebp,SPCRAM
+      mov ax,0FFC0h
+      add ebp,eax
+      mov [spcPCRam],ebp
+      mov dword[spcS],1EFh
+      mov dword[spcRamDP],SPCRAM
+
+      ; initialize all the SPC write registers
+      mov dword[spcWptr+0],SPCRegF0
+      mov dword[spcWptr+4],SPCRegF1
+      mov dword[spcWptr+8],SPCRegF2
+      mov dword[spcWptr+12],SPCRegF3
+      mov dword[spcWptr+16],SPCRegF4
+      mov dword[spcWptr+20],SPCRegF5
+      mov dword[spcWptr+24],SPCRegF6
+      mov dword[spcWptr+28],SPCRegF7
+      mov dword[spcWptr+32],SPCRegF8
+      mov dword[spcWptr+36],SPCRegF9
+      mov dword[spcWptr+40],SPCRegFA
+      mov dword[spcWptr+44],SPCRegFB
+      mov dword[spcWptr+48],SPCRegFC
+      mov dword[spcWptr+52],SPCRegFD
+      mov dword[spcWptr+56],SPCRegFE
+      mov dword[spcWptr+60],SPCRegFF
+
+   ; first fill all pointer to an invalid access function
+      mov ecx,256
+      mov eax,Invalidopcode
+      mov ebp,0
+.loop
+%ifdef __MSDOS__
+      mov [ds:opcjmptab+ebp],eax
+%else
+      mov [opcjmptab+ebp],eax
+%endif
+      add ebp,4
+      dec ecx
+      jnz .loop
+   ; now fill the table
+      mov dword[opcjmptab+00h],Op00
+      mov dword[opcjmptab+04h],Op01
+      mov dword[opcjmptab+08h],Op02
+      mov dword[opcjmptab+0Ch],Op03
+      mov dword[opcjmptab+010h],Op04
+      mov dword[opcjmptab+014h],Op05
+      mov dword[opcjmptab+018h],Op06
+      mov dword[opcjmptab+01Ch],Op07
+      mov dword[opcjmptab+020h],Op08
+      mov dword[opcjmptab+024h],Op09
+      mov dword[opcjmptab+028h],Op0A
+      mov dword[opcjmptab+02Ch],Op0B
+      mov dword[opcjmptab+030h],Op0C
+      mov dword[opcjmptab+034h],Op0D
+      mov dword[opcjmptab+038h],Op0E
+      mov dword[opcjmptab+03Ch],Op0F
+      mov dword[opcjmptab+040h],Op10
+      mov dword[opcjmptab+044h],Op11
+      mov dword[opcjmptab+048h],Op12
+      mov dword[opcjmptab+04Ch],Op13
+      mov dword[opcjmptab+050h],Op14
+      mov dword[opcjmptab+054h],Op15
+      mov dword[opcjmptab+058h],Op16
+      mov dword[opcjmptab+05Ch],Op17
+      mov dword[opcjmptab+060h],Op18
+      mov dword[opcjmptab+064h],Op19
+      mov dword[opcjmptab+068h],Op1A
+      mov dword[opcjmptab+06Ch],Op1B
+      mov dword[opcjmptab+070h],Op1C
+      mov dword[opcjmptab+074h],Op1D
+      mov dword[opcjmptab+078h],Op1E
+      mov dword[opcjmptab+07Ch],Op1F
+      mov dword[opcjmptab+080h],Op20
+      mov dword[opcjmptab+084h],Op21
+      mov dword[opcjmptab+088h],Op22
+      mov dword[opcjmptab+08Ch],Op23
+      mov dword[opcjmptab+090h],Op24
+      mov dword[opcjmptab+094h],Op25
+      mov dword[opcjmptab+098h],Op26
+      mov dword[opcjmptab+09Ch],Op27
+      mov dword[opcjmptab+0A0h],Op28
+      mov dword[opcjmptab+0A4h],Op29
+      mov dword[opcjmptab+0A8h],Op2A
+      mov dword[opcjmptab+0ACh],Op2B
+      mov dword[opcjmptab+0B0h],Op2C
+      mov dword[opcjmptab+0B4h],Op2D
+      mov dword[opcjmptab+0B8h],Op2E
+      mov dword[opcjmptab+0BCh],Op2F
+      mov dword[opcjmptab+0C0h],Op30
+      mov dword[opcjmptab+0C4h],Op31
+      mov dword[opcjmptab+0C8h],Op32
+      mov dword[opcjmptab+0CCh],Op33
+      mov dword[opcjmptab+0D0h],Op34
+      mov dword[opcjmptab+0D4h],Op35
+      mov dword[opcjmptab+0D8h],Op36
+      mov dword[opcjmptab+0DCh],Op37
+      mov dword[opcjmptab+0E0h],Op38
+      mov dword[opcjmptab+0E4h],Op39
+      mov dword[opcjmptab+0E8h],Op3A
+      mov dword[opcjmptab+0ECh],Op3B
+      mov dword[opcjmptab+0F0h],Op3C
+      mov dword[opcjmptab+0F4h],Op3D
+      mov dword[opcjmptab+0F8h],Op3E
+      mov dword[opcjmptab+0FCh],Op3F
+      mov dword[opcjmptab+0100h],Op40
+      mov dword[opcjmptab+0104h],Op41
+      mov dword[opcjmptab+0108h],Op42
+      mov dword[opcjmptab+010Ch],Op43
+      mov dword[opcjmptab+0110h],Op44
+      mov dword[opcjmptab+0114h],Op45
+      mov dword[opcjmptab+0118h],Op46
+      mov dword[opcjmptab+011Ch],Op47
+      mov dword[opcjmptab+0120h],Op48
+      mov dword[opcjmptab+0124h],Op49
+      mov dword[opcjmptab+0128h],Op4A
+      mov dword[opcjmptab+012Ch],Op4B
+      mov dword[opcjmptab+0130h],Op4C
+      mov dword[opcjmptab+0134h],Op4D
+      mov dword[opcjmptab+0138h],Op4E
+      mov dword[opcjmptab+013Ch],Op4F
+      mov dword[opcjmptab+0140h],Op50
+      mov dword[opcjmptab+0144h],Op51
+      mov dword[opcjmptab+0148h],Op52
+      mov dword[opcjmptab+014Ch],Op53
+      mov dword[opcjmptab+0150h],Op54
+      mov dword[opcjmptab+0154h],Op55
+      mov dword[opcjmptab+0158h],Op56
+      mov dword[opcjmptab+015Ch],Op57
+      mov dword[opcjmptab+0160h],Op58
+      mov dword[opcjmptab+0164h],Op59
+      mov dword[opcjmptab+0168h],Op5A
+      mov dword[opcjmptab+016Ch],Op5B
+      mov dword[opcjmptab+0170h],Op5C
+      mov dword[opcjmptab+0174h],Op5D
+      mov dword[opcjmptab+0178h],Op5E
+      mov dword[opcjmptab+017Ch],Op5F
+      mov dword[opcjmptab+0180h],Op60
+      mov dword[opcjmptab+0184h],Op61
+      mov dword[opcjmptab+0188h],Op62
+      mov dword[opcjmptab+018Ch],Op63
+      mov dword[opcjmptab+0190h],Op64
+      mov dword[opcjmptab+0194h],Op65
+      mov dword[opcjmptab+0198h],Op66
+      mov dword[opcjmptab+019Ch],Op67
+      mov dword[opcjmptab+01A0h],Op68
+      mov dword[opcjmptab+01A4h],Op69
+      mov dword[opcjmptab+01A8h],Op6A
+      mov dword[opcjmptab+01ACh],Op6B
+      mov dword[opcjmptab+01B0h],Op6C
+      mov dword[opcjmptab+01B4h],Op6D
+      mov dword[opcjmptab+01B8h],Op6E
+      mov dword[opcjmptab+01BCh],Op6F
+      mov dword[opcjmptab+01C0h],Op70
+      mov dword[opcjmptab+01C4h],Op71
+      mov dword[opcjmptab+01C8h],Op72
+      mov dword[opcjmptab+01CCh],Op73
+      mov dword[opcjmptab+01D0h],Op74
+      mov dword[opcjmptab+01D4h],Op75
+      mov dword[opcjmptab+01D8h],Op76
+      mov dword[opcjmptab+01DCh],Op77
+      mov dword[opcjmptab+01E0h],Op78
+      mov dword[opcjmptab+01E4h],Op79
+      mov dword[opcjmptab+01E8h],Op7A
+      mov dword[opcjmptab+01ECh],Op7B
+      mov dword[opcjmptab+01F0h],Op7C
+      mov dword[opcjmptab+01F4h],Op7D
+      mov dword[opcjmptab+01F8h],Op7E
+      mov dword[opcjmptab+01FCh],Op7F
+      mov dword[opcjmptab+0200h],Op80
+      mov dword[opcjmptab+0204h],Op81
+      mov dword[opcjmptab+0208h],Op82
+      mov dword[opcjmptab+020Ch],Op83
+      mov dword[opcjmptab+0210h],Op84
+      mov dword[opcjmptab+0214h],Op85
+      mov dword[opcjmptab+0218h],Op86
+      mov dword[opcjmptab+021Ch],Op87
+      mov dword[opcjmptab+0220h],Op88
+      mov dword[opcjmptab+0224h],Op89
+      mov dword[opcjmptab+0228h],Op8A
+      mov dword[opcjmptab+022Ch],Op8B
+      mov dword[opcjmptab+0230h],Op8C
+      mov dword[opcjmptab+0234h],Op8D
+      mov dword[opcjmptab+0238h],Op8E
+      mov dword[opcjmptab+023Ch],Op8F
+      mov dword[opcjmptab+0240h],Op90
+      mov dword[opcjmptab+0244h],Op91
+      mov dword[opcjmptab+0248h],Op92
+      mov dword[opcjmptab+024Ch],Op93
+      mov dword[opcjmptab+0250h],Op94
+      mov dword[opcjmptab+0254h],Op95
+      mov dword[opcjmptab+0258h],Op96
+      mov dword[opcjmptab+025Ch],Op97
+      mov dword[opcjmptab+0260h],Op98
+      mov dword[opcjmptab+0264h],Op99
+      mov dword[opcjmptab+0268h],Op9A
+      mov dword[opcjmptab+026Ch],Op9B
+      mov dword[opcjmptab+0270h],Op9C
+      mov dword[opcjmptab+0274h],Op9D
+      mov dword[opcjmptab+0278h],Op9E
+      mov dword[opcjmptab+027Ch],Op9F
+      mov dword[opcjmptab+0280h],OpA0
+      mov dword[opcjmptab+0284h],OpA1
+      mov dword[opcjmptab+0288h],OpA2
+      mov dword[opcjmptab+028Ch],OpA3
+      mov dword[opcjmptab+0290h],OpA4
+      mov dword[opcjmptab+0294h],OpA5
+      mov dword[opcjmptab+0298h],OpA6
+      mov dword[opcjmptab+029Ch],OpA7
+      mov dword[opcjmptab+02A0h],OpA8
+      mov dword[opcjmptab+02A4h],OpA9
+      mov dword[opcjmptab+02A8h],OpAA
+      mov dword[opcjmptab+02ACh],OpAB
+      mov dword[opcjmptab+02B0h],OpAC
+      mov dword[opcjmptab+02B4h],OpAD
+      mov dword[opcjmptab+02B8h],OpAE
+      mov dword[opcjmptab+02BCh],OpAF
+      mov dword[opcjmptab+02C0h],OpB0
+      mov dword[opcjmptab+02C4h],OpB1
+      mov dword[opcjmptab+02C8h],OpB2
+      mov dword[opcjmptab+02CCh],OpB3
+      mov dword[opcjmptab+02D0h],OpB4
+      mov dword[opcjmptab+02D4h],OpB5
+      mov dword[opcjmptab+02D8h],OpB6
+      mov dword[opcjmptab+02DCh],OpB7
+      mov dword[opcjmptab+02E0h],OpB8
+      mov dword[opcjmptab+02E4h],OpB9
+      mov dword[opcjmptab+02E8h],OpBA
+      mov dword[opcjmptab+02ECh],OpBB
+      mov dword[opcjmptab+02F0h],OpBC
+      mov dword[opcjmptab+02F4h],OpBD
+      mov dword[opcjmptab+02F8h],OpBE
+      mov dword[opcjmptab+02FCh],OpBF
+      mov dword[opcjmptab+0300h],OpC0
+      mov dword[opcjmptab+0304h],OpC1
+      mov dword[opcjmptab+0308h],OpC2
+      mov dword[opcjmptab+030Ch],OpC3
+      mov dword[opcjmptab+0310h],OpC4
+      mov dword[opcjmptab+0314h],OpC5
+      mov dword[opcjmptab+0318h],OpC6
+      mov dword[opcjmptab+031Ch],OpC7
+      mov dword[opcjmptab+0320h],OpC8
+      mov dword[opcjmptab+0324h],OpC9
+      mov dword[opcjmptab+0328h],OpCA
+      mov dword[opcjmptab+032Ch],OpCB
+      mov dword[opcjmptab+0330h],OpCC
+      mov dword[opcjmptab+0334h],OpCD
+      mov dword[opcjmptab+0338h],OpCE
+      mov dword[opcjmptab+033Ch],OpCF
+      mov dword[opcjmptab+0340h],OpD0
+      mov dword[opcjmptab+0344h],OpD1
+      mov dword[opcjmptab+0348h],OpD2
+      mov dword[opcjmptab+034Ch],OpD3
+      mov dword[opcjmptab+0350h],OpD4
+      mov dword[opcjmptab+0354h],OpD5
+      mov dword[opcjmptab+0358h],OpD6
+      mov dword[opcjmptab+035Ch],OpD7
+      mov dword[opcjmptab+0360h],OpD8
+      mov dword[opcjmptab+0364h],OpD9
+      mov dword[opcjmptab+0368h],OpDA
+      mov dword[opcjmptab+036Ch],OpDB
+      mov dword[opcjmptab+0370h],OpDC
+      mov dword[opcjmptab+0374h],OpDD
+      mov dword[opcjmptab+0378h],OpDE
+      mov dword[opcjmptab+037Ch],OpDF
+      mov dword[opcjmptab+0380h],OpE0
+      mov dword[opcjmptab+0384h],OpE1
+      mov dword[opcjmptab+0388h],OpE2
+      mov dword[opcjmptab+038Ch],OpE3
+      mov dword[opcjmptab+0390h],OpE4
+      mov dword[opcjmptab+0394h],OpE5
+      mov dword[opcjmptab+0398h],OpE6
+      mov dword[opcjmptab+039Ch],OpE7
+      mov dword[opcjmptab+03A0h],OpE8
+      mov dword[opcjmptab+03A4h],OpE9
+      mov dword[opcjmptab+03A8h],OpEA
+      mov dword[opcjmptab+03ACh],OpEB
+      mov dword[opcjmptab+03B0h],OpEC
+      mov dword[opcjmptab+03B4h],OpED
+      mov dword[opcjmptab+03B8h],OpEE
+      mov dword[opcjmptab+03BCh],OpEF
+      mov dword[opcjmptab+03C0h],OpF0
+      mov dword[opcjmptab+03C4h],OpF1
+      mov dword[opcjmptab+03C8h],OpF2
+      mov dword[opcjmptab+03CCh],OpF3
+      mov dword[opcjmptab+03D0h],OpF4
+      mov dword[opcjmptab+03D4h],OpF5
+      mov dword[opcjmptab+03D8h],OpF6
+      mov dword[opcjmptab+03DCh],OpF7
+      mov dword[opcjmptab+03E0h],OpF8
+      mov dword[opcjmptab+03E4h],OpF9
+      mov dword[opcjmptab+03E8h],OpFA
+      mov dword[opcjmptab+03ECh],OpFB
+      mov dword[opcjmptab+03F0h],OpFC
+      mov dword[opcjmptab+03F4h],OpFD
+      mov dword[opcjmptab+03F8h],OpFE
+      mov dword[opcjmptab+03FCh],OpFF
+      ret
+
 
 ; This function is called every scanline (262*60 times/sec)
 ; Make it call 0.9825 times (393/400) (skip when divisible by 64)
