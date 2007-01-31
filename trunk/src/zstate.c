@@ -106,8 +106,8 @@ static void copy_spc_data(unsigned char **buffer, void (*copy_func)(unsigned cha
 {
   //SPC stuff, DSP stuff
   copy_func(buffer, SPCRAM, PHspcsave);
-  copy_func(buffer, &BRRBuffer, PHdspsave);
-  copy_func(buffer, &DSPMem, sizeof(DSPMem));
+//  copy_func(buffer, &BRRBuffer, PHdspsave);
+//  copy_func(buffer, &DSPMem, sizeof(DSPMem));
 }
 
 static void copy_extra_data(unsigned char **buffer, void (*copy_func)(unsigned char **, void *, size_t))
@@ -549,14 +549,14 @@ void PrepareSaveState()
   spcPCRam -= (unsigned int)SPCRAM;
   spcRamDP -= (unsigned int)SPCRAM;
 
-  Voice0BufPtr -= spcBuffera;
+/*  Voice0BufPtr -= spcBuffera;
   Voice1BufPtr -= spcBuffera;
   Voice2BufPtr -= spcBuffera;
   Voice3BufPtr -= spcBuffera;
   Voice4BufPtr -= spcBuffera;
   Voice5BufPtr -= spcBuffera;
   Voice6BufPtr -= spcBuffera;
-  Voice7BufPtr -= spcBuffera;
+  Voice7BufPtr -= spcBuffera;*/
 }
 
 extern unsigned int SA1Stat;
@@ -617,14 +617,14 @@ void ResetState()
   spcPCRam += (unsigned int)SPCRAM;
   spcRamDP += (unsigned int)SPCRAM;
 
-  ResState(Voice0BufPtr);
+/*  ResState(Voice0BufPtr);
   ResState(Voice1BufPtr);
   ResState(Voice2BufPtr);
   ResState(Voice3BufPtr);
   ResState(Voice4BufPtr);
   ResState(Voice5BufPtr);
   ResState(Voice6BufPtr);
-  ResState(Voice7BufPtr);
+  ResState(Voice7BufPtr);*/
 }
 
 extern unsigned int SfxRomBuffer, SfxCROM;
@@ -1043,7 +1043,7 @@ bool zst_compressed_loader(FILE *fp)
 void zst_sram_load(FILE *fp)
 {
   fseek(fp, sizeof(zst_header_cur)-1 + PH65816regsize + 199635, SEEK_CUR);
-  if (spcon) { fseek(fp, PHspcsave + PHdspsave + sizeof(DSPMem), SEEK_CUR); }
+  if (spcon) { fseek(fp, PHspcsave /*+ PHdspsave + sizeof(DSPMem)*/, SEEK_CUR); }
   if (C4Enable) { fseek(fp, 8192, SEEK_CUR); }
   if (SFXEnable) { fseek(fp, PHnum2writesfxreg + 131072, SEEK_CUR); }
   if (SA1Enable)
@@ -1082,7 +1082,7 @@ void zst_sram_load_compressed(FILE *fp)
         if (uncompress(buffer, &data_size, compressed_buffer, compressed_size) == Z_OK)
         {
           unsigned char *data = buffer + PH65816regsize + 199635;
-          if (spcon)  { data += PHspcsave + PHdspsave + sizeof(DSPMem); }
+          if (spcon)  { data += PHspcsave /*+ PHdspsave + sizeof(DSPMem)*/; }
           if (C4Enable) { data += 8192; }
           if (SFXEnable)  { data += PHnum2writesfxreg + 131072; }
           if (SA1Enable)
@@ -1445,7 +1445,7 @@ void savespcdata()
 
       fwrite(ssdatst, 1, sizeof(ssdatst), fp);
       fwrite(SPCRAM, 1, 65536, fp); //00100h-100FFh - SPCRam
-      fwrite(DSPMem, 1, 192, fp);   //10100h-101FFh - DSPRam
+//      fwrite(DSPMem, 1, 192, fp);   //10100h-101FFh - DSPRam
       fwrite(spcextraram, 1, 64, fp); //Seems DSPRam is split in two, but I don't get what's going on here
       fclose(fp);
 

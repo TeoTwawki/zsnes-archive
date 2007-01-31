@@ -2365,9 +2365,9 @@ static bool raw_video_open()
 static void raw_audio_write(unsigned int samples)
 {
   void ProcessSoundBuffer();
-  extern int DSPBuffer[1280];
-  extern unsigned int BufferSizeB, BufferSizeW;
-  int *d = DSPBuffer, *d_end;
+//  extern int DSPBuffer[1280];
+//  extern unsigned int BufferSizeB, BufferSizeW;
+  int /* *d = DSPBuffer,*/ *d_end;
 
   while (samples > 1280) //This is in a loop for future proofing if we ever add above 48KHz
   {
@@ -2375,7 +2375,7 @@ static void raw_audio_write(unsigned int samples)
     samples -= 1280;
   }
 
-  BufferSizeB = samples;
+/*  BufferSizeB = samples;
   BufferSizeW = samples<<1;
 
   asm_call(ProcessSoundBuffer);
@@ -2385,7 +2385,7 @@ static void raw_audio_write(unsigned int samples)
     if ((unsigned int)(*d + 0x7FFF) < 0xFFFF) { fwrite2((short)*d, raw_vid.ap); continue; }
     if (*d > 0x7FFF) { fwrite2(0x7FFF, raw_vid.ap); }
     else { fwrite2(0x8001, raw_vid.ap); }
-  }
+  }*/
 }
 
 #define PIXEL (vidbuffer[((y+1)*288) + x + 16])
@@ -2707,14 +2707,14 @@ static void OldMoviePlay(FILE *fp)
 
     SetMovieMode(MOVIE_OLD_PLAY);
     sramsavedis = 1;
-    DSPMem[0x08] = 0;
+/*    DSPMem[0x08] = 0;
     DSPMem[0x18] = 0;
     DSPMem[0x28] = 0;
     DSPMem[0x38] = 0;
     DSPMem[0x48] = 0;
     DSPMem[0x58] = 0;
     DSPMem[0x68] = 0;
-    DSPMem[0x78] = 0;
+    DSPMem[0x78] = 0;*/
 
     Msgptr = "OLD MOVIE REPLAYING.";
 

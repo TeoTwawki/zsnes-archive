@@ -1430,7 +1430,7 @@ void debugdump() {
   }
 
   if ((fp = fopen_dir(ZCfgPath,"DSP.dmp","wb"))) {
-    fwrite(DSPMem,1,256,fp);
+//    fwrite(DSPMem,1,256,fp);
     fclose(fp);
   }
 }

@@ -128,7 +128,7 @@ SECTION .text
   cmp ebx,0f0h+SPCRAM
   jb %%normalmem
   sub ebx,SPCRAM
-  call dword near [spcWptr+ebx*4-0f0h*4]
+;  call dword near [spcWptr+ebx*4-0f0h*4]
   jmp %%finished
 %%extramem
   cmp ebx,0ffc0h+SPCRAM
@@ -136,11 +136,6 @@ SECTION .text
   mov [spcextraram+ebx-0FFC0h-SPCRAM],al
   test byte[SPCRAM+0F1h],80h
   jnz %%finished
-;  push ecx
-;  mov cl,[DSPMem+06Ch]
-;  test cl,20h
-;  pop ecx
-;  jz .finished
 %%normalmem
   mov [ebx],al
 %%finished
@@ -148,41 +143,27 @@ SECTION .text
 
 %macro ReadByte 0
   cmp ebx,0f0h+SPCRAM
-  jb %%normalmem2
+  jb %%normalmem
   cmp ebx,0ffh+SPCRAM
   ja %%normalmem
   sub ebx,SPCRAM
-  call dword near [spcRptr+ebx*4-0f0h*4]
+;  call dword near [spcRptr+ebx*4-0f0h*4]
   jmp %%finished
 %%normalmem
-;  cmp ebx,0ffc0h+SPCRAM
-;  jb .rnormalmem2
-;  test byte[DSPMem+6Ch],10h
-;  jz .rnormalmem2
-;  mov al,[spcextraram+ebx-0FFC0h-SPCRAM]
-;  jmp .rfinished
-%%normalmem2
    mov al,[ebx]
 %%finished
 %endmacro
 
 %macro ReadByte2 0
   cmp ebx,0f0h+SPCRAM
-  jb %%normalmem2
+  jb %%normalmem
   cmp ebx,0ffh+SPCRAM
   ja %%normalmem
   sub ebx,SPCRAM
-  call dword near [spcRptr+ebx*4-0f0h*4]
+;  call dword near [spcRptr+ebx*4-0f0h*4]
   add ebx,SPCRAM
   jmp %%finished
 %%normalmem
-;  cmp ebx,0ffc0h+SPCRAM
-;  jb .rnormalmem2
-;  test byte[DSPMem+6Ch],10h
-;  jz .rnormalmem2
-;  mov al,[spcextraram+ebx-0FFC0h-SPCRAM]
-;  jmp .rfinished
-%%normalmem2
    mov al,[ebx]
 %%finished
 %endmacro
@@ -196,19 +177,6 @@ SECTION .text
 ; 2 8khz, 1 64khz
 
 NEWSYM updatetimer
-;    inc dword[timer2upd]
-;    cmp dword[timer2upd],400
-;    jne .nowrap
-;    mov dword[timer2upd],0
-;.nowrap
-;.again
-;    mov eax,dword[timer2upd]
-;    shr eax,6
-;    shl eax,6
-;    cmp eax,dword[timer2upd]
-;    je near .noin2d
-
-
 .another
     xor byte[timrcall],01h
     test byte[timrcall],01h
@@ -355,7 +323,7 @@ NEWSYM SPCRegF2
     push ebx
     xor eax,eax
     mov al,[SPCRAM+0F2h]
-    mov bl,[DSPMem+eax]
+;    mov bl,[DSPMem+eax]
     mov [SPCRAM+0F3h],bl
     pop ebx
     pop eax

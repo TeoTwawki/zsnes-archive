@@ -82,12 +82,12 @@ void InitSampleControl()
 #ifdef __LIBAO__
 static void SoundWriteSamples_ao(unsigned int samples)
 {
-  extern unsigned int BufferSizeB, BufferSizeW;
-  extern int DSPBuffer[1280];
+//  extern unsigned int BufferSizeB, BufferSizeW;
+//  extern int DSPBuffer[1280];
   void ProcessSoundBuffer();
   short stemp[1280];
 
-  int *d = DSPBuffer, *end_d = 0;
+  int /* *d = DSPBuffer,*/ *end_d = 0;
   short *p = stemp;
 
   while (samples > 1280)
@@ -98,7 +98,7 @@ static void SoundWriteSamples_ao(unsigned int samples)
 
   //printf("samples %d\n", samples);
 
-  BufferSizeB = samples;
+/*  BufferSizeB = samples;
   BufferSizeW = samples<<1;
 
   asm_call(ProcessSoundBuffer);
@@ -109,7 +109,7 @@ static void SoundWriteSamples_ao(unsigned int samples)
     if ((unsigned int)(*d + 0x7FFF) < 0xFFFF) { *p = *d; continue; }
     if (*d > 0x7FFF) { *p = 0x7FFF; }
     else { *p = 0x8001; }
-  }
+  }*/
 
   ao_play(audio_device, (char *)stemp, samples*2);
 }
@@ -213,13 +213,13 @@ static int SoundInit_ao()
 
 void SoundWrite_sdl()
 {
-  extern int DSPBuffer[];
+//  extern int DSPBuffer[];
   extern unsigned char DSPDisable;
-  extern unsigned int BufferSizeB, BufferSizeW, T36HZEnabled;
+  extern unsigned int /*BufferSizeB, BufferSizeW,*/ T36HZEnabled;
 
   // Process sound
-  BufferSizeB = 256;
-  BufferSizeW = BufferSizeB+BufferSizeB;
+/*  BufferSizeB = 256;
+  BufferSizeW = 512;*/
 
   // take care of the things we left behind last time
   SDL_LockAudio();
@@ -227,7 +227,7 @@ void SoundWrite_sdl()
   {
     short *p = (short*)&sdl_audio_buffer[sdl_audio_buffer_tail];
 
-    if (soundon && !DSPDisable) { asm_call(ProcessSoundBuffer); }
+/*    if (soundon && !DSPDisable) { asm_call(ProcessSoundBuffer); }
 
     if (T36HZEnabled)
     {
@@ -248,7 +248,7 @@ void SoundWrite_sdl()
     sdl_audio_buffer_fill += BufferSizeW;
     sdl_audio_buffer_tail += BufferSizeW;
     if (sdl_audio_buffer_tail >= sdl_audio_buffer_len) { sdl_audio_buffer_tail = 0; }
-  }
+*/  }
   SDL_UnlockAudio();
 }
 

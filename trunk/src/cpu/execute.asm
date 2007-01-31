@@ -144,14 +144,14 @@ VoiceEndMute:
 VoiceStartMute:
     mov byte[MuteVoiceF],0
     push eax
-    StartMute 0
-    StartMute 1
-    StartMute 2
-    StartMute 3
-    StartMute 4
-    StartMute 5
-    StartMute 6
-    StartMute 7
+;    StartMute 0
+;    StartMute 1
+;    StartMute 2
+;    StartMute 3
+;    StartMute 4
+;    StartMute 5
+;    StartMute 6
+;    StartMute 7
     pop eax
     ret
 
@@ -1032,7 +1032,7 @@ NEWSYM cpuover
     cmp byte[KeyOnStB],0
     je .nokeyon
     mov al,[KeyOnStB]
-    call ProcessKeyOn
+;    call ProcessKeyOn
 .nokeyon
     mov al,[KeyOnStA]
     mov [KeyOnStB],al
@@ -2034,7 +2034,7 @@ NEWSYM execsingle
     cmp byte[KeyOnStB],0
     je .nokeyon
     mov al,[KeyOnStB]
-    call ProcessKeyOn
+;    call ProcessKeyOn
 .nokeyon
     mov al,[KeyOnStA]
     mov [KeyOnStB],al

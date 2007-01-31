@@ -1478,11 +1478,11 @@ void clearvidsound()
   memset(vidmemch2, 0, 4096);
   memset(vidmemch4, 0, 4096);
   memset(vidmemch8, 0, 4096);
-  memset(BRRBuffer, 0, PHdspsave);
-  memset(&echoon0, 0, PHdspsave2);
+//  memset(BRRBuffer, 0, PHdspsave);
+//  memset(&echoon0, 0, PHdspsave2);
   memset(echobuf, 0, 90000);
   memset(spcBuffera, 0, 65536*4+4096);
-  memset(DSPMem, 0, 256);
+//  memset(DSPMem, 0, 256);
 }
 
 /*
@@ -1833,7 +1833,7 @@ void outofmemfix(), GUIDoReset();
 
 void initpitch()
 {
-  Voice0Pitch = DSPMem[2+0*0x10];
+/*  Voice0Pitch = DSPMem[2+0*0x10];
   Voice0Freq = ((((Voice0Pitch & 0x3FFF) * dspPAdj) >> 8) & 0xFFFFFFFF);
   Voice1Pitch = DSPMem[2+1*0x10];
   Voice1Freq = ((((Voice1Pitch & 0x3FFF) * dspPAdj) >> 8) & 0xFFFFFFFF);
@@ -1848,7 +1848,7 @@ void initpitch()
   Voice6Pitch = DSPMem[2+6*0x10];
   Voice6Freq = ((((Voice6Pitch & 0x3FFF) * dspPAdj) >> 8) & 0xFFFFFFFF);
   Voice7Pitch = DSPMem[2+7*0x10];
-  Voice7Freq = ((((Voice7Pitch & 0x3FFF) * dspPAdj) >> 8) & 0xFFFFFFFF);
+  Voice7Freq = ((((Voice7Pitch & 0x3FFF) * dspPAdj) >> 8) & 0xFFFFFFFF);*/
 }
 
 extern unsigned int SfxR1, SfxR2, SetaCmdEnable, SfxSFR, SfxSCMR;
@@ -2783,14 +2783,14 @@ void init65816()
       cycpb358 = cycpb268;
     }
 
-    FIRTAPVal0 = 0x7F;
+/*    FIRTAPVal0 = 0x7F;
     FIRTAPVal1 = 0;
     FIRTAPVal2 = 0;
     FIRTAPVal3 = 0;
     FIRTAPVal4 = 0;
     FIRTAPVal5 = 0;
     FIRTAPVal6 = 0;
-    FIRTAPVal7 = 0;
+    FIRTAPVal7 = 0;*/
 
     // Check Headers
     headerhack();

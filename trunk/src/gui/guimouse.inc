@@ -2780,10 +2780,10 @@ DisplayGUISoundClick:
   mov al,127
 .noof
   mov [MusicVol],al
-  mov al,[DSPMem+0Ch]
-  call WDSPReg0C
-  mov al,[DSPMem+1Ch]
-  call WDSPReg1C
+;  mov al,[DSPMem+0Ch]
+;  call WDSPReg0C
+;  mov al,[DSPMem+1Ch]
+;  call WDSPReg1C
 
   mov eax,[GUIwinposx+6*4]
   add eax,15
