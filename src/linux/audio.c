@@ -223,11 +223,11 @@ void SoundWrite_sdl()
 
   // take care of the things we left behind last time
   SDL_LockAudio();
-  while (sdl_audio_buffer_fill < sdl_audio_buffer_len)
+/*  while (sdl_audio_buffer_fill < sdl_audio_buffer_len)
   {
     short *p = (short*)&sdl_audio_buffer[sdl_audio_buffer_tail];
 
-/*    if (soundon && !DSPDisable) { asm_call(ProcessSoundBuffer); }
+    if (soundon && !DSPDisable) { asm_call(ProcessSoundBuffer); }
 
     if (T36HZEnabled)
     {
@@ -248,7 +248,7 @@ void SoundWrite_sdl()
     sdl_audio_buffer_fill += BufferSizeW;
     sdl_audio_buffer_tail += BufferSizeW;
     if (sdl_audio_buffer_tail >= sdl_audio_buffer_len) { sdl_audio_buffer_tail = 0; }
-*/  }
+  }*/
   SDL_UnlockAudio();
 }
 
