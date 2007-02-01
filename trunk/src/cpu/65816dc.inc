@@ -1135,7 +1135,7 @@ COPemulmode
     mov bl,[xpb]
     mov ax,[xpc]
     test eax,8000h
-    jz near .loweraddr
+    jz .loweraddr
     mov eax,[snesmmap+ebx*4]
     mov ebx,esi
     sub ebx,eax
