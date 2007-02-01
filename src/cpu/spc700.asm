@@ -647,13 +647,13 @@ NEWSYM SPCRegF1
     ret
 NEWSYM SPCRegF2
     mov [SPCRAM+0F2h],al
-    push eax
-    push ebx
+;    push eax
+;    push ebx
 ;    and eax,0FFh
 ;    mov bl,[DSPMem+eax]
 ;    mov [SPCRAM+0F3h],bl
-    pop ebx
-    pop eax
+;    pop ebx
+;    pop eax
     ret
 NEWSYM SPCRegF3
     push ebx

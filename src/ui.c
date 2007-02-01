@@ -826,7 +826,7 @@ void QuickKeyCheck()
         case 2:   Msgptr = mztrtr2;
                   break;
         default:  Msgptr = mztrtr0;
-                  MZTForceRTR = 0;                 
+                  MZTForceRTR = 0;
       }
 
       MessageOn = MsgCount;
