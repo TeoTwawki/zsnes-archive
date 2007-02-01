@@ -24,7 +24,6 @@
 EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
 
-
 %include "cpu/regsw.mac"
 %include "cpu/spcdef.inc"
 %include "cpu/spcaddr.inc"
@@ -160,13 +159,14 @@ SECTION .text
 
 %macro ReadByte2 0
   cmp ebx,0f0h+SPCRAM
-  jb %%normalmem2
+  jb %%normalmem
   cmp ebx,0ffh+SPCRAM
-  ja %%normalmem2
+  ja %%normalmem
   sub ebx,SPCRAM
   call dword near [spcRptr+ebx*4-0f0h*4]
+  add ebx,SPCRAM
   jmp %%finished
-%%normalmem2
+%%normalmem
    mov al,[ebx]
 %%finished
 %endmacro
@@ -484,7 +484,6 @@ NEWSYM InitSPC
       mov dword[opcjmptab+03FCh],OpFF
       ret
 
-
 ; This function is called every scanline (262*60 times/sec)
 ; Make it call 0.9825 times (393/400) (skip when divisible by 64)
 ; 2 8khz, 1 64khz
@@ -634,10 +633,9 @@ NEWSYM SPCRegF2
     mov [SPCRAM+0F2h],al
     push eax
     push ebx
-    xor eax,eax
-    mov al,[SPCRAM+0F2h]
+;    and eax,0FFh
 ;    mov bl,[DSPMem+eax]
-    mov [SPCRAM+0F3h],bl
+;    mov [SPCRAM+0F3h],bl
     pop ebx
     pop eax
     ret
