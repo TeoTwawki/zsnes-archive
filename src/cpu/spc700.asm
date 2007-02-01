@@ -211,6 +211,22 @@ NEWSYM InitSPC
       mov dword[spcWptr+52],SPCRegFD
       mov dword[spcWptr+56],SPCRegFE
       mov dword[spcWptr+60],SPCRegFF
+      mov dword[spcRptr+0],RSPCRegF0
+      mov dword[spcRptr+4],RSPCRegF1
+      mov dword[spcRptr+8],RSPCRegF2
+      mov dword[spcRptr+12],RSPCRegF3
+      mov dword[spcRptr+16],RSPCRegF4
+      mov dword[spcRptr+20],RSPCRegF5
+      mov dword[spcRptr+24],RSPCRegF6
+      mov dword[spcRptr+28],RSPCRegF7
+      mov dword[spcRptr+32],RSPCRegF8
+      mov dword[spcRptr+36],RSPCRegF9
+      mov dword[spcRptr+40],RSPCRegFA
+      mov dword[spcRptr+44],RSPCRegFB
+      mov dword[spcRptr+48],RSPCRegFC
+      mov dword[spcRptr+52],RSPCRegFD
+      mov dword[spcRptr+56],RSPCRegFE
+      mov dword[spcRptr+60],RSPCRegFF
 
    ; first fill all pointer to an invalid access function
       mov ecx,256
