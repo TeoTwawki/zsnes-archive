@@ -692,6 +692,18 @@ void adjstateslotmsg()
     MessageOn = MsgCount;
 }
 
+void adjgammamsg()
+{
+    gammalevel16b = gammalevel >> 1;
+    if(gammalevel < 10)
+      gammamsg[13] = ' ';
+    else
+      gammamsg[13] = '1';
+    gammamsg[14] = gammalevel%10+48;
+    Msgptr = gammamsg;
+    MessageOn = MsgCount;
+}
+
 /*
 void adjsoundchmsg(char *soundch, char *soundstatus, char num)
 {
@@ -923,14 +935,7 @@ void QuickKeyCheck()
       if(gammalevel < 15)
       {
         gammalevel++;
-        gammalevel16b = gammalevel >> 1;
-        if(gammalevel < 10)
-          gammamsg[13] = ' ';
-        else
-          gammamsg[13] = '1';
-        gammamsg[14] = gammalevel%10+48;
-        Msgptr = gammamsg;
-        MessageOn = MsgCount;       
+        adjgammamsg();
       }
     }
 
@@ -940,14 +945,7 @@ void QuickKeyCheck()
       if(gammalevel)
       {
         gammalevel--;
-        gammalevel16b = gammalevel >> 1;
-        if(gammalevel < 10)
-          gammamsg[13] = ' ';
-        else
-          gammamsg[13] = '1';
-        gammamsg[14] = gammalevel%10+48;
-        Msgptr = gammamsg;
-        MessageOn = MsgCount;
+        adjgammamsg();
       }
     }
 
