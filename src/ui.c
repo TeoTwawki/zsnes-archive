@@ -785,14 +785,14 @@ void QuickKeyCheck()
     if(pressed[KeyResetAll] == 1)
     {
       pressed[KeyResetAll] = 2;
-      Voice0Disable = 1;
+/*    Voice0Disable = 1;
       Voice1Disable = 1;
       Voice2Disable = 1;
       Voice3Disable = 1;
       Voice4Disable = 1;
       Voice5Disable = 1;
       Voice6Disable = 1;
-      Voice7Disable = 1;
+      Voice7Disable = 1; */
       scrndis = 0;
       disableeffects = 0;
       osm2dis = 0;
