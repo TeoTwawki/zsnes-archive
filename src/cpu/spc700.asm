@@ -660,7 +660,7 @@ NEWSYM SPCRegF3
     xor ebx,ebx
     mov bl,[SPCRAM+0F2h]
     and bl,07fh
-    call dword near [dspWptr+ebx*4]
+    ;call dword near [dspWptr+ebx*4]
     pop ebx
     mov [SPCRAM+ebx],al
     ret
