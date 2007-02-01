@@ -28,7 +28,7 @@ EXTSYM flagnz,flago,flagc,cpucycle,cycpbl,cycpblt,opcjmptab,doirqnext,dmadata
 
 %macro endloop 0
     sub dword[cycpbl],55
-    jmp near %%skipallspc
+    jnc %%skipallspc
     mov eax,[cycpblt]
     mov bl,[ebp]
     add dword[cycpbl],eax
