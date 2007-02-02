@@ -2306,7 +2306,7 @@ void UpdateVFrame(void)
   DataNeeded/=(SPCSize*2);
   DataNeeded*=(SPCSize*2);
 
-  while (DataNeeded>0)
+/*  while (DataNeeded>0)
   {
     asm_call(SoundProcess);
 
@@ -2425,7 +2425,7 @@ ASM_COMMAND(_top_mmx:)
     LastUsedPos+=SPCSize*2;
     if (LastUsedPos==SoundBufferSize) LastUsedPos=0;
     DataNeeded-=(SPCSize*2);
-  }
+  }*/
 }
 
 extern unsigned char curblank;

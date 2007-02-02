@@ -184,7 +184,7 @@ CHIPSOBJ=${CHIPDIR}/dsp1emu${OE} ${CHIPDIR}/fxemu2${OE} ${CHIPDIR}/sfxproc${OE}\
 	${CHIPDIR}/obc1emu${OE} ${CHIPDIR}/obc1proc${OE} ${CHIPDIR}/c4proc${OE}\
 	${CHIPDIR}/7110proc${OE} ${CHIPDIR}/st11proc${OE} ${CHIPDIR}/seta11${OE}
 
-CPUOBJ=${CPUDIR}/dma${OE} ${CPUDIR}/dsp${OE} ${CPUDIR}/dspproc${OE}\
+CPUOBJ=${CPUDIR}/dma${OE}\
 	${CPUDIR}/execute${OE} ${CPUDIR}/executec${OE} ${CPUDIR}/irq${OE}\
 	${CPUDIR}/memory${OE} ${CPUDIR}/memtable${OE} ${CPUDIR}/spc700${OE}\
 	${CPUDIR}/stable${OE} ${CPUDIR}/table${OE}\
