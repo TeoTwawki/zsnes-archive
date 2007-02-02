@@ -647,6 +647,7 @@ NEWSYM SPCRegF1
     ret
 NEWSYM SPCRegF2
     mov [SPCRAM+0F2h],al
+    mov byte[SPCRAM+0F3h],0  ; That's needed for the time being.
 ;    push eax
 ;    push ebx
 ;    and eax,0FFh
