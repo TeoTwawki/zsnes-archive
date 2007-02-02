@@ -16,7 +16,7 @@ void dsp_disable_surround(int bDisable);
 
 // Read/write DSP register
 int dsp_read(int reg);
-int dsp_write(int reg, int val);
+void dsp_write(int reg, int val);
 
 // Run DSP for 'count' samples. Write resulting samples to 'buf' if not NULL.
 void dsp_run(long count, short *buf);
