@@ -68,7 +68,7 @@ NEWSYM SystemInit
     call DisplayWIPDisclaimer
     popad
 %endif
-    mov byte[SBHDMA],1
+;    mov byte[SBHDMA],1
     ret
 
 NEWSYM PrintStr          ; Print ASCIIZ string
@@ -782,6 +782,7 @@ NEWSYM StartSound
 
 
 NEWSYM SoundProcess     ; This function is called ~60 times/s at full speed
+%if 0
     cmp byte[soundon],0
     je .nosound
     cmp byte[DSPDisable],1
@@ -796,6 +797,7 @@ NEWSYM SoundProcess     ; This function is called ~60 times/s at full speed
     ; DSPBuffer should contain the processed buffer in the specified size
     ; You will have to convert/clip it to 16-bit for actual sound process
 .nosound
+%endif
     ret
 
 section .data
