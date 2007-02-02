@@ -19,6 +19,7 @@
 
 CHIP_D=chips
 CPU_D=cpu
+CPU_SPC_D=cpu/spc
 DOS_D=dos
 EFF_D=effects
 GUI_D=gui
@@ -45,7 +46,7 @@ CHIP_CO=$(CHIP_D)/c4emu.o $(CHIP_D)/dsp1emu.o $(CHIP_D)/dsp3emu.o\
 
 CPU_AO=$(CPU_D)/dma.o $(CPU_D)/execute.o $(CPU_D)/irq.o $(CPU_D)/memory.o\
 	$(CPU_D)/spc700.o $(CPU_D)/stable.o $(CPU_D)/table.o $(CPU_D)/tablec.o
-CPU_CO=$(CPU_D)/executec.o $(CPU_D)/memtable.o
+CPU_CO=$(CPU_D)/executec.o $(CPU_D)/memtable.o $(CPU_SPC_D)/dsp.o
 
 DEBUG_AO=@DEBUGGER_A@
 DEBUG_CO=@DEBUGGER_C@
