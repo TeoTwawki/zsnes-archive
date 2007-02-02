@@ -21,7 +21,7 @@ void dsp_set_gain(double gain) {
     theDsp.set_gain(gain);
 }
 
-void dsp_dsiable_surround(int bDisable) {
+void dsp_disable_surround(int bDisable) {
     theDsp.disable_surround(bDisable);
 }
 
