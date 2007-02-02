@@ -1,8 +1,11 @@
+// Do not add ZSNES copyright statement to this unless it actually has
+// substantial diffferences from the version in Game_Music_Emu!
+
 // Game_Music_Emu 0.5.2. http://www.slack.net/~ant/
 
 // Based on Brad Martin's OpenSPC DSP emulator
 
-#include "Spc_Dsp.h"
+#include "dsp.h"
 
 #include "blargg_endian.h"
 #include <string.h>
