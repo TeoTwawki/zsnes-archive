@@ -1,24 +1,32 @@
 #ifndef DSPBIND_H
 #define DSPBIND_H
 
-// Mute voice n if bit n (1 << n) of mask is clear.
-void dsp_mute_voices(int mask);
+
+// Mute voice n if bit n (1 << n) of DSP_mask is clear.
+extern int DSP_mask;
+void dsp_mute_voices();
 
 // Clear state and silence everything.
 void dsp_reset();
 
 // Set gain, where 1.0 is normal. When greater than 1.0, output is clamped to
 // the 16-bit sample range.
-void dsp_set_gain(double gain);
+extern double DSP_gain;
+void dsp_set_gain();
 
 // If true, prevent channels and global volumes from being phase-negated
-void dsp_disable_surround(int bDisable);
+extern int DSP_disable;
+void dsp_disable_surround();
 
 // Read/write DSP register
-int dsp_read(int reg);
-void dsp_write(int reg, int val);
+
+extern int DSP_reg, DSP_val;
+int dsp_read();
+void dsp_write();
 
 // Run DSP for 'count' samples. Write resulting samples to 'buf' if not NULL.
-void dsp_run(long count, short *buf);
+extern int DSP_count;
+extern short *DSP_buf;
+void dsp_run();
 
 #endif // !DSPBIND_H
