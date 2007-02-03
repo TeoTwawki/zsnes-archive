@@ -21,7 +21,7 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_run,dsp_reset
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_write,dsp_reset
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,DSP_val,DSP_reg,opcjmptab
 
 %include "cpu/regsw.mac"
@@ -665,6 +665,11 @@ NEWSYM SPCRegF3
     mov bl,[SPCRAM+0F2h]
     and bl,07fh
     ;call dword near [dspWptr+ebx*4]
+    mov byte[DSP_val],al
+    mov byte[DSP_reg],bl
+    pushad
+    call dsp_write
+    popad
     pop ebx
     mov [SPCRAM+ebx],al
     ret
