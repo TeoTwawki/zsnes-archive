@@ -5,7 +5,7 @@ extern "C" {
 
 #include "dspbind.h"
 
-extern unsigned char SPCRAM[0x1000];
+extern unsigned char SPCRAM[0x10000];
 
 static Spc_Dsp theDsp(SPCRAM);
 
