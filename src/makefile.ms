@@ -69,7 +69,7 @@ STRIP=-Ws -s
 
 ifeq (${ENV},dos)
   CC = gcc
-  CPPC = gpp
+  CPPC = gxx
   OS=__MSDOS__
 endif
 
@@ -188,7 +188,7 @@ CPUOBJ=${CPUDIR}/dma${OE}\
 	${CPUDIR}/execute${OE} ${CPUDIR}/executec${OE} ${CPUDIR}/irq${OE}\
 	${CPUDIR}/memory${OE} ${CPUDIR}/memtable${OE} ${CPUDIR}/spc700${OE}\
 	${CPUDIR}/stable${OE} ${CPUDIR}/table${OE}\
-	${CPUDIR}/tablec${OE}
+	${CPUDIR}/tablec${OE} ${CPUDIR}/spc/dsp${OE} ${CPUDIR}/spc/dspbind${OE}
 
 EFFECTSOBJ=${EFFECTSDIR}/burn${OE} ${EFFECTSDIR}/water${OE} ${EFFECTSDIR}/smoke${OE}
 
@@ -518,6 +518,7 @@ ifneq (${ENV},)
 	${DELPRE} ${EXE}${SEP} ${PSR}${DELSUF}
 	${DELPRE} *${OE}${SEP} ${NETDIR}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${CPUDIR}${SLASH}*${OE}${SEP} ${GUIDIR}${SLASH}*${OE}${DELSUF}
+	${DELPRE} ${CPUDIR}${SLASH}spc${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${JMADIR}${SLASH}*${OE}${SEP} ${MMLIBDIR}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${EFFECTSDIR}${SLASH}*${OE}${SEP} ${ZIPDIR}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${DOSDIR}${SLASH}*${OE}${SEP} ${WINDIR}${SLASH}*${OE}${DELSUF}

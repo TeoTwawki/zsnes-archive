@@ -4,7 +4,7 @@
 #ifndef SPC_DSP_H
 #define SPC_DSP_H
 
-#include "blargg_common.h"
+#include "b_common.h"
 
 class Spc_Dsp {
 	typedef BOOST::int8_t int8_t;
