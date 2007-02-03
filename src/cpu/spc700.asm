@@ -21,7 +21,7 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_reset
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
 
 %include "cpu/regsw.mac"
@@ -498,6 +498,9 @@ NEWSYM InitSPC
       mov dword[opcjmptab+03F4h],OpFD
       mov dword[opcjmptab+03F8h],OpFE
       mov dword[opcjmptab+03FCh],OpFF
+      pushad
+      call dsp_reset
+      popad
       ret
 
 ; This function is called every scanline (262*60 times/sec)
