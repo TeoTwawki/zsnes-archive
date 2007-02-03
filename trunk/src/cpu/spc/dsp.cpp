@@ -7,7 +7,7 @@
 
 #include "dsp.h"
 
-#include "blargg_endian.h"
+#include "b_endian.h"
 #include <string.h>
 
 /* Copyright (C) 2002 Brad Martin */
@@ -22,7 +22,7 @@ details. You should have received a copy of the GNU Lesser General Public
 License along with this module; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
-#include "blargg_source.h"
+#include "b_source.h"
 
 #ifdef BLARGG_ENABLE_OPTIMIZER
 	#include BLARGG_ENABLE_OPTIMIZER
