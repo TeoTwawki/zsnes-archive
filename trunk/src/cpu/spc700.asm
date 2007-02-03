@@ -21,8 +21,8 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_reset
-EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_run,dsp_reset
+EXTSYM spc700read,dspWptr,curexecstate,tableadc,DSP_val,DSP_reg,opcjmptab
 
 %include "cpu/regsw.mac"
 %include "cpu/spcdef.inc"
