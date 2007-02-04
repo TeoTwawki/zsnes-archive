@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 ;Copyright (C) 1997-2007 ZSNES Team ( zsKnight, _Demo_, pagefault, Nach )
 ;
 ;http://www.zsnes.com
