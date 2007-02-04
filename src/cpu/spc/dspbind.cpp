@@ -43,7 +43,9 @@ void dsp_run() {
 if (DSP_midframe) {
 
     theDsp.run(DSP_count, DSP_buf);
+    #ifdef __LIBAO__
     SoundWrite_ao();
+    #endif
 }
 else
 
