@@ -659,6 +659,7 @@ NEWSYM SPCRegF2
 ;    pop ebx
 ;    pop eax
     ret
+EXTSYM dsp_run, DSP_count, DSP_midframe
 NEWSYM SPCRegF3
     push ebx
     xor ebx,ebx
@@ -667,9 +668,13 @@ NEWSYM SPCRegF3
     ;call dword near [dspWptr+ebx*4]
     mov byte[DSP_val],al
     mov byte[DSP_reg],bl
+   mov byte[DSP_midframe],1
+    mov dword[DSP_count],8
     pushad
     call dsp_write
+    call dsp_run
     popad
+    mov byte[DSP_midframe],0
     pop ebx
     mov [SPCRAM+ebx],al
     ret

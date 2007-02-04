@@ -6,16 +6,15 @@ extern "C" {
 #include "dspbind.h"
 
 extern unsigned char SPCRAM[0x10000];
-
 int DSP_mask;
 double DSP_gain;
 int DSP_disable;
 int DSP_reg, DSP_val;
+extern void SoundWrite_ao();
 int DSP_count;
+int DSP_midframe;
 short *DSP_buf;
-
 static Spc_Dsp theDsp(SPCRAM);
-
 void dsp_mute_voices() {
     theDsp.mute_voices(DSP_mask);
 }
@@ -41,6 +40,13 @@ void dsp_write() {
 }
 
 void dsp_run() {
+if (DSP_midframe) {
+
+    theDsp.run(DSP_count, DSP_buf);
+    SoundWrite_ao();
+}
+else
+
     theDsp.run(DSP_count, DSP_buf);
 }
 
