@@ -21,7 +21,7 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_write,dsp_reset
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_run,dsp_reset
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,DSP_val,DSP_reg,opcjmptab
 
 %include "cpu/regsw.mac"
@@ -659,22 +659,12 @@ NEWSYM SPCRegF2
 ;    pop ebx
 ;    pop eax
     ret
-EXTSYM dsp_run, DSP_count, DSP_midframe
 NEWSYM SPCRegF3
     push ebx
     xor ebx,ebx
     mov bl,[SPCRAM+0F2h]
     and bl,07fh
     ;call dword near [dspWptr+ebx*4]
-    mov byte[DSP_val],al
-    mov byte[DSP_reg],bl
-   mov byte[DSP_midframe],1
-    mov dword[DSP_count],8
-    pushad
-    call dsp_write
-    call dsp_run
-    popad
-    mov byte[DSP_midframe],0
     pop ebx
     mov [SPCRAM+ebx],al
     ret
