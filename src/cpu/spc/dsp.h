@@ -10,36 +10,36 @@ class Spc_Dsp {
 	typedef BOOST::int8_t int8_t;
 	typedef BOOST::uint8_t uint8_t;
 public:
-	
+
 	// Keeps pointer to 64K ram
 	Spc_Dsp( uint8_t* ram );
-	
+
 	// Mute voice n if bit n (1 << n) of mask is clear.
 	enum { voice_count = 8 };
 	void mute_voices( int mask );
-	
+
 	// Clear state and silence everything.
 	void reset();
-	
+
 	// Set gain, where 1.0 is normal. When greater than 1.0, output is clamped to
 	// the 16-bit sample range.
 	void set_gain( double );
-	
+
 	// If true, prevent channels and global volumes from being phase-negated
 	void disable_surround( bool disable );
-	
+
 	// Read/write register 'n', where n ranges from 0 to register_count - 1.
 	enum { register_count = 128 };
 	int  read ( int n );
 	void write( int n, int );
-	
+
 	// Run DSP for 'count' samples. Write resulting samples to 'buf' if not NULL.
 	void run( long count, short* buf = NULL );
-	
-	
+
+
 // End of public interface
 private:
-	
+
 	struct raw_voice_t {
 		int8_t  left_vol;
 		int8_t  right_vol;
@@ -51,7 +51,7 @@ private:
 		int8_t  outx;       // current sample
 		int8_t  unused [6];
 	};
-	
+
 	struct globals_t {
 		int8_t  unused1 [12];
 		int8_t  left_volume;        // 0C   Main Volume Left (-.7)
@@ -78,44 +78,44 @@ private:
 		uint8_t echo_delay;         // 7D   ms >> 4
 		char    unused9 [2];
 	};
-	
+
 	union {
 		raw_voice_t voice [voice_count];
 		uint8_t reg [register_count];
 		globals_t g;
 	};
-	
+
 	uint8_t* const ram;
-	
+
 	// Cache of echo FIR values for faster access
 	short fir_coeff [voice_count];
-	
+
 	// fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code
 	short fir_buf [16] [2];
 	int fir_offset; // (0 to 7)
-	
+
 	enum { emu_gain_bits = 8 };
 	int emu_gain;
-	
+
 	int keyed_on; // 8-bits for 8 voices
 	int keys;
-	
+
 	int echo_ptr;
 	int noise_amp;
 	int noise;
 	int noise_count;
-	
+
 	int surround_threshold;
-	
+
 	static BOOST::int16_t const gauss [];
-	
+
 	enum state_t {
 		state_attack,
 		state_decay,
 		state_sustain,
 		state_release
 	};
-	
+
 	struct voice_t {
 		short volume [2];
 		short fraction;// 12-bit fractional position
@@ -133,9 +133,9 @@ private:
 		short envstate;
 		short unused; // pad to power of 2
 	};
-	
+
 	voice_t voice_state [voice_count];
-	
+
 	int clock_envelope( int );
 };
 
