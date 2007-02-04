@@ -30,6 +30,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "../asm_call.h"
 #include "../cfg.h"
+#include "../cpu/spc/dspbind.h"
+unsigned int BufferSizeB, BufferSizeW;
+short DSPBuffer[1280];
 
 #ifdef __LIBAO__
 static pthread_t audio_thread;
@@ -82,14 +85,6 @@ void InitSampleControl()
 #ifdef __LIBAO__
 static void SoundWriteSamples_ao(unsigned int samples)
 {
-//  extern unsigned int BufferSizeB, BufferSizeW;
-//  extern int DSPBuffer[1280];
-  void ProcessSoundBuffer();
-  short stemp[1280];
-
-  int /* *d = DSPBuffer,*/ *end_d = 0;
-  short *p = stemp;
-
   while (samples > 1280)
   {
     SoundWriteSamples_ao(1280);
@@ -98,20 +93,15 @@ static void SoundWriteSamples_ao(unsigned int samples)
 
   //printf("samples %d\n", samples);
 
-/*  BufferSizeB = samples;
+  BufferSizeB = samples;
   BufferSizeW = samples<<1;
 
-  asm_call(ProcessSoundBuffer);
+  DSP_count = samples/2;
+  DSP_buf = DSPBuffer;
 
-  end_d = DSPBuffer+samples;
-  for (; d < end_d; d++, p++)
-  {
-    if ((unsigned int)(*d + 0x7FFF) < 0xFFFF) { *p = *d; continue; }
-    if (*d > 0x7FFF) { *p = 0x7FFF; }
-    else { *p = 0x8001; }
-  }*/
-
-  ao_play(audio_device, (char *)stemp, samples*2);
+  dsp_run();
+  
+  ao_play(audio_device, (char *)DSPBuffer, samples*2);
 }
 
 void SoundWrite_ao()
@@ -213,21 +203,22 @@ static int SoundInit_ao()
 
 void SoundWrite_sdl()
 {
-//  extern int DSPBuffer[];
   extern unsigned char DSPDisable;
-  extern unsigned int /*BufferSizeB, BufferSizeW,*/ T36HZEnabled;
+  extern unsigned T36HZEnabled;
 
+  DSP_buf = DSPBuffer;
   // Process sound
-/*  BufferSizeB = 256;
-  BufferSizeW = 512;*/
+  BufferSizeB = 256;
+  BufferSizeW = 512;
 
+  DSP_count = BufferSizeB/2;
   // take care of the things we left behind last time
   SDL_LockAudio();
-/*  while (sdl_audio_buffer_fill < sdl_audio_buffer_len)
+  while (sdl_audio_buffer_fill < sdl_audio_buffer_len)
   {
     short *p = (short*)&sdl_audio_buffer[sdl_audio_buffer_tail];
 
-    if (soundon && !DSPDisable) { asm_call(ProcessSoundBuffer); }
+    if (soundon && !DSPDisable) { dsp_run(); }
 
     if (T36HZEnabled)
     {
@@ -235,20 +226,15 @@ void SoundWrite_sdl()
     }
     else
     {
-      int *d = DSPBuffer, *end_d = DSPBuffer+BufferSizeB;
+      short *d = DSPBuffer, *end_d = DSPBuffer+BufferSizeB;
 
-      for (; d < end_d; d++, p++)
-      {
-        if ((unsigned int)(*d + 0x7fff) < 0xffff) { *p = *d; continue; }
-        if (*d > 0x7fff) { *p = 0x7fff; }
-        else { *p = 0x8001; }
-      }
+      memcpy(p, d, BufferSizeW);
     }
 
     sdl_audio_buffer_fill += BufferSizeW;
     sdl_audio_buffer_tail += BufferSizeW;
     if (sdl_audio_buffer_tail >= sdl_audio_buffer_len) { sdl_audio_buffer_tail = 0; }
-  }*/
+  }
   SDL_UnlockAudio();
 }
 
