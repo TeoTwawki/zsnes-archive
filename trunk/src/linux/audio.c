@@ -100,7 +100,7 @@ static void SoundWriteSamples_ao(unsigned int samples)
   DSP_buf = DSPBuffer;
 
   dsp_run();
-  
+
   ao_play(audio_device, (char *)DSPBuffer, samples*2);
 }
 
