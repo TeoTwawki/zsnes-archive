@@ -85,23 +85,24 @@ void InitSampleControl()
 #ifdef __LIBAO__
 static void SoundWriteSamples_ao(unsigned int samples)
 {
+  //static short buffer[1280*2];
+  dsp_run();
+/*
   while (samples > 1280)
   {
     SoundWriteSamples_ao(1280);
     samples -= 1280;
   }
+*/
 
   //printf("samples %d\n", samples);
 
-  BufferSizeB = samples;
-  BufferSizeW = samples<<1;
-
-  DSP_count = samples/2;
-  DSP_buf = DSPBuffer;
-
+/*
+  DSP_count = samples;
+  DSP_buf = buffer;
   dsp_run();
-
-  ao_play(audio_device, (char *)DSPBuffer, samples*2);
+  ao_play(audio_device, (char *)buffer, samples*4);
+*/
 }
 
 void SoundWrite_ao()
@@ -112,7 +113,7 @@ void SoundWrite_ao()
   {
     if (!samples_waiting && sample_control.lo)
     {
-      samples = (unsigned int)((sample_control.balance/sample_control.lo) << StereoSound);
+      samples = (unsigned int)((sample_control.balance/sample_control.lo));
       sample_control.balance %= sample_control.lo;
       sample_control.balance += sample_control.hi;
 
