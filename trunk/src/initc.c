@@ -1486,7 +1486,7 @@ void clearvidsound()
 Would be nice to trash this section in the future
 */
 
-extern unsigned char ENVDisable, cycpb268, cycpb358, cycpbl2, cycpblt2, cycpbl;
+extern unsigned char cycpb268, cycpb358, cycpbl2, cycpblt2, cycpbl;
 extern unsigned char cycpblt, opexec268, opexec358, opexec268b, opexec358b;
 extern unsigned char opexec268cph, opexec358cph, opexec268cphb, opexec358cphb;
 bool HacksDisable;
@@ -1494,7 +1494,6 @@ bool HacksDisable;
 void headerhack()
 {
   char *RomData = (char *)romdata;
-  ENVDisable = 0;
 
   if (curromspace < Lo || HacksDisable) { return; }
 
@@ -1552,13 +1551,6 @@ void headerhack()
   {
     RomData[0x666B] = 0xEE;
     RomData[0x666C] = 0xBC;
-  }
-
-  //Emerald Dragon (J)
-  //Hangs while drawing the logo after loading the ROM.
-  if (!strncmp((RomData+Hi),"EMERALD DRAG", 12))
-  {
-    ENVDisable = true;
   }
 
   //Rendering Ranger R2
@@ -2715,11 +2707,11 @@ void init65816()
     }
 
     cycpb268 = 140;
-    cycpb358 = 155;
+    cycpb358 = 156;
     cycpbl2 = 140;
-    cycpblt2 = 155;
+    cycpblt2 = 156;
     cycpbl = 140;
-    cycpblt = 155;
+    cycpblt = 156;
 
     SPCSkipXtraROM = 0;
     if(ReturnFromSPCStall)
