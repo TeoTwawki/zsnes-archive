@@ -74,7 +74,7 @@ void dsp_run()
     {
       samples -= next_samples;
     }
-    if (samples+mid_samples > next_samples)
+    if (samples+mid_samples >= next_samples)
     {
       samples = next_samples-mid_samples;
       mid_samples = next_samples-samples;
