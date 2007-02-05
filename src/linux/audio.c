@@ -86,7 +86,7 @@ void InitSampleControl()
 static void SoundWriteSamples_ao(unsigned int samples)
 {
   //static short buffer[1280*2];
-  dsp_run();
+  //dsp_run();
 /*
   while (samples > 1280)
   {
@@ -107,6 +107,8 @@ static void SoundWriteSamples_ao(unsigned int samples)
 
 void SoundWrite_ao()
 {
+  dsp_run();
+  /*
   unsigned int samples = 0;
 
   if (!pthread_mutex_trylock(&audio_mutex))
@@ -126,6 +128,7 @@ void SoundWrite_ao()
   {
     pthread_cond_broadcast(&audio_wait); //Send signal
   }
+  */
 }
 
 static void *SoundThread_ao(void *useless)
