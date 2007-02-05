@@ -2715,11 +2715,11 @@ void init65816()
       if (SPC7110PackPtr) free(SPC7110PackPtr);
     }
 
-    cycpb268 = 140;
+    cycpb268 = 145;
     cycpb358 = 150;
-    cycpbl2 = 140;
+    cycpbl2 = 145;
     cycpblt2 = 150;
-    cycpbl = 140;
+    cycpbl = 145;
     cycpblt = 150;
 
     SPCSkipXtraROM = 0;
