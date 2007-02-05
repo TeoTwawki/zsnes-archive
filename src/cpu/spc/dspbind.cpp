@@ -68,16 +68,15 @@ void dsp_run()
   {
     div_t d = div((remainder+spcCycle)-lastCycle, 64);
     remainder = d.rem;
-    //printf("remainder: %d\n", remainder);
     int samples = d.quot<<1;
     if (samples > 0)
     {
       printf("outputting samples: %d\n", samples);
-      theDsp.run(samples*2, tempbuf);
+      theDsp.run(samples, tempbuf);
       write_audio(tempbuf, samples);
-      lastCycle = spcCycle;
       mid_samples += samples;
     }
+    lastCycle = spcCycle;
   }
   else
   {
@@ -89,7 +88,7 @@ void dsp_run()
     if (samples > 0)
     {
       printf("outputting samples: %d\n", samples);
-      theDsp.run(samples*2, tempbuf);
+      theDsp.run(samples, tempbuf);
       write_audio(tempbuf, samples);
     }
     mid_samples = 0;
