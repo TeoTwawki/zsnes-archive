@@ -24,16 +24,19 @@ EXTSYM flagnz,flago,flagc,cpucycle,cycpbl,cycpblt,opcjmptab,doirqnext,dmadata
 ;*******************************************************
 ; Flag Setting Macros
 ;*******************************************************
+EXTSYM clocktable,spcCycle
 
 
 %macro endloop 0
     sub dword[cycpbl],55
-    jnc %%skipallspc
+    jnc near %%skipallspc
     mov eax,[cycpblt]
     mov bl,[ebp]
     add dword[cycpbl],eax
     ; 1260, 10000/12625
     inc ebp
+    mov eax,[clocktable+ebx*4]
+    add dword[spcCycle],eax
     call dword [opcjmptab+ebx*4]
     xor ebx,ebx
 %%skipallspc
@@ -1135,7 +1138,7 @@ COPemulmode
     mov bl,[xpb]
     mov ax,[xpc]
     test eax,8000h
-    jz .loweraddr
+    jz near .loweraddr
     mov eax,[snesmmap+ebx*4]
     mov ebx,esi
     sub ebx,eax
@@ -1652,14 +1655,14 @@ emulRTI
 
 %macro WAIMacro 0
     cmp byte[intrset],1
-    jne .notws
+    jne near .notws
     dec esi
     endloop
 .notws
     test byte[intrset],0FFh
-    jz .waitstate
+    jz near .waitstate
     cmp byte[intrset],2
-    je .stopint
+    je near .stopint
     dec esi
     endloop
 .waitstate
