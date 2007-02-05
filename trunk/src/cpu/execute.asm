@@ -777,6 +777,7 @@ ALIGN16
 %endif
 %endmacro
 EXTSYM clocktable,spcCycle
+EXTSYM lastCycle
 NEWSYM execute
 NEWSYM execloop
    mov bl,dl
@@ -1493,8 +1494,9 @@ NEWSYM cpuover
     inc esi
     jmp execloop.startagain
 
-
 .overy
+    mov eax,[spcCycle]
+    mov [lastCycle],eax
     mov dh,80
 %ifdef __MSDOS__
     cmp byte[smallscreenon],1

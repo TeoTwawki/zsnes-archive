@@ -66,14 +66,11 @@ void dsp_run()
   if (DSP_midframe)
   {
     int samples = (spcCycle-lastCycle)/32;
-    if (samples > 0)
-    {
       printf("outputting samples: %d\n", samples);
-      theDsp.run(samples*2, tempbuf);
+      if (lastCycle != spcCycle) theDsp.run(samples*2, tempbuf);
       write_audio(tempbuf, samples);
       lastCycle = spcCycle;
       mid_samples += samples;
-    }
   }
   else
   {
@@ -82,12 +79,9 @@ void dsp_run()
     sample_control.balance += sample_control.hi;
 
     samples -= mid_samples;
-    if (samples > 0)
-    {
       printf("outputting samples: %d\n", samples);
       theDsp.run(samples*2, tempbuf);
       write_audio(tempbuf, samples);
-    }
     mid_samples = 0;
   }
 }
