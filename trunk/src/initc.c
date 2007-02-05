@@ -2110,7 +2110,7 @@ void SetupROM()
   }
 
   #ifdef __UNIXSDL__
-  InitSampleControl();
+  //InitSampleControl();
   #endif
 
   if (romispal)

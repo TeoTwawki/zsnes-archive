@@ -1203,7 +1203,7 @@ void drawscreenwin(void)
   extern bool RawDumpInProgress;
   if (!sound_sdl && !GUIOn2 && !GUIOn && !EMUPause && !RawDumpInProgress)
   {
-    SoundWrite_ao();
+    //SoundWrite_ao();
   }
 #endif
 

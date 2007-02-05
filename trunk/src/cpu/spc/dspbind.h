@@ -28,10 +28,12 @@ extern int DSP_reg, DSP_val;
 int dsp_read();
 void dsp_write();
 
+
 // Run DSP for 'count' samples. Write resulting samples to 'buf' if not NULL.
-extern int DSP_count;
-extern short *DSP_buf;
 void dsp_run();
+
+extern short dsp_samples_buffer[1068];
+extern int dsp_sample_count;
 
 #ifdef __cplusplus
 }
