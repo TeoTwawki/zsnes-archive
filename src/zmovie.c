@@ -3125,15 +3125,6 @@ void MovieDumpRaw()
   }
 }
 
-#include <stdio.h>
-#define NUMCONV_FW2
-#define NUMCONV_FW4
-#include "numconv.h"
-
-#ifdef __LIBAO__
-#include <ao/ao.h>
-#endif
-
 void write_audio(short *sample_buffer, size_t sample_count)
 {
   static unsigned char first_time = 1;
