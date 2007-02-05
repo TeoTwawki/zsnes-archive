@@ -2638,7 +2638,6 @@ extern unsigned char coladdr, coladdg, coladdb;
 extern unsigned char SDD1BankA,SDD1BankB, SDD1BankC, SDD1BankD;
 extern unsigned char intrset, curcyc, cycpl, GUIReset;
 extern unsigned int numspcvblleft, SPC700read, SPC700write, spc700idle;
-extern unsigned int FIRTAPVal0, FIRTAPVal1, FIRTAPVal2, FIRTAPVal3, FIRTAPVal4, FIRTAPVal5, FIRTAPVal6, FIRTAPVal7;
 extern unsigned int xa, xdb, xpb, xs, xd, xx, xy, scrndis;
 extern unsigned short VIRQLoc, resolutn, xpc;
 extern unsigned char spcextraram[64], SPCROM[64];
@@ -2715,11 +2714,11 @@ void init65816()
       if (SPC7110PackPtr) free(SPC7110PackPtr);
     }
 
-    cycpb268 = 142;
+    cycpb268 = 140;
     cycpb358 = 155;
-    cycpbl2 = 142;
+    cycpbl2 = 140;
     cycpblt2 = 155;
-    cycpbl = 142;
+    cycpbl = 140;
     cycpblt = 155;
 
     SPCSkipXtraROM = 0;
@@ -2777,22 +2776,16 @@ void init65816()
       cycpb358 = cycpb268;
     }
 
-/*    FIRTAPVal0 = 0x7F;
-    FIRTAPVal1 = 0;
-    FIRTAPVal2 = 0;
-    FIRTAPVal3 = 0;
-    FIRTAPVal4 = 0;
-    FIRTAPVal5 = 0;
-    FIRTAPVal6 = 0;
-    FIRTAPVal7 = 0;*/
-
     // Check Headers
     headerhack();
 
+
+    // What the hell is this?
     SPCRAM[0xF4] = 0;
     SPCRAM[0xF5] = 0;
     SPCRAM[0xF6] = 0;
     SPCRAM[0xF7] = 0;
+
     reg1read = 0;
     reg2read = 0;
     reg3read = 0;
