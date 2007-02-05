@@ -2365,34 +2365,7 @@ static bool raw_video_open()
 
 static void raw_audio_write(unsigned int samples)
 {
-  extern short DSPBuffer[1280];
-
-  while (samples > 1280) //This is in a loop for future proofing if we ever add above 48KHz
-  {
-    raw_audio_write(1280);
-    samples -= 1280;
-  }
-
-  DSP_count = samples;
-#ifdef __UNIXSDL__
-  DSP_buf = DSPBuffer;
-
-  dsp_run();
-
-  fwrite(DSPBuffer, 2, samples, raw_vid.ap);
-#endif
-
-/*  BufferSizeB = samples;
-  BufferSizeW = samples<<1;
-
-  asm_call(ProcessSoundBuffer);
-
-  for (d_end = DSPBuffer+samples; d < d_end; d++)
-  {
-    if ((unsigned int)(*d + 0x7FFF) < 0xFFFF) { fwrite2((short)*d, raw_vid.ap); continue; }
-    if (*d > 0x7FFF) { fwrite2(0x7FFF, raw_vid.ap); }
-    else { fwrite2(0x8001, raw_vid.ap); }
-  }*/
+  fwrite(dsp_samples_buffer, 2, dsp_sample_count, raw_vid.ap);
 }
 
 #define PIXEL (vidbuffer[((y+1)*288) + x + 16])

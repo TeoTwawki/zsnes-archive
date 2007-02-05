@@ -39,7 +39,7 @@ static pthread_t audio_thread;
 static pthread_mutex_t audio_mutex;
 static pthread_cond_t audio_wait;
 static ao_device *audio_device = 0;
-static volatile unsigned int samples_waiting = 0;
+static volatile bool samples_waiting = false;
 #endif
 
 unsigned char *sdl_audio_buffer = 0;
@@ -51,75 +51,19 @@ int SoundEnabled = 1;
 unsigned char PrevStereoSound;
 unsigned int PrevSoundQuality;
 
-#define SAMPLE_NTSC_HI_SCALE 995ULL
-#define SAMPLE_NTSC_LO 59649ULL
-#define SAMPLE_PAL_HI_SCALE  1ULL
-#define SAMPLE_PAL_LO       50ULL
 static const int freqtab[7] = { 8000, 11025, 22050, 44100, 16000, 32000, 48000 };
 #define RATE freqtab[SoundQuality = ((SoundQuality > 6) ? 1 : SoundQuality)]
 
-struct
-{
-  unsigned long long hi;
-  unsigned long long lo;
-  unsigned long long balance;
-} sample_control;
-
-void InitSampleControl()
-{
-  extern unsigned char romispal;
-  if (romispal)
-  {
-    sample_control.hi = SAMPLE_PAL_HI_SCALE*RATE;
-    sample_control.lo = SAMPLE_PAL_LO;
-  }
-  else
-  {
-    sample_control.hi = SAMPLE_NTSC_HI_SCALE*RATE;
-    sample_control.lo = SAMPLE_NTSC_LO;
-  }
-  sample_control.balance = sample_control.hi;
-}
-
 
 #ifdef __LIBAO__
-static void SoundWriteSamples_ao(unsigned int samples)
-{
-  //static short buffer[1280*2];
-  //dsp_run();
-/*
-  while (samples > 1280)
-  {
-    SoundWriteSamples_ao(1280);
-    samples -= 1280;
-  }
-*/
-
-  //printf("samples %d\n", samples);
-
-/*
-  DSP_count = samples;
-  DSP_buf = buffer;
-  dsp_run();
-  ao_play(audio_device, (char *)buffer, samples*4);
-*/
-}
 
 void SoundWrite_ao()
 {
-//  dsp_run();
-  /*
-  unsigned int samples = 0;
-
   if (!pthread_mutex_trylock(&audio_mutex))
   {
-    if (!samples_waiting && sample_control.lo)
+    if (!samples_waiting)
     {
-      samples = (unsigned int)((sample_control.balance/sample_control.lo));
-      sample_control.balance %= sample_control.lo;
-      sample_control.balance += sample_control.hi;
-
-      samples_waiting = samples;
+      samples_waiting = true;
       pthread_cond_broadcast(&audio_wait); //Send signal
     }
     pthread_mutex_unlock(&audio_mutex);
@@ -128,13 +72,10 @@ void SoundWrite_ao()
   {
     pthread_cond_broadcast(&audio_wait); //Send signal
   }
-  */
 }
 
 static void *SoundThread_ao(void *useless)
 {
-  unsigned int samples;
-
   for (;;)
   {
     pthread_mutex_lock(&audio_mutex);
@@ -145,11 +86,10 @@ static void *SoundThread_ao(void *useless)
       pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
     }
 
-    samples = samples_waiting;
-    samples_waiting = 0;
+    samples_waiting = false;
     pthread_mutex_unlock(&audio_mutex);
 
-    SoundWriteSamples_ao(samples);
+    ao_play(audio_device, (char *)dsp_samples_buffer, dsp_sample_count*sizeof(short));
   }
   return(0);
 }
@@ -183,7 +123,6 @@ static int SoundInit_ao()
     {
       puts("pthread_cond_init() failed.");
     }
-    InitSampleControl();
   }
 
   //ao_option driver_options = { "buf_size", "32768", 0 };
@@ -207,6 +146,7 @@ static int SoundInit_ao()
 
 void SoundWrite_sdl()
 {
+/*
   extern unsigned char DSPDisable;
   extern unsigned T36HZEnabled;
 
@@ -240,6 +180,7 @@ void SoundWrite_sdl()
     if (sdl_audio_buffer_tail >= sdl_audio_buffer_len) { sdl_audio_buffer_tail = 0; }
   }
   SDL_UnlockAudio();
+*/
 }
 
 static void SoundUpdate_sdl(void *userdata, unsigned char *stream, int len)
