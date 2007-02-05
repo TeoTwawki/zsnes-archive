@@ -28,7 +28,7 @@ EXTSYM clocktable,spcCycle
 
 
 %macro endloop 0
-    sub dword[cycpbl],55
+    sub dword[cycpbl],80
     jnc near %%skipallspc
     mov eax,[cycpblt]
     mov bl,[ebp]
