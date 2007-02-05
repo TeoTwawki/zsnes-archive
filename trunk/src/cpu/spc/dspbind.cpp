@@ -50,7 +50,7 @@ void dsp_write()
   theDsp.write(DSP_reg, DSP_val);
 }
 
-short tempbuf[2048*4] = {0};
+short tempbuf[1068*2] = {0}; //Why this has to be *2, I have no idea, but blargg's DSP is outputting samples*4 bytes
 int lastCycle = 0;
 
 struct
