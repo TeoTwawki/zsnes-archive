@@ -1,6 +1,10 @@
 #ifndef DSPBIND_H
 #define DSPBIND_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 // Mute voice n if bit n (1 << n) of DSP_mask is clear.
 extern int DSP_mask;
@@ -28,5 +32,9 @@ void dsp_write();
 extern int DSP_count;
 extern short *DSP_buf;
 void dsp_run();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // !DSPBIND_H
