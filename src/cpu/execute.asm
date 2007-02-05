@@ -776,6 +776,7 @@ ALIGN16
 %%noflip
 %endif
 %endmacro
+EXTSYM clocktable,spcCycle
 NEWSYM execute
 NEWSYM execloop
    mov bl,dl
@@ -812,13 +813,15 @@ NEWSYM execloop
    call OSPC_Run
    popad
 %else
-   sub dword[cycpbl],55
+   sub dword[cycpbl],100
    jnc .skipallspc
    mov eax,[cycpblt]
    mov bl,[ebp]
    add dword[cycpbl],eax
    ; 1260, 10000/12625
    inc ebp
+   mov eax,[clocktable+ebx*4]
+   add dword[spcCycle],eax
    call dword near [opcjmptab+ebx*4]
    xor ebx,ebx
 .skipallspc
@@ -856,6 +859,7 @@ NEWSYM EMUPause, db 0
 NEWSYM INCRFrame, db 0
 NEWSYM NoHDMALine, db 0
 SECTION .text
+
 
 NEWSYM cpuover
     dec esi
@@ -1988,8 +1992,8 @@ NEWSYM execsingle
     xor ebx,ebx
     test byte[curexecstate],2
     jz .nosoundb
-    sub dword[cycpbl],55
-    jnc .skipallspc
+;    sub dword[cycpbl],20
+;    jnc .skipallspc
     mov eax,[cycpblt]
     mov bl,[ebp]
     add dword[cycpbl],eax

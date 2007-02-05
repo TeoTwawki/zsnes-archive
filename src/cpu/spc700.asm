@@ -21,7 +21,7 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_run,dsp_reset
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_run,dsp_write,dsp_reset
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,DSP_val,DSP_reg,opcjmptab
 
 %include "cpu/regsw.mac"
@@ -107,7 +107,7 @@ NEWSYM timinl0,  db 0     ; ticks left before incrementing
 NEWSYM timinl1,  db 0     ; ticks left before incrementing
 NEWSYM timinl2,  db 0     ; ticks left before incrementing
 NEWSYM timrcall, db 0     ; alternating bit 0 to correctly timer timer1 & 2 to 8000hz
-
+NEWSYM DSPInit, dw 0
 NEWSYM spcextraram, times 64 db 0 ; extra ram, used for tcall
 
 NEWSYM FutureExpandS,  times 256-64 db 0
@@ -122,6 +122,25 @@ NEWSYM SPCROM
    db 0CCh,0F4h,0D0h,0FBh,02Fh,019h,0EBh,0F4h,0D0h,0FCh,07Eh,0F4h,0D0h,00Bh,0E4h,0F5h
    db 0CBh,0F4h,0D7h,000h,0FCh,0D0h,0F3h,0ABh,001h,010h,0EFh,07Eh,0F4h,010h,0EBh,0BAh
    db 0F6h,0DAh,000h,0BAh,0F4h,0C4h,0F4h,0DDh,05Dh,0D0h,0DBh,01Fh,000h,000h,0C0h,0FFh
+
+NEWSYM clocktable
+;//  0 1 2 3 4 5 6 7 8 9 A B C D E F
+dd	2,8,4,5,3,4,3,6,2,6,5,4,5,4,6,8, ;// 0
+dd	2,8,4,5,4,5,5,6,5,5,6,5,2,2,4,6, ;// 1
+dd	2,8,4,5,3,4,3,6,2,6,5,4,5,4,5,4, ;// 2
+dd	2,8,4,5,4,5,5,6,5,5,6,5,2,2,3,8, ;// 3
+dd	2,8,4,5,3,4,3,6,2,6,4,4,5,4,6,6, ;// 4
+dd	2,8,4,5,4,5,5,6,5,5,4,5,2,2,4,3, ;// 5
+dd	2,8,4,5,3,4,3,6,2,6,4,4,5,4,5,5, ;// 6
+dd	2,8,4,5,4,5,5,6,5,5,5,5,2,2,3,6, ;// 7
+dd	2,8,4,5,3,4,3,6,2,6,5,4,5,2,4,5, ;// 8
+dd	2,8,4,5,4,5,5,6,5,5,5,5,2,2,12,5, ;// 9
+dd	3,8,4,5,3,4,3,6,2,6,4,4,5,2,4,4, ;// A
+dd	2,8,4,5,4,5,5,6,5,5,5,5,2,2,3,4, ;// B
+dd	3,8,4,5,4,5,4,7,2,5,6,4,5,2,4,9, ;// C
+dd	2,8,4,5,5,6,6,7,4,5,4,5,2,2,6,3, ;// D
+dd	2,8,4,5,3,4,3,6,2,4,5,3,4,3,4,3, ;// E
+dd	2,8,4,5,4,5,5,6,3,4,5,4,2,2,4,3  ;// F
 
 SECTION .text
 
@@ -232,6 +251,8 @@ NEWSYM InitSPC
       mov ecx,256
       mov eax,Invalidopcode
       mov ebp,0
+    mov dword[spcCycle],0
+
 .loop
 %ifdef __MSDOS__
       mov [ds:opcjmptab+ebp],eax
@@ -498,6 +519,7 @@ NEWSYM InitSPC
       mov dword[opcjmptab+03F4h],OpFD
       mov dword[opcjmptab+03F8h],OpFE
       mov dword[opcjmptab+03FCh],OpFF
+	mov word[DSPInit],1
       pushad
       call dsp_reset
       popad
@@ -659,12 +681,21 @@ NEWSYM SPCRegF2
 ;    pop ebx
 ;    pop eax
     ret
+EXTSYM DSP_midframe,dsp_run
 NEWSYM SPCRegF3
     push ebx
     xor ebx,ebx
     mov bl,[SPCRAM+0F2h]
     and bl,07fh
     ;call dword near [dspWptr+ebx*4]
+    mov byte[DSP_val],al
+    mov byte[DSP_reg],bl
+    mov byte[DSP_midframe],1
+    pushad
+    call dsp_write
+    call dsp_run
+    popad
+    mov byte[DSP_midframe],0
     pop ebx
     mov [SPCRAM+ebx],al
     ret
