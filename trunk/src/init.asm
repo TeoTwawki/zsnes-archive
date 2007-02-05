@@ -262,10 +262,10 @@ NEWSYM nmiv8,   dw 0    ; nmi vector emulation mode
 NEWSYM irqv8,   dw 0    ; irq vector emulation mode
 NEWSYM brkv8,   dw 0    ; brk vector emulation mode
 NEWSYM copv8,   dw 0    ; cop vector emulation mode
-NEWSYM cycpb268, db 109  ; 110
-NEWSYM cycpb358, db 149  ; 155
-NEWSYM cycpbl2,  db 109  ; percentage left of CPU/SPC to run  (3.58 = 175)
-NEWSYM cycpblt2, db 149  ; percentage of CPU/SPC to run
+NEWSYM cycpb268, db 160  ; 110
+NEWSYM cycpb358, db 180  ; 155
+NEWSYM cycpbl2,  db 160  ; percentage left of CPU/SPC to run  (3.58 = 175)
+NEWSYM cycpblt2, db 180  ; percentage of CPU/SPC to run
 NEWSYM writeon, db 0    ; Write enable/disable on snes rom memory
 NEWSYM totlines, dw 263 ; total # of lines
 
