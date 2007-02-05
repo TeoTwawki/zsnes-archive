@@ -17,9 +17,7 @@ int DSP_mask;
 double DSP_gain;
 int DSP_disable;
 int DSP_reg, DSP_val;
-int DSP_count;
 int DSP_midframe;
-short *DSP_buf;
 int lastCycles;
 static Spc_Dsp theDsp(SPCRAM);
 
