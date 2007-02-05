@@ -67,7 +67,7 @@ void dsp_run()
   static int next_samples = 0;
   if (DSP_midframe)
   {
-    div_t d = div((remainder+spcCycle)-lastCycle, 32);
+    div_t d = div((remainder+spcCycle)-lastCycle, 64);
     remainder = d.rem;
     int samples = d.quot;
     while (samples > next_samples)
