@@ -681,7 +681,7 @@ NEWSYM SPCRegF2
 ;    pop ebx
 ;    pop eax
     ret
-EXTSYM DSP_midframe,dsp_run
+EXTSYM DSP_midframe
 NEWSYM SPCRegF3
     push ebx
     xor ebx,ebx
