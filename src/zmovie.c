@@ -2374,11 +2374,13 @@ static void raw_audio_write(unsigned int samples)
   }
 
   DSP_count = samples;
+#ifdef __UNIXSDL__
   DSP_buf = DSPBuffer;
 
   dsp_run();
 
   fwrite(DSPBuffer, 2, samples, raw_vid.ap);
+#endif
 
 /*  BufferSizeB = samples;
   BufferSizeW = samples<<1;
@@ -3128,7 +3130,9 @@ void MovieDumpRaw()
 #define NUMCONV_FW4
 #include "numconv.h"
 
+#ifdef __LIBAO__
 #include <ao/ao.h>
+#endif
 
 void write_audio(short *sample_buffer, size_t sample_count)
 {
