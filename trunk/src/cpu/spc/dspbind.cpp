@@ -50,7 +50,7 @@ void dsp_write()
   theDsp.write(DSP_reg, DSP_val);
 }
 
-short tempbuf[4096*8] = {0};
+short tempbuf[2048*4] = {0};
 int lastCycle = 0;
 
 struct
