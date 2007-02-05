@@ -64,14 +64,24 @@ void dsp_run()
 {
   static int mid_samples = 0;
   static int remainder = 0;
+  static int next_samples = 0;
   if (DSP_midframe)
   {
     div_t d = div((remainder+spcCycle)-lastCycle, 32);
     remainder = d.rem;
     int samples = d.quot<<1;
+    while (samples > next_samples)
+    {
+      samples -= next_samples;
+    }
+    if (samples+mid_samples > next_samples)
+    {
+      samples = next_samples-mid_samples;
+      mid_samples = next_samples-samples;
+    }
     if (samples > 0)
     {
-      printf("outputting samples: %d\n", samples);
+      //printf("outputting samples: %d\n", samples);
       theDsp.run(samples, tempbuf);
       write_audio(tempbuf, samples);
       mid_samples += samples;
@@ -80,21 +90,15 @@ void dsp_run()
   }
   else
   {
-    int samples = (unsigned int)((sample_control.balance/sample_control.lo) << 1);
-    sample_control.balance %= sample_control.lo;
-    sample_control.balance += sample_control.hi;
-
-    if (mid_samples > samples)
+    int samples = next_samples-mid_samples;
+    if (samples > 0)
     {
-      mid_samples -= samples;
-    }
-    else
-    {
-      samples -= mid_samples;
-      printf("outputting samples: %d\n", samples);
       theDsp.run(samples, tempbuf);
       write_audio(tempbuf, samples);
-      mid_samples = 0;
     }
+    mid_samples = 0;
+    next_samples = (unsigned int)((sample_control.balance/sample_control.lo)<<1);
+    sample_control.balance %= sample_control.lo;
+    sample_control.balance += sample_control.hi;
   }
 }
