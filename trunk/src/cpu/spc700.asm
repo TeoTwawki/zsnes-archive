@@ -630,7 +630,6 @@ NEWSYM SPCRegF1
     test al,10h
     jz .No01Clear
     mov byte[SPCRAM+0F4h],0
-    mov byte[SPCRAM+0F5h],0
 .No01Clear
     test al,20h
     jz .No23Clear
@@ -672,14 +671,6 @@ NEWSYM SPCRegF1
     ret
 NEWSYM SPCRegF2
     mov [SPCRAM+0F2h],al
-    mov byte[SPCRAM+0F3h],0  ; That's needed for the time being.
-;    push eax
-;    push ebx
-;    and eax,0FFh
-;    mov bl,[DSPMem+eax]
-;    mov [SPCRAM+0F3h],bl
-;    pop ebx
-;    pop eax
     ret
 EXTSYM DSP_midframe
 NEWSYM SPCRegF3
