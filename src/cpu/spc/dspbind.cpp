@@ -53,7 +53,7 @@ void dsp_write()
   theDsp.write(DSP_reg, DSP_val);
 }
 
-short dsp_samples_buffer[1068];
+short dsp_samples_buffer[1068] = {0};
 int dsp_sample_count;
 static short dsp_buffer[1068] = {0};
 int lastCycle = 0;
