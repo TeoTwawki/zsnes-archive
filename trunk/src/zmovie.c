@@ -59,6 +59,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cfg.h"
 #include "zpath.h"
 #include "zmovie.h"
+#include "cpu/spc/dspbind.h"
 
 #define NUMCONV_FR2
 #define NUMCONV_FR3
@@ -2364,16 +2365,20 @@ static bool raw_video_open()
 
 static void raw_audio_write(unsigned int samples)
 {
-  void ProcessSoundBuffer();
-//  extern int DSPBuffer[1280];
-//  extern unsigned int BufferSizeB, BufferSizeW;
-  int /* *d = DSPBuffer,*/ *d_end;
+  extern short DSPBuffer[1280];
 
   while (samples > 1280) //This is in a loop for future proofing if we ever add above 48KHz
   {
     raw_audio_write(1280);
     samples -= 1280;
   }
+
+  DSP_count = samples;
+  DSP_buf = DSPBuffer;
+
+  dsp_run();
+
+  fwrite(DSPBuffer, 2, samples, raw_vid.ap);
 
 /*  BufferSizeB = samples;
   BufferSizeW = samples<<1;

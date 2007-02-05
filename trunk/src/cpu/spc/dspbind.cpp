@@ -10,7 +10,6 @@ extern "C" {
   extern unsigned int spcCycle;
 }
 
-int samples_total;
 int DSP_mask;
 double DSP_gain;
 int DSP_disable;
@@ -51,25 +50,44 @@ void dsp_write()
   theDsp.write(DSP_reg, DSP_val);
 }
 
-short tempbuf[4096] = {0};
+short tempbuf[154096] = {0};
 int lastCycle = 0;
+
+struct
+{
+  unsigned long long hi;
+  unsigned long long lo;
+  unsigned long long balance;
+} static sample_control = { 995ULL*32000ULL, 59649ULL, 995ULL*32000ULL };
 
 void dsp_run()
 {
+  static int mid_samples = 0;
   if (DSP_midframe)
   {
-    theDsp.run(((spcCycle-lastCycle)/32), tempbuf);
-    samples_total=((spcCycle-lastCycle)/32);
-    lastCycle = spcCycle;
-    //if (samples_total > 0)
-    write_audio(tempbuf, samples_total);
-    printf("outputting samples: %d\n", samples_total);
+    int samples = (spcCycle-lastCycle)/32;
+    if (samples > 0)
+    {
+      printf("outputting samples: %d\n", samples);
+      theDsp.run(samples*2, tempbuf);
+      write_audio(tempbuf, samples);
+      lastCycle = spcCycle;
+      mid_samples += samples;
+    }
   }
   else
   {
-    theDsp.run(DSP_count*2, tempbuf);
-     samples_total = DSP_count*2;
-    printf("outputting samples: %d\n", samples_total);
-    write_audio(tempbuf, samples_total);
+    int samples = (unsigned int)((sample_control.balance/sample_control.lo) << 1);
+    sample_control.balance %= sample_control.lo;
+    sample_control.balance += sample_control.hi;
+
+    samples -= mid_samples;
+    if (samples > 0)
+    {
+      printf("outputting samples: %d\n", samples);
+      theDsp.run(samples*2, tempbuf);
+      write_audio(tempbuf, samples);
+    }
+    mid_samples = 0;
   }
 }
