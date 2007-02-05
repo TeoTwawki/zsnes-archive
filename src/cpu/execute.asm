@@ -1488,8 +1488,12 @@ NEWSYM cpuover
     mov bl,[esi]
     inc esi
     jmp execloop.startagain
-
+EXTSYM dsp_run
 .overy
+    pushad
+    call dsp_run
+    popad
+
     mov eax,[spcCycle]
     mov [lastCycle],eax
     mov dh,80

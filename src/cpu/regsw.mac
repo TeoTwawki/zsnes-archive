@@ -19,7 +19,7 @@
 
 
 
-
+EXTSYM dsp_run
 ;*******************************************************
 ; InitRegW                   Initializes Write Registers
 ;*******************************************************
@@ -36,6 +36,9 @@
     mov bl,dl
     mov edi,[tableadc+ebx*4]
     pop ebx
+    pushad
+    call dsp_run
+    popad
 %%enspc
 %endmacro
 

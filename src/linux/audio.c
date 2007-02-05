@@ -107,7 +107,7 @@ static void SoundWriteSamples_ao(unsigned int samples)
 
 void SoundWrite_ao()
 {
-  dsp_run();
+//  dsp_run();
   /*
   unsigned int samples = 0;
 

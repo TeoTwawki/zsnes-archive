@@ -608,14 +608,12 @@ NEWSYM updatetimer
 ;    mov dword[timer2upd],0
 ;    jmp .again
 ;.nowrap
-
     inc dword[timer2upd]
-    cmp dword[timer2upd],60
+    cmp dword[timer2upd],31
     jne .noanother
     mov dword[timer2upd],0
     jmp .another
 .noanother
-
     ret
 
 

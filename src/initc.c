@@ -2715,12 +2715,12 @@ void init65816()
       if (SPC7110PackPtr) free(SPC7110PackPtr);
     }
 
-    cycpb268 = 117;
-    cycpb358 = 127;
-    cycpbl2 = 117;
-    cycpblt2 = 117;
-    cycpbl = 117;
-    cycpblt = 117;
+    cycpb268 = 160;
+    cycpb358 = 180;
+    cycpbl2 = 160;
+    cycpblt2 = 180;
+    cycpbl = 160;
+    cycpblt = 180;
 
     SPCSkipXtraROM = 0;
     if(ReturnFromSPCStall)
@@ -2748,7 +2748,7 @@ void init65816()
       SPCStallSetting = 0;
     }
 
-    numspcvblleft = 480;
+    numspcvblleft = 500;
     SPC700write = 0;
     SPC700read = 0;
     spc700idle = 0;
