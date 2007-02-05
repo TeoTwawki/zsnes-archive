@@ -66,10 +66,10 @@ void dsp_run()
   static int remainder = 0;
   if (DSP_midframe)
   {
-    div_t d = div((remainder+spcCycle)-lastCycle, 32);
+    div_t d = div((remainder+spcCycle)-lastCycle, 64);
     remainder = d.rem;
     //printf("remainder: %d\n", remainder);
-    int samples = d.quot;
+    int samples = d.quot<<1;
     if (samples > 0)
     {
       printf("outputting samples: %d\n", samples);
