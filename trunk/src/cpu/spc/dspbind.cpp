@@ -50,7 +50,7 @@ void dsp_write()
   theDsp.write(DSP_reg, DSP_val);
 }
 
-short tempbuf[4096*2] = {0};
+short tempbuf[4096*8] = {0};
 int lastCycle = 0;
 
 struct
@@ -66,7 +66,7 @@ void dsp_run()
   static int remainder = 0;
   if (DSP_midframe)
   {
-    div_t d = div((remainder+spcCycle)-lastCycle, 64);
+    div_t d = div((remainder+spcCycle)-lastCycle, 32);
     remainder = d.rem;
     int samples = d.quot<<1;
     if (samples > 0)
@@ -84,13 +84,17 @@ void dsp_run()
     sample_control.balance %= sample_control.lo;
     sample_control.balance += sample_control.hi;
 
-    samples -= mid_samples;
-    if (samples > 0)
+    if (mid_samples > samples)
     {
+      mid_samples -= samples;
+    }
+    else
+    {
+      samples -= mid_samples;
       printf("outputting samples: %d\n", samples);
       theDsp.run(samples, tempbuf);
       write_audio(tempbuf, samples);
+      mid_samples = 0;
     }
-    mid_samples = 0;
   }
 }
