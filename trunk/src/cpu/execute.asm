@@ -224,9 +224,6 @@ VoiceStartMute:
 
 ; .returnfromsfx
 
-; pexecs
-; *** Copy to PC whenever a non-relative jump is executed
-
 SECTION .data
 NEWSYM romloadskip, db 0
 NEWSYM SSKeyPressed, dd 0
@@ -1160,8 +1157,6 @@ NEWSYM cpuover
     jne .nodrawlineb2
     call drawline
 .nodrawlineb2
-    cmp byte[curexecstate],2
-    je near pexecs
     cmp byte[curexecstate],0
     jne .yesexec
     xor dh,dh
@@ -1690,35 +1685,6 @@ NEWSYM cpuover
 SECTION .bss
 .numcheat resb 1
 SECTION .text
-
-ALIGN16
-
-NEWSYM pexecs
-   mov byte[soundcycleft],30
-.sloop
-   mov bl,[ebp]
-   ; 1260, 10000/12625
-   inc ebp
-   call dword near [opcjmptab+ebx*4]
-   xor ebx,ebx
-   dec byte[soundcycleft]
-   jnz .sloop
-   xor dh,dh
-   xor ebx,ebx
-   mov bl,[esi]
-   inc esi
-   jmp execloop.startagain
-
-NEWSYM pexecs2
-.sloop
-   mov bl,[ebp]
-   ; 1260, 10000/12625
-   inc ebp
-   call dword near [opcjmptab+ebx*4]
-   xor ebx,ebx
-   dec dword[soundcycleft]
-   jnz .sloop
-   ret
 
 NEWSYM UpdatePORSCMR
    push ebx
