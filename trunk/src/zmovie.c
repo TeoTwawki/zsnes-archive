@@ -3117,3 +3117,45 @@ void MovieDumpRaw()
     }
   }
 }
+
+#include <stdio.h>
+#define NUMCONV_FW2
+#define NUMCONV_FW4
+#include "numconv.h"
+
+#include <ao/ao.h>
+
+void write_audio(short *sample_buffer, size_t sample_count)
+{
+  static unsigned char first_time = 1;
+  static FILE *fp = 0;
+  if (first_time)
+  {
+    fp = fopen("audio.wav", "wb");
+    if (fp)
+    {
+      fputs("RIFF", fp);                 //header
+      fwrite4(~0, fp);                   //file size - unknown till file close
+      fputs("WAVEfmt ", fp);             //format
+      fwrite4(0x12, fp);                 //fmt size
+      fwrite2(1, fp);                    //fmt type (PCM)
+      fwrite2(2, fp);                    //channels
+      fwrite4(32000, fp);                //sample rate
+      fwrite4(32000*4, fp);              //byte rate (sample rate*block align)
+      fwrite2(16/8*2, fp);               //block align (SignificantBitsPerSample / 8 * NumChannels)
+      fwrite2(16, fp);                   //Significant bits per sample
+      fwrite2(0, fp);                    //Extra format bytes
+      fputs("data", fp);                 //data header
+      fwrite4(~0, fp);                   //data size - unknown till file close
+    }
+    else
+    {
+      fputs("Error creating audio.wav", stderr);
+    }
+    first_time = 0;
+  }
+  if (fp)
+  {
+    fwrite(sample_buffer, 2, sample_count, fp);
+  }
+}

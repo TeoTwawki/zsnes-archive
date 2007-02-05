@@ -42,7 +42,6 @@ typedef long long _int64;
 typedef long long LARGE_INTEGER;
 #define QueryPerformanceCounter(x) asm volatile("rdtsc" : "=a"(((unsigned int *)(x))[0]),"=d"(((unsigned int *)x)[1]))
 
-
 typedef enum { FALSE = 0, TRUE = 1 } BOOL;
 typedef enum vidstate_e { vid_null, vid_none, vid_soft, vid_gl } vidstate_t;
 
@@ -1089,9 +1088,9 @@ void initwinvideo(void)
 
 void CheckTimers(void)
 {
+
   //QueryPerformanceCounter((LARGE_INTEGER*)&end2);
   end2 = sem_GetTicks();
-
   while ((end2 - start2) >= update_ticks_pc2)
   {
     start2 += update_ticks_pc2;
