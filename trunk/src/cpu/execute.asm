@@ -1699,6 +1699,8 @@ NEWSYM pexecs
    mov bl,[ebp]
    ; 1260, 10000/12625
    inc ebp
+   mov eax,[clocktable+ebx*4]
+   add dword[spcCycle],eax
    call dword near [opcjmptab+ebx*4]
    xor ebx,ebx
    dec byte[soundcycleft]
@@ -1714,6 +1716,8 @@ NEWSYM pexecs2
    mov bl,[ebp]
    ; 1260, 10000/12625
    inc ebp
+   mov eax,[clocktable+ebx*4]
+   add dword[spcCycle],eax
    call dword near [opcjmptab+ebx*4]
    xor ebx,ebx
    dec dword[soundcycleft]
