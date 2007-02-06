@@ -76,9 +76,8 @@ TOOL_CO=$(TOOL_D)/fileutil.o $(TOOL_D)/strutil.o
 VID_AO=$(VID_D)/copyvwin.o $(VID_D)/makev16b.o $(VID_D)/makev16t.o\
 	$(VID_D)/makevid.o $(VID_D)/mode716.o $(VID_D)/mode716b.o\
 	$(VID_D)/mode716d.o $(VID_D)/mode716e.o $(VID_D)/mode716t.o\
-	$(VID_D)/mv16tms.o\
-	$(VID_D)/m716text.o $(VID_D)/newg162.o $(VID_D)/newgfx.o\
-	$(VID_D)/newgfx16.o $(VID_D)/procvid.o\
+	$(VID_D)/mv16tms.o $(VID_D)/m716text.o $(VID_D)/newg162.o\
+	$(VID_D)/newgfx.o $(VID_D)/newgfx16.o $(VID_D)/procvid.o\
 	$(VID_D)/sw_draw.o $(VID_D)/2xsaiw.o $(VID_D)/hq2x16.o $(VID_D)/hq2x32.o\
 	$(VID_D)/hq3x16.o $(VID_D)/hq3x32.o $(VID_D)/hq4x16.o $(VID_D)/hq4x32.o
 VID_CO=$(VID_D)/procvidc.o $(VID_D)/ntsc.o
@@ -139,19 +138,18 @@ $(TOOL_D)/varrep: $(TOOL_D)/varrep.cpp $(TOOL_CO)
 	@CXX@ @CXXFLAGS@ -o $@ $@.cpp $(TOOL_CO)
 
 include makefile.dep
-makefile.dep: $(TOOL_D)/depbuild Makefile
-	$(TOOL_D)/depbuild @CC@ "@CFLAGS@" @NASMPATH@ "@NFLAGS@" $(Z_OBJS) > makefile.dep
-
-Makefile: Makefile.in config.status
-	./config.status
 
 config.status: configure.in
 	./autogen.sh --recheck
+Makefile: config.status Makefile.in
+	./config.status
+makefile.dep: $(TOOL_D)/depbuild Makefile
+	$(TOOL_D)/depbuild @CC@ "@CFLAGS@" @NASMPATH@ "@NFLAGS@" $(Z_OBJS) > makefile.dep
 
 # set ${prefix} so mandir works.
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-datarootdir = @datarootdir@
+datarootdir=@datarootdir@
 
 install:
 	@INSTALL@ -d -m 0755 $(DESTDIR)/@bindir@

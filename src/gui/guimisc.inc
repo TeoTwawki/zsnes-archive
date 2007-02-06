@@ -480,6 +480,7 @@ NEWSYM GUIDoReset
     call init65816
     pushad
     call procexecloop
+    call dsp_reset
     popad
 
     xor eax,eax

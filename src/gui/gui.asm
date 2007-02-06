@@ -43,7 +43,7 @@
 %include "macros.mac"
 
 EXTSYM curblank,vidpastecopyscr,frameskip,newengen,cvidmode,antienab
-EXTSYM soundon,StereoSound,SoundQuality,MusicRelVol,endprog
+EXTSYM soundon,StereoSound,SoundQuality,MusicRelVol,endprog,dsp_reset
 EXTSYM continueprog,spcBuffera,cbitmode,t1cc
 EXTSYM romloadskip,romdata,init65816,current_zst
 EXTSYM procexecloop,SPCRAM,spcPCRam,spcS,spcRamDP,spcA,spcX,spcY,spcP,spcNZ
@@ -71,7 +71,6 @@ EXTSYM nssdip1,nssdip2,nssdip3,nssdip4,nssdip5,nssdip6
 EXTSYM SkipMovie,MovieStop,MoviePlay,MovieRecord
 EXTSYM MovieInsertChapter,MovieSeekAhead,MovieSeekBehind,ResetDuringMovie
 EXTSYM MovieDumpRaw,MovieAppend,AutoLoadCht,GUIQuickLoadUpdate,GUILoadData
-
 EXTSYM GUIwinposx,GUIwinposy,maxskip,GUIEffect,hqFilter,En2xSaI,NTSCFilter
 EXTSYM NTSCBlend,NTSCHue,NTSCSat,NTSCCont,NTSCBright,NTSCSharp,NTSCRef
 EXTSYM NTSCGamma,NTSCRes,NTSCArt,NTSCFringe,NTSCBleed,NTSCWarp
