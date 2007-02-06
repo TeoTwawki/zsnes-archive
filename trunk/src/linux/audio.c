@@ -69,6 +69,9 @@ void SoundWrite_ao()
     }
     */
     samples_waiting += dsp_sample_count;
+    if (samples_waiting > dsp_buffer_size) {
+	printf("Urk! Too many (%d) samples waiting!\n", samples_waiting);
+    }
     pthread_mutex_unlock(&audio_mutex);
   }
   else
