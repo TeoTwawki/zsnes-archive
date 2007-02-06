@@ -39,7 +39,7 @@ static pthread_t audio_thread;
 static pthread_mutex_t audio_mutex;
 static pthread_cond_t audio_wait;
 static ao_device *audio_device = 0;
-static volatile bool samples_waiting = false;
+static volatile size_t samples_waiting = false;
 #endif
 
 unsigned char *sdl_audio_buffer = 0;
@@ -59,37 +59,57 @@ static const int freqtab[7] = { 8000, 11025, 22050, 44100, 16000, 32000, 48000 }
 
 void SoundWrite_ao()
 {
-  if (!pthread_mutex_trylock(&audio_mutex))
+  if (!pthread_mutex_lock(&audio_mutex))
   {
+    /*
     if (!samples_waiting)
     {
       samples_waiting = true;
       pthread_cond_broadcast(&audio_wait); //Send signal
     }
+    */
+    samples_waiting += dsp_sample_count;
     pthread_mutex_unlock(&audio_mutex);
   }
   else
   {
-    pthread_cond_broadcast(&audio_wait); //Send signal
+    //pthread_cond_broadcast(&audio_wait); //Send signal
   }
 }
 
 static void *SoundThread_ao(void *useless)
 {
+  static unsigned int buffer_loc = 0;
+  unsigned int play_amount;
   for (;;)
   {
     pthread_mutex_lock(&audio_mutex);
 
+    /*
     //The while() is there to prevent error codes from breaking havoc
     while (!samples_waiting)
     {
       pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
     }
+    */
 
-    samples_waiting = false;
+    if (samples_waiting > 256) { play_amount = 256; }
+    else { play_amount =  samples_waiting; }
+    samples_waiting -= play_amount;
     pthread_mutex_unlock(&audio_mutex);
 
-    ao_play(audio_device, (char *)dsp_samples_buffer, dsp_sample_count*sizeof(short));
+    if (buffer_loc + play_amount >= dsp_buffer_size)
+    {
+      unsigned int current_amount = dsp_buffer_size - buffer_loc;
+      ao_play(audio_device, (char *)(dsp_samples_buffer+buffer_loc), current_amount*sizeof(short));
+      play_amount -= current_amount;
+      buffer_loc = 0;
+    }
+    if (play_amount)
+    {
+      ao_play(audio_device, (char *)(dsp_samples_buffer+buffer_loc), play_amount*sizeof(short));
+      buffer_loc += play_amount;
+    }
   }
   return(0);
 }

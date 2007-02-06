@@ -20,9 +20,9 @@ int DSP_reg, DSP_val;
 int DSP_midframe;
 static Spc_Dsp theDsp(SPCRAM);
 
-short dsp_samples_buffer[1280];
+short dsp_samples_buffer[1280*3]; //Buffer 3 frames for even PAL
+const unsigned int dsp_buffer_size = sizeof(dsp_samples_buffer)/sizeof(short);
 int dsp_sample_count;
-static short dsp_buffer[1280];
 int lastCycle;
 
 static int mid_samples;
@@ -50,7 +50,6 @@ void dsp_init(unsigned char is_pal)
   }
   sample_control.balance = sample_control.hi;
   memset(dsp_samples_buffer, 0, sizeof(dsp_samples_buffer));
-  memset(dsp_buffer, 0, sizeof(dsp_buffer));
   mid_samples = next_samples = dsp_sample_count = cycles_remaining = lastCycle = 0;
 }
 
@@ -84,6 +83,28 @@ void dsp_write()
   theDsp.write(DSP_reg, DSP_val);
 }
 
+void dsp_fill(unsigned int stereo_samples)
+{
+  static unsigned int fill_loc = 0;
+  dsp_sample_count = stereo_samples*2;
+  if (fill_loc+stereo_samples*2 >= dsp_buffer_size)
+  {
+    unsigned int current_samples = (dsp_buffer_size-fill_loc)/2;
+    theDsp.run(current_samples, dsp_samples_buffer+fill_loc);
+    stereo_samples -= current_samples;
+    fill_loc = 0;
+  }
+  if (stereo_samples)
+  {
+    theDsp.run(stereo_samples, dsp_samples_buffer+fill_loc);
+    fill_loc += stereo_samples*2;
+  }
+#ifdef __LIBAO__
+  SoundWrite_ao();
+#endif
+  //write_audio(dsp_samples_buffer, dsp_sample_count);
+}
+
 void dsp_run()
 {
   if (DSP_midframe)
@@ -105,8 +126,7 @@ void dsp_run()
     if (samples > 0)
     {
       //printf("outputting samples: %d\n", samples);
-      theDsp.run(samples, dsp_buffer);
-      memcpy(dsp_samples_buffer+mid_samples*2, dsp_buffer, samples*sizeof(short)*2);
+      dsp_fill(samples);
       mid_samples += samples;
     }
     lastCycle = spcCycle;
@@ -116,18 +136,11 @@ void dsp_run()
     int samples = next_samples-mid_samples;
     if (samples > 0)
     {
-      theDsp.run(samples, dsp_buffer);
-      memcpy(dsp_samples_buffer+mid_samples*2, dsp_buffer, samples*sizeof(short)*2);
+      dsp_fill(samples);
     }
-    dsp_sample_count = next_samples*2;
     mid_samples = 0;
     next_samples = (unsigned int)(sample_control.balance/sample_control.lo);
     sample_control.balance %= sample_control.lo;
     sample_control.balance += sample_control.hi;
-
-#ifdef __LIBAO__
-    SoundWrite_ao();
-#endif
-    //write_audio(dsp_samples_buffer, dsp_sample_count);
   }
 }
