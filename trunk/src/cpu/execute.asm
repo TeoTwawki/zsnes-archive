@@ -19,48 +19,46 @@
 
 %include "macros.mac"
 
-EXTSYM KeyRewind,statesaver,Voice0Status,UpdateDPage
-EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo
-EXTSYM vidbufferofsa,device2,RawDumpInProgress
-EXTSYM KeySaveState,KeyLoadState,KeyQuickExit,KeyQuickLoad,KeyQuickRst
-EXTSYM GUIDoReset,GUIReset,KeyOnStA,KeyOnStB,ProcessKeyOn,C4Enable,KeyQuickClock
-EXTSYM KeyQuickSaveSPC,TimerEnable,splitflags,joinflags
-EXTSYM KeyQuickSnapShot,csounddisable,videotroub
+EXTSYM KeyRewind,statesaver,Voice0Status,UpdateDPage,clocktable,spcCycle,dsp_run
+EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo,lastCycle
+EXTSYM vidbufferofsa,device2,RawDumpInProgress,KeySaveState,KeyLoadState
+EXTSYM KeyQuickExit,KeyQuickLoad,KeyQuickRst,GUIDoReset,GUIReset,KeyOnStA
+EXTSYM KeyOnStB,ProcessKeyOn,C4Enable,KeyQuickClock,KeyQuickSaveSPC,TimerEnable
+EXTSYM splitflags,joinflags,KeyQuickSnapShot,csounddisable,videotroub
 EXTSYM InitPreGame,Curtableaddr,curcyc,debugdisble,dmadata,guioff,memtabler8
 EXTSYM SetupPreGame,memtablew8,regaccessbankr8,showmenu,snesmap2,snesmmap
-EXTSYM DeInitPostGame,spcPCRam,xp,xpb,xpc,tablead
-EXTSYM tableadc,SA1UpdateDPage,Makemode7Table,nextmenupopup,MovieProcessing
-EXTSYM SFXEnable,wramdata,cycpbl,cycpblt,irqon,spcon
-EXTSYM multchange,romispal,scrndis,sprlefttot,sprleftpr,processsprites
-EXTSYM cachesprites,opcjmptab,CheatOn,Output_Text,Check_Key,Get_Key,
-EXTSYM INTEnab,JoyCRead,NMIEnab,NumCheats,CurrentExecSA1,ReadInputDevice
+EXTSYM DeInitPostGame,spcPCRam,xp,xpb,xpc,tablead,tableadc,SA1UpdateDPage
+EXTSYM Makemode7Table,nextmenupopup,MovieProcessing,SFXEnable,wramdata,cycpbl
+EXTSYM cycpblt,irqon,spcon,multchange,romispal,scrndis,sprlefttot,sprleftpr
+EXTSYM processsprites,cachesprites,opcjmptab,CheatOn,Output_Text,Check_Key
+EXTSYM Get_Key,INTEnab,JoyCRead,NMIEnab,NumCheats,CurrentExecSA1,ReadInputDevice
 EXTSYM StartDrawNewGfx,VIRQLoc,cachevideo,cfield,cheatdata,curblank,curnmi
 EXTSYM curypos,cycpl,doirqnext,drawline,exechdma,hdmadelay,intrset,newengen
-EXTSYM oamaddr,oamaddrs,resolutn,showvideo,starthdma,switchtonmi
-EXTSYM switchtovirq,totlines,updatetimer,SA1Swap,SA1DoIRQ,JoyAOrig,JoyANow
-EXTSYM JoyBOrig,JoyBNow,JoyCOrig,JoyCNow,JoyDOrig,JoyDNow,JoyEOrig,JoyENow
-EXTSYM SA1Message,MultiTapStat,idledetectspc,SA1Control,SA1Enable,SA1IRQEnable
-EXTSYM SPC700read,SPC700write,numspcvblleft,spc700idle,SA1IRQExec,ForceNewGfxOff
-EXTSYM LethEnData,GUIQuit,IRAM,SA1Ptr,SA1BWPtr,outofmemfix
-EXTSYM yesoutofmemory,ProcessMovies,MovieStop,ppustatus,C4VBlank
-EXTSYM ReturnFromSPCStall,scanlines,MainLoop,MoviePassWaiting,MovieDumpRaw
-EXTSYM NumberOfOpcodes,SfxCLSR,SfxSCMR,SfxPOR,sfx128lineloc,sfx160lineloc
-EXTSYM sfx192lineloc,sfxobjlineloc,sfxclineloc,PLOTJmpa,PLOTJmpb,FxTable
-EXTSYM FxTableb,FxTablec,FxTabled,SfxPBR,SCBRrel,SfxSCBR,SfxCOLR,SFXCounter
-EXTSYM fxbit01,fxbit01pcal,fxbit23,fxbit23pcal,fxbit45,fxbit45pcal,fxbit67
-EXTSYM fxbit67pcal,SfxSFR,nosprincr,cpucycle,switchtovirqdeb,switchtonmideb
-EXTSYM MovieSeekBehind,BackupCVFrame,RestoreCVFrame,loadstate,xe
-EXTSYM KeyInsrtChap,KeyNextChap,KeyPrevChap,MovieInsertChapter,MovieSeekAhead
-EXTSYM ResetDuringMovie,EMUPauseKey,INCRFrameKey,MovieWaiting,NoInputRead
-EXTSYM AllocatedRewindStates,PauseFrameMode,RestorePauseFrame,BackupPauseFrame
+EXTSYM oamaddr,oamaddrs,resolutn,showvideo,starthdma,switchtonmi,switchtovirq
+EXTSYM totlines,updatetimer,SA1Swap,SA1DoIRQ,JoyAOrig,JoyANow,JoyBOrig,JoyBNow
+EXTSYM JoyCOrig,JoyCNow,JoyDOrig,JoyDNow,JoyEOrig,JoyENow,SA1Message
+EXTSYM MultiTapStat,idledetectspc,SA1Control,SA1Enable,SA1IRQEnable,SPC700read
+EXTSYM SPC700write,numspcvblleft,spc700idle,SA1IRQExec,ForceNewGfxOff,LethEnData
+EXTSYM GUIQuit,IRAM,SA1Ptr,SA1BWPtr,outofmemfix,yesoutofmemory,ProcessMovies
+EXTSYM MovieStop,ppustatus,C4VBlank,ReturnFromSPCStall,scanlines,MainLoop
+EXTSYM MoviePassWaiting,MovieDumpRaw,NumberOfOpcodes,SfxCLSR,SfxSCMR,SfxPOR
+EXTSYM sfx128lineloc,sfx160lineloc,sfx192lineloc,sfxobjlineloc,sfxclineloc
+EXTSYM PLOTJmpa,PLOTJmpb,FxTable,FxTableb,FxTablec,FxTabled,SfxPBR,SCBRrel
+EXTSYM SfxSCBR,SfxCOLR,SFXCounter,fxbit01,fxbit01pcal,fxbit23,fxbit23pcal
+EXTSYM fxbit45,fxbit45pcal,fxbit67,fxbit67pcal,SfxSFR,nosprincr,cpucycle
+EXTSYM switchtovirqdeb,switchtonmideb,MovieSeekBehind,BackupCVFrame
+EXTSYM RestoreCVFrame,loadstate,xe,KeyInsrtChap,KeyNextChap,KeyPrevChap
+EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
+EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
+EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger
 %endif
 
 %ifdef __MSDOS__
-EXTSYM dssel,Game60hzcall,NextLineStart,FlipWait,LastLineStart,smallscreenon,ScreenScale
-EXTSYM cvidmode,GUI16VID,ScreenShotFormat,ResetTripleBuf
+EXTSYM dssel,Game60hzcall,NextLineStart,FlipWait,LastLineStart,smallscreenon
+EXTSYM cvidmode,GUI16VID,ScreenShotFormat,ResetTripleBuf,ScreenScale
 %endif
 
 SECTION .data
@@ -520,7 +518,7 @@ SECTION .data
 ; global variables
 NEWSYM invalid, db 0
 NEWSYM invopcd, db 0
-NEWSYM pressed, times 256+128+64 db 0          ; keyboard pressed keys in scancode
+NEWSYM pressed, times 256+128+64 db 0 ; keyboard pressed keys in scancode
 NEWSYM exiter, db 0
 NEWSYM oldhand9o, dd 0
 NEWSYM oldhand9s, dw 0
@@ -773,8 +771,7 @@ ALIGN16
 %%noflip
 %endif
 %endmacro
-EXTSYM clocktable,spcCycle
-EXTSYM lastCycle
+
 NEWSYM execute
 NEWSYM execloop
    mov bl,dl
@@ -1343,8 +1340,8 @@ NEWSYM cpuover
     jmp .nonewgfx
 .noemupause
 
-    ;Rewind update must be done before process this frame of movie, so rewind doesn't
-    ;back up incremented values (some vars being for the next frame)
+    ;Rewind update must be done before process this frame of movie, so rewind
+    ;doesn't back up incremented values (some vars being for the next frame)
     call UpdateRewind
 
     cmp byte[MovieProcessing],0
@@ -1488,7 +1485,6 @@ NEWSYM cpuover
     mov bl,[esi]
     inc esi
     jmp execloop.startagain
-EXTSYM dsp_run
 .overy
     pushad
     call dsp_run

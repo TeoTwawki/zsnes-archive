@@ -23,7 +23,7 @@
 
 EXTSYM flagnz,flago,flagc,SfxSCMR,curnmi,execloop,initaddrl,nmiv,snesmap2
 EXTSYM snesmmap,stackand,stackor,xe,xirqb,xpb,xpc,xs,irqon,irqv,irqv8
-EXTSYM execloopdeb,nmiv8,membank0w8
+EXTSYM execloopdeb,nmiv8,membank0w8,doirqnext
 
 ;        NMI     Hardware        00FFFA,B    00FFEA,B     3  -> 000108
 ;        RES     Hardware        00FFFC.D    00FFFC,D     1
@@ -165,8 +165,6 @@ NEWSYM NMIemulmode
     mov [initaddrl],esi
     add esi,eax
     jmp execloop
-
-EXTSYM doirqnext
 
 NEWSYM switchtovirq
     mov byte[irqon],80h

@@ -19,12 +19,11 @@
 
 %include "macros.mac"
 
-EXTSYM DosExit,getenv,PrintStr,printhex,WaitForKey
-EXTSYM soundon,csounddisable,DisplayS,SPCRAM
-EXTSYM StereoSound,SoundQuality
-EXTSYM dssel,PrintChar
+EXTSYM DosExit,getenv,PrintStr,printhex,WaitForKey,soundon,csounddisable
+EXTSYM DisplayS,SPCRAM,StereoSound,SoundQuality,dssel,PrintChar
 ;EXTSYM DSPMem,DSPBuffer,BufferSizeB,BufferSizeW,SBToSPCSpeeds2
 ;EXTSYM ProcessSoundBuffer,BufferSize,BufferSizes,SoundSpeeds,SoundSpeedt
+EXTSYM MsgCount,MessageOn,Msgptr
 
 SECTION .text
 
@@ -158,9 +157,6 @@ NEWSYM SoundInterrupt, dd 0
 
 
 ; ViBRA16X fixes!
-EXTSYM MsgCount         ; points to counter
-EXTSYM MessageOn        ; points to "message" delay counter
-EXTSYM Msgptr           ; points to the message to be displayed
 NEWSYM vibmsg, db 'VIBRA16X MODE ENABLED', 0
 
 section .text

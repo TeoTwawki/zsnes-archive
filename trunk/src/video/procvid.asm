@@ -29,7 +29,7 @@ EXTSYM romispal,scaddtype,scanlines,selcA000,t1cc,vcache4b,vesa2_bpos
 EXTSYM spritetablea,vesa2_clbit,vesa2_gpos,vesa2_rpos,vesa2red10
 EXTSYM vidbuffer,vram,KeyStateSelct,soundon
 EXTSYM bg1objptr,DecompAPtr,HalfTransB,HalfTransC
-EXTSYM DrawScreen,MMXSupport
+EXTSYM DrawScreen,MMXSupport,TwelveHourClock
 EXTSYM Get_MouseData,Get_MousePositionDisplacement,GUIEnableTransp,GUIFontData
 EXTSYM StopSound,StartSound,PrevPicture,nggposng,current_zst,newest_zst
 EXTSYM GetTimeInSeconds,bg3ptr,bg3scroly,bg3scrolx,C4Ram
@@ -2533,8 +2533,6 @@ SECTION .bss
 NEWSYM tempoffset, resw 1
 NEWSYM Testval, resd 1
 SECTION .text
-
-EXTSYM TwelveHourClock
 
 NEWSYM ClockOutput
 %ifdef __MSDOS__
