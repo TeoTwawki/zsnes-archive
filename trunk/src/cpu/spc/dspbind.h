@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+extern int lastCycle;
+
 void dsp_init(unsigned char is_pal);
 
 

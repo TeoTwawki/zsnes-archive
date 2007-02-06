@@ -18,13 +18,12 @@ double DSP_gain;
 int DSP_disable;
 int DSP_reg, DSP_val;
 int DSP_midframe;
-int lastCycles;
 static Spc_Dsp theDsp(SPCRAM);
 
 short dsp_samples_buffer[1280];
 int dsp_sample_count;
 static short dsp_buffer[1280];
-int lastCycle = 0;
+int lastCycle;
 
 static int mid_samples;
 static int cycles_remaining;
@@ -52,7 +51,7 @@ void dsp_init(unsigned char is_pal)
   sample_control.balance = sample_control.hi;
   memset(dsp_samples_buffer, 0, sizeof(dsp_samples_buffer));
   memset(dsp_buffer, 0, sizeof(dsp_buffer));
-  mid_samples = next_samples = dsp_sample_count = cycles_remaining = 0;
+  mid_samples = next_samples = dsp_sample_count = cycles_remaining = lastCycle = 0;
 }
 
 void dsp_mute_voices()
