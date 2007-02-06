@@ -22,7 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef AUDIO_H
 #define AUDIO_H
 
-void InitSampleControl();
 int InitSound();
 void DeinitSound();
 
