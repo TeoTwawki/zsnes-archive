@@ -37,6 +37,7 @@ void dsp_write();
 void dsp_run();
 
 extern short dsp_samples_buffer[];
+extern const unsigned int dsp_buffer_size;
 extern int dsp_sample_count;
 
 #ifdef __cplusplus
