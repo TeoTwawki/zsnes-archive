@@ -19,7 +19,7 @@
 
 %include "macros.mac"
 
-EXTSYM KeyRewind,statesaver,Voice0Status,UpdateDPage,clocktable,spcCycle,dsp_run
+EXTSYM KeyRewind,statesaver,Voice0Status,UpdateDPage,clocktable,spcCycle
 EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo,lastCycle
 EXTSYM vidbufferofsa,device2,RawDumpInProgress,KeySaveState,KeyLoadState
 EXTSYM KeyQuickExit,KeyQuickLoad,KeyQuickRst,GUIDoReset,GUIReset,KeyOnStA
@@ -50,7 +50,7 @@ EXTSYM switchtovirqdeb,switchtonmideb,MovieSeekBehind,BackupCVFrame
 EXTSYM RestoreCVFrame,loadstate,xe,KeyInsrtChap,KeyNextChap,KeyPrevChap
 EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
 EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
-EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame
+EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame,dsp_run_wrap
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger
@@ -1489,7 +1489,7 @@ NEWSYM cpuover
     jmp execloop.startagain
 .overy
     pushad
-    call dsp_run
+    call dsp_run_wrap
     popad
 
     mov eax,[spcCycle]

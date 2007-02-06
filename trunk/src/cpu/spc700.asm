@@ -21,13 +21,9 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_write,dsp_reset
-EXTSYM spc700read,dspWptr,curexecstate,tableadc,DSP_val,DSP_reg,opcjmptab
-EXTSYM DSP_midframe
-
-%ifdef __UNIXSDL__
-EXTSYM dsp_run
-%endif
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl
+EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
+EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_write_wrap,dsp_reset,dsp_run_wrap
 
 %include "cpu/regsw.mac"
 %include "cpu/spcdef.inc"
@@ -686,9 +682,9 @@ NEWSYM SPCRegF3
     mov [DSP_reg],bl
     mov byte[DSP_midframe],1
     pushad
-    call dsp_write
+    call dsp_write_wrap
 %ifdef __UNIXSDL__
-    call dsp_run
+    call dsp_run_wrap
 %endif
     popad
     mov byte[DSP_midframe],0
