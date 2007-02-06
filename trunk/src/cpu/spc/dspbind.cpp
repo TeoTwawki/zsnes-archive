@@ -91,18 +91,20 @@ void dsp_fill(unsigned int stereo_samples)
   {
     unsigned int current_samples = (dsp_buffer_size-fill_loc)/2;
     theDsp.run(current_samples, dsp_samples_buffer+fill_loc);
+    write_audio(dsp_samples_buffer+fill_loc, current_samples*2);
     stereo_samples -= current_samples;
     fill_loc = 0;
   }
   if (stereo_samples)
   {
     theDsp.run(stereo_samples, dsp_samples_buffer+fill_loc);
+    write_audio(dsp_samples_buffer+fill_loc, stereo_samples*2);
     fill_loc += stereo_samples*2;
   }
+
 #ifdef __LIBAO__
   SoundWrite_ao();
 #endif
-  //write_audio(dsp_samples_buffer, dsp_sample_count);
 }
 
 void dsp_run()
@@ -129,7 +131,6 @@ void dsp_run()
       dsp_fill(samples);
       mid_samples += samples;
     }
-    lastCycle = spcCycle;
   }
   else
   {
@@ -143,4 +144,5 @@ void dsp_run()
     sample_control.balance %= sample_control.lo;
     sample_control.balance += sample_control.hi;
   }
+  lastCycle = spcCycle;
 }
