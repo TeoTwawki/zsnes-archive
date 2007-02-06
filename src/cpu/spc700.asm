@@ -631,6 +631,7 @@ NEWSYM SPCRegF1
     test al,10h
     jz .No01Clear
     mov byte[SPCRAM+0F4h],0
+    mov byte[SPCRAM+0F5h],0
 .No01Clear
     test al,20h
     jz .No23Clear
