@@ -38,7 +38,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "input.h"
 #include "zpath.h"
 #include "cpu/memtable.h"
-#include "cpu/spc/dspbind.h"
+#include "cpu/dsp.h"
 
 #define NUMCONV_FR4
 #include "numconv.h"
@@ -2110,7 +2110,7 @@ void SetupROM()
       romispal = ((!BSEnable) && (ROM[infoloc+CountryOffset] > 1) && (ROM[infoloc+CountryOffset] < 0xD));
   }
 
-  dsp_init(romispal);
+  dsp_init_wrap(romispal);
 
   if (romispal)
   {
