@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+void dsp_init(unsigned char is_pal);
+
 
 // Mute voice n if bit n (1 << n) of DSP_mask is clear.
 extern int DSP_mask;
@@ -32,7 +34,7 @@ void dsp_write();
 // Run DSP for 'count' samples. Write resulting samples to 'buf' if not NULL.
 void dsp_run();
 
-extern short dsp_samples_buffer[1068];
+extern short dsp_samples_buffer[];
 extern int dsp_sample_count;
 
 #ifdef __cplusplus

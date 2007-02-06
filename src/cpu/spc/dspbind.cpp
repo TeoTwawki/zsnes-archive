@@ -21,6 +21,40 @@ int DSP_midframe;
 int lastCycles;
 static Spc_Dsp theDsp(SPCRAM);
 
+short dsp_samples_buffer[1280];
+int dsp_sample_count;
+static short dsp_buffer[1280];
+int lastCycle = 0;
+
+static int mid_samples;
+static int cycles_remaining;
+static int next_samples;
+
+struct
+{
+  unsigned long long hi;
+  unsigned long long lo;
+  unsigned long long balance;
+} static sample_control;
+
+void dsp_init(unsigned char is_pal)
+{
+  if (is_pal)
+  {
+    sample_control.hi = 1ULL*32000ULL;
+    sample_control.lo = 50ULL;
+  }
+  else
+  {
+    sample_control.hi = 995ULL*32000ULL;
+    sample_control.lo = 59649ULL;
+  }
+  sample_control.balance = sample_control.hi;
+  memset(dsp_samples_buffer, 0, sizeof(dsp_samples_buffer));
+  memset(dsp_buffer, 0, sizeof(dsp_buffer));
+  mid_samples = next_samples = dsp_sample_count = cycles_remaining = 0;
+}
+
 void dsp_mute_voices()
 {
   theDsp.mute_voices(DSP_mask);
@@ -51,29 +85,14 @@ void dsp_write()
   theDsp.write(DSP_reg, DSP_val);
 }
 
-short dsp_samples_buffer[1068] = {0};
-int dsp_sample_count;
-static short dsp_buffer[1068] = {0};
-int lastCycle = 0;
-
-struct
-{
-  unsigned long long hi;
-  unsigned long long lo;
-  unsigned long long balance;
-} static sample_control = { 995ULL*32000ULL, 59649ULL, 995ULL*32000ULL };
-
 void dsp_run()
 {
-  static int mid_samples = 0;
-  static int remainder = 0;
-  static int next_samples = 0;
   if (DSP_midframe)
   {
     int samples;
 
-    div_t d = div((remainder+spcCycle)-lastCycle, 64);
-    remainder = d.rem;
+    div_t d = div((cycles_remaining+spcCycle)-lastCycle, 64);
+    cycles_remaining = d.rem;
     samples = d.quot;
     while (samples > next_samples)
     {
