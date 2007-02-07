@@ -21,9 +21,9 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_init_wrap
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
-EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_write_wrap,dsp_reset,dsp_run_wrap
+EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_write_wrap,dsp_run_wrap
 
 %include "cpu/regsw.mac"
 %include "cpu/spcdef.inc"
@@ -194,7 +194,7 @@ SECTION .data
 NEWSYM timer2upd, dd 0
 SECTION .text
 
-NEWSYM InitSPC
+NEWSYM InitSPCRegs
       mov eax,SPCRAM
       mov ebx,0EFh
 .loop2
@@ -519,10 +519,6 @@ NEWSYM InitSPC
       mov dword[opcjmptab+03F4h],OpFD
       mov dword[opcjmptab+03F8h],OpFE
       mov dword[opcjmptab+03FCh],OpFF
-      pushad
-      call dsp_init_wrap
-      call dsp_reset
-      popad
       ret
 
 ; This function is called every scanline (262*60 times/sec)

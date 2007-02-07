@@ -1492,8 +1492,6 @@ NEWSYM cpuover
     call dsp_run_wrap
     popad
 
-    mov eax,[spcCycle]
-    mov [lastCycle],eax
     mov dh,80
 %ifdef __MSDOS__
     cmp byte[smallscreenon],1
