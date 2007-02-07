@@ -70,27 +70,8 @@ static int mid_samples;
 static int cycles_remaining;
 static int next_samples;
 
-struct sample_control_t
-{
-  unsigned long long hi;
-  unsigned long long lo;
-  unsigned long long balance;
-};
-static struct sample_control_t sample_control;
-
 void InitDSPControl(unsigned char is_pal)
 {
-  if (is_pal)
-  {
-    sample_control.hi = 1ULL*32050ULL;
-    sample_control.lo = 50ULL;
-  }
-  else
-  {
-    sample_control.hi = 995ULL*32050ULL;
-    sample_control.lo = 59649ULL;
-  }
-  sample_control.balance = sample_control.hi;
   memset(dsp_samples_buffer, 0, sizeof(dsp_samples_buffer));
   mid_samples = next_samples = dsp_sample_count = cycles_remaining = lastCycle = 32;
 }
@@ -153,9 +134,7 @@ void dsp_run_wrap()
       dsp_fill(samples);
     }
     mid_samples = 0;
-    next_samples = (unsigned int)(sample_control.balance/sample_control.lo);
-    sample_control.balance %= sample_control.lo;
-    sample_control.balance += sample_control.hi;
+    next_samples = ???
   }
   lastCycle = spcCycle;
 }
