@@ -937,11 +937,10 @@ void dsp_run_wrap()
 {
   if (DSP_midframe)
   {
-    int samples;
+    int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 6;
 
-    div_t d = div((cycles_remaining+spcCycle)-lastCycle, 64);
-    cycles_remaining = d.rem;
-    samples = d.quot;
+    cycles_remaining = i & 63;
+
     while (samples > next_samples)
     {
       samples -= next_samples;
