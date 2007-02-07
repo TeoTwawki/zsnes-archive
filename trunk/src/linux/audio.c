@@ -76,7 +76,7 @@ static void *SoundThread_ao(void *useless)
   unsigned int play_amount;
   for (;;)
   {
-    pthread_cond_broadcast(&audio_wait); //Send signal
+    //pthread_cond_broadcast(&audio_wait); //Send signal
     pthread_mutex_lock(&audio_mutex);
 
     if (samples_waiting > 256) { play_amount = 256; }
