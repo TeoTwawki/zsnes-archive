@@ -2574,7 +2574,9 @@ bool loadfileGUI()
 extern unsigned int CheatOn, NumCheats;
 extern unsigned char CheatWinMode, CheatSearchStatus;
 void GUIQuickLoadUpdate();
+#ifdef __UNIXSDL__
 void InitSPC(bool);
+#endif
 
 void powercycle(bool sramload, bool romload)
 {
@@ -2603,7 +2605,9 @@ void powercycle(bool sramload, bool romload)
     {
       if (DisplayInfo) { showinfogui(); }
       initsnes();
+#ifdef __UNIXSDL__
       InitSPC(romispal);
+#endif
     }
 
     sramsavedis = 0;
