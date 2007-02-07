@@ -19,6 +19,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -61,7 +62,7 @@ void write_audio(short *sample_buffer, size_t sample_count);
 extern unsigned char cycpbl;
 extern unsigned int spcCycle;
 
-short dsp_samples_buffer[1280*3]; //Buffer 3 frames for even PAL
+short dsp_samples_buffer[1280*5]; //Buffer 5 frames for even PAL
 const unsigned int dsp_buffer_size = sizeof(dsp_samples_buffer)/sizeof(short);
 int dsp_sample_count;
 int lastCycle;
@@ -99,7 +100,9 @@ void InitDSPControl(unsigned char is_pal)
 void dsp_fill(unsigned int stereo_samples)
 {
   static unsigned int fill_loc = 0;
-  dsp_sample_count = stereo_samples*2;
+  printf("outputting samples: %d\n", stereo_samples);
+
+  dsp_sample_count += stereo_samples*2;
   if (fill_loc+stereo_samples*2 >= dsp_buffer_size)
   {
     unsigned int current_samples = (dsp_buffer_size-fill_loc)/2;
@@ -115,9 +118,13 @@ void dsp_fill(unsigned int stereo_samples)
     fill_loc += stereo_samples*2;
   }
 
+  if (dsp_sample_count >= 512) //Prevent slowing down from crazy little writing
+  {
 #ifdef __LIBAO__
-  SoundWrite_ao();
+    SoundWrite_ao();
 #endif
+    dsp_sample_count = 0;
+  }
 }
 
 int DSP_midframe;
