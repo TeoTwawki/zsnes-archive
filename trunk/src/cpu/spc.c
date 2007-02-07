@@ -27,12 +27,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define true 1
 #define false 0
 
-void InitSPC(bool is_pal)
+void InitSPC()
 {
   extern unsigned char SPCRAM[0x10000];
+  extern bool romispal;
 
   asm_call(InitSPCRegs);
   dsp_init(SPCRAM);
   dsp_reset();
-  InitDSPControl(is_pal);
+  InitDSPControl(romispal);
 }
