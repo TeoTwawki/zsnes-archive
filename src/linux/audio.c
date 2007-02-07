@@ -61,22 +61,12 @@ void SoundWrite_ao()
 {
   if (!pthread_mutex_lock(&audio_mutex))
   {
-    /*
-    if (!samples_waiting)
-    {
-      samples_waiting = true;
-      pthread_cond_broadcast(&audio_wait); //Send signal
-    }
-    */
     samples_waiting += dsp_sample_count;
-    if (samples_waiting > dsp_buffer_size) {
-	printf("Urk! Too many (%d) samples waiting!\n", samples_waiting);
+    if (samples_waiting > 1280)
+    {
+      pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
     }
     pthread_mutex_unlock(&audio_mutex);
-  }
-  else
-  {
-    //pthread_cond_broadcast(&audio_wait); //Send signal
   }
 }
 
@@ -86,15 +76,8 @@ static void *SoundThread_ao(void *useless)
   unsigned int play_amount;
   for (;;)
   {
+    pthread_cond_broadcast(&audio_wait); //Send signal
     pthread_mutex_lock(&audio_mutex);
-
-    /*
-    //The while() is there to prevent error codes from breaking havoc
-    while (!samples_waiting)
-    {
-      pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
-    }
-    */
 
     if (samples_waiting > 256) { play_amount = 256; }
     else { play_amount =  samples_waiting; }

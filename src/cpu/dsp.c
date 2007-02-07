@@ -873,6 +873,8 @@ void dsp_load_state( dsp_state_t const* in )
 
 //ZSNES Extras Begin
 
+int DSP_reg, DSP_val;
+
 int dsp_read_wrap()
 {
   return dsp_read(DSP_reg);
@@ -889,9 +891,6 @@ void SoundWrite_ao();
 void write_audio(short *sample_buffer, size_t sample_count);
 extern unsigned char cycpbl;
 extern unsigned int spcCycle;
-
-int DSP_reg, DSP_val;
-int DSP_midframe;
 
 short dsp_samples_buffer[1280*3]; //Buffer 3 frames for even PAL
 const unsigned int dsp_buffer_size = sizeof(dsp_samples_buffer)/sizeof(short);
@@ -950,6 +949,8 @@ void dsp_fill(unsigned int stereo_samples)
   SoundWrite_ao();
 #endif
 }
+
+int DSP_midframe;
 
 void dsp_run_wrap()
 {
