@@ -189,7 +189,7 @@ CPUOBJ=${CPU_D}/dma${OE}\
 	${CPU_D}/execute${OE} ${CPU_D}/executec${OE} ${CPU_D}/irq${OE}\
 	${CPU_D}/memory${OE} ${CPU_D}/memtable${OE} ${CPU_D}/spc700${OE}\
 	${CPU_D}/stable${OE} ${CPU_D}/table${OE}\
-	${CPU_D}/tablec${OE} ${CPU_D}/spc/dsp${OE} ${CPU_D}/spc/dspbind${OE}
+	${CPU_D}/tablec${OE} ${CPU_D}/dsp${OE}
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
 
@@ -358,13 +358,7 @@ ${CHIP_D}/st10proc${OE}: ${CHIP_D}/st10proc.asm macros.mac
 ${CHIP_D}/st11proc${OE}: ${CHIP_D}/st11proc.asm macros.mac
 
 ${CPU_D}/dma${OE}: ${CPU_D}/dma.asm macros.mac
-#${CPU_D}/dsp${OE}: ${CPU_D}/dsp.asm macros.mac
-#${CPU_D}/dspproc${OE}: ${CPU_D}/dspproc.asm macros.mac ${CPU_D}/firtable.inc
-${CPU_D}/spc/dsp${OE}: ${CPU_D}/spc/dsp.cpp ${CPU_D}/spc/b_common.h \
-	${CPU_D}/spc/b_config.h ${CPU_D}/spc/b_endian.h ${CPU_D}/spc/b_source.h \
-	${CPU_D}/spc/dsp.h
-${CPU_D}/spc/dspbind${OE}: ${CPU_D}/spc/dspbind.cpp ${CPU_D}/spc/b_common.h \
-	${CPU_D}/spc/b_config.h ${CPU_D}/spc/dsp.h ${CPU_D}/spc/dspbind.h
+${CPU_D}/dsp${OE}: ${CPU_D}/dsp.c macros.mac
 ${CPU_D}/execute${OE}: ${CPU_D}/execute.asm macros.mac
 ${CPU_D}/executec${OE}: ${CPU_D}/executec.c gblvars.h
 ${CPU_D}/irq${OE}: ${CPU_D}/irq.asm macros.mac
@@ -512,7 +506,6 @@ ifneq (${ENV},)
 	${DELPRE} ${EXE}${SEP} ${PSR}${DELSUF}
 	${DELPRE} *${OE}${SEP} ${NET_D}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${CPU_D}${SLASH}*${OE}${SEP} ${GUI_D}${SLASH}*${OE}${DELSUF}
-	${DELPRE} ${CPU_D}${SLASH}spc${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${JMA_D}${SLASH}*${OE}${SEP} ${MMLIB_D}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${EFF_D}${SLASH}*${OE}${SEP} ${ZIP_D}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${DOS_D}${SLASH}*${OE}${SEP} ${WIN_D}${SLASH}*${OE}${DELSUF}
