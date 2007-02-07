@@ -27,7 +27,7 @@ EXTSYM flagnz,flago,flagc,cpucycle,cycpbl,cycpblt,opcjmptab,doirqnext,dmadata
 EXTSYM clocktable,spcCycle
 
 
-%macro endloop 
+%macro endloop 0
     sub dword[cycpbl],26
     jnc near %%skipallspc
     mov eax,[cycpblt]
