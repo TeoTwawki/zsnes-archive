@@ -27,10 +27,10 @@ EXTSYM flagnz,flago,flagc,cpucycle,cycpbl,cycpblt,opcjmptab,doirqnext,dmadata
 EXTSYM clocktable,spcCycle
 
 
-%macro endloop 0
+%macro endloop 
 ;    test byte[curexecstate],2
 ;    jz near %%skipallspc
-    sub dword[cycpbl],25
+    sub dword[cycpbl],26
     jnc near %%skipallspc
     mov eax,[cycpblt]
     mov bl,[ebp]
