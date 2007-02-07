@@ -1925,13 +1925,15 @@ NEWSYM execsingle
     xor ebx,ebx
     test byte[curexecstate],2
     jz .nosoundb
-;    sub dword[cycpbl],20
-;    jnc .skipallspc
+    sub dword[cycpbl],55
+    jnc .skipallspc
     mov eax,[cycpblt]
     mov bl,[ebp]
     add dword[cycpbl],eax
     ; 1260, 10000/12625
     inc ebp
+    mov eax,[clocktable+ebx*4]
+    add dword[spcCycle],eax
     call dword near [opcjmptab+ebx*4]
     xor ebx,ebx
 .skipallspc
