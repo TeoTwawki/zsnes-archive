@@ -3104,7 +3104,7 @@ void write_audio(short *sample_buffer, size_t sample_count)
   static FILE *fp = 0;
   if (first_time)
   {
-    fp = fopen("audio.wav", "wb");
+    fp = fopen_dir(ZCfgPath, "zdsp.wav", "wb");
     if (fp)
     {
       fputs("RIFF", fp);                 //header
