@@ -125,7 +125,7 @@ void dsp_run_wrap()
 {
   if (DSP_midframe)
   {
-    int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 6;
+    int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 5;
 
     cycles_remaining = i & 31;
 
