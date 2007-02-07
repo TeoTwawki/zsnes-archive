@@ -810,7 +810,7 @@ NEWSYM execloop
    call OSPC_Run
    popad
 %else
-   sub dword[cycpbl],55
+   sub dword[cycpbl],38
    jnc .skipallspc
    mov eax,[cycpblt]
    mov bl,[ebp]
