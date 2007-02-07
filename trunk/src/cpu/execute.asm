@@ -1507,41 +1507,6 @@ NEWSYM cpuover
 .nocfield
     mov word[curypos],0
     xor byte[ppustatus],80h
-    cmp dword[numspcvblleft],0
-    je near .novblch
-    cmp [lowestspc],ebp
-    ja .failspc
-    cmp [highestspc],ebp
-    jb .failspc
-    jmp .okayspc
-.failspc
-    mov eax,ebp
-    sub eax,10
-    mov [lowestspc],eax
-    add eax,20
-    mov [highestspc],eax
-    mov dword[spc700idle],0
-.okayspc
-    cmp dword[SPC700write],0
-    jne .notwritespc
-    cmp dword[spc700read],0
-    je .notwritespc
-    cmp dword[SPC700read],1500
-    jb .notwritespc
-    inc dword[spc700idle]
-    cmp dword[spc700idle],30
-    jne .noidleend
-    call idledetectspc
-    cmp byte[ReturnFromSPCStall],1
-    jne .noidleend
-    mov byte[ExecExitOkay],0
-    jmp exitloop
-.noidleend
-    jmp .notidle
-.notwritespc
-    mov dword[spc700idle],0
-.notidle
-    dec dword[numspcvblleft]
     mov dword[SPC700write],0
     mov dword[SPC700read],0
     mov dword[spc700read],0
