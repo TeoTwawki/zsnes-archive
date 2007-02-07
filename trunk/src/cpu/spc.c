@@ -82,17 +82,17 @@ void InitDSPControl(unsigned char is_pal)
 {
   if (is_pal)
   {
-    sample_control.hi = 1ULL*32000ULL;
+    sample_control.hi = 1ULL*32050ULL;
     sample_control.lo = 50ULL;
   }
   else
   {
-    sample_control.hi = 995ULL*32000ULL;
+    sample_control.hi = 995ULL*32050ULL;
     sample_control.lo = 59649ULL;
   }
   sample_control.balance = sample_control.hi;
   memset(dsp_samples_buffer, 0, sizeof(dsp_samples_buffer));
-  mid_samples = next_samples = dsp_sample_count = cycles_remaining = lastCycle = 0;
+  mid_samples = next_samples = dsp_sample_count = cycles_remaining = lastCycle = 32;
 }
 
 void dsp_fill(unsigned int stereo_samples)
@@ -127,7 +127,7 @@ void dsp_run_wrap()
   {
     int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 6;
 
-    cycles_remaining = i & 63;
+    cycles_remaining = i & 31;
 
     while (samples > next_samples)
     {
