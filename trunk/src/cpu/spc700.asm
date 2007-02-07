@@ -677,10 +677,8 @@ NEWSYM SPCRegF3
     mov [DSP_reg],bl
     mov byte[DSP_midframe],1
     pushad
-    call dsp_write_wrap
-%ifdef __UNIXSDL__
     call dsp_run_wrap
-%endif
+    call dsp_write_wrap
     popad
     mov byte[DSP_midframe],0
     pop ebx
