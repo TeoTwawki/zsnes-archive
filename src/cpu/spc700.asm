@@ -29,8 +29,8 @@ EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_write_wrap,dsp_reset,dsp_run_wrap
 %include "cpu/spcdef.inc"
 %include "cpu/spcaddr.inc"
 
-; SPC 700 Emulation by _Demo_
-; Version 2.0
+; SPC 700 Emulation by _Demo_, and pagefault
+; Version 2.5
 
 ; Little info on functions :
 ; Write byte : write al at [ebx]
