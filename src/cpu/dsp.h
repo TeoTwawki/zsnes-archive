@@ -85,19 +85,4 @@ typedef struct dsp_state_t
 void dsp_save_state( dsp_state_t* out );
 void dsp_load_state( dsp_state_t const* in );
 
-
-//ZSNES Extras Begin
-extern int DSP_reg, DSP_val;
-int dsp_read_wrap();
-void dsp_write_wrap();
-
-extern short dsp_samples_buffer[];
-extern const unsigned int dsp_buffer_size;
-extern int dsp_sample_count;
-void dsp_run_wrap();
-
-extern int lastCycle;
-void InitDSPControl(unsigned char is_pal);
-
-
 #endif
