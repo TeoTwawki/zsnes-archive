@@ -100,7 +100,7 @@ void InitDSPControl(unsigned char is_pal)
 void dsp_fill(unsigned int stereo_samples)
 {
   static unsigned int fill_loc = 0;
-  printf("outputting samples: %d\n", stereo_samples);
+  // printf("outputting samples: %d\n", stereo_samples);
 
   dsp_sample_count += stereo_samples*2;
   if (fill_loc+stereo_samples*2 >= dsp_buffer_size)
@@ -166,4 +166,11 @@ void dsp_run_wrap()
   }
 */
   lastCycle = spcCycle;
+
+  // debug stuff
+  if (!DSP_midframe) {
+      static lastframe = 0;
+      printf("frame cycles: %d\n", lastCycle-lastframe);
+      lastframe = lastCycle;
+  }
 }
