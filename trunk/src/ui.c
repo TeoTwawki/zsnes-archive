@@ -98,7 +98,7 @@ unsigned char DSPDisable    = 0;    // Disable DSP emulation
 unsigned char MusicVol      = 0;
 unsigned char MMXextSupport = 0;
 
-void init(), WaitForKey(), MMXCheck(), InitSPC(), DosExit();
+void init(), WaitForKey(), MMXCheck(), DosExit();
 void SystemInit(), StartUp(), MultiMouseInit();
 
 void *alloc_ptr;
@@ -379,13 +379,7 @@ void zstart()
     romloadskip = true;
   }
 
-#ifdef OPENSPC
-  OSPC_Init();
-#else
   setnoise();
-  asm_call(InitSPC);
-#endif
-
   allocmem();
 
   if (!(spcon = !SPCDisable)) { soundon = 0; }

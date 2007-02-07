@@ -2110,8 +2110,6 @@ void SetupROM()
       romispal = ((!BSEnable) && (ROM[infoloc+CountryOffset] > 1) && (ROM[infoloc+CountryOffset] < 0xD));
   }
 
-  dsp_init_wrap(romispal);
-
   if (romispal)
   {
     totlines = 314;
@@ -2576,6 +2574,7 @@ bool loadfileGUI()
 extern unsigned int CheatOn, NumCheats;
 extern unsigned char CheatWinMode, CheatSearchStatus;
 void GUIQuickLoadUpdate();
+void InitSPC(bool);
 
 void powercycle(bool sramload, bool romload)
 {
@@ -2604,6 +2603,7 @@ void powercycle(bool sramload, bool romload)
     {
       if (DisplayInfo) { showinfogui(); }
       initsnes();
+      InitSPC(romispal);
     }
 
     sramsavedis = 0;

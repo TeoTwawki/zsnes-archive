@@ -1,10 +1,31 @@
-#include "dsp.h"
+/*
+Copyright (C) 1997-2007 ZSNES Team ( zsKnight, _Demo_, pagefault, Nach )
+
+http://www.zsnes.com
+http://sourceforge.net/projects/zsnes
+https://zsnes.bountysource.com
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+version 2 as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
+
+#include "dsp.h"
 
 /* Copyright (C) 2002 Brad Martin (original implementation) */
 /* Copyright (C) 2006-2007 Adam Gashlin (hcs) (conversion to C) */
@@ -124,22 +145,22 @@ enum { gain_bits = 8 };
 struct dsp_t
 {
 	union regs_t r;
-	
+
 	uint8_t* ram;
-	
+
 	unsigned echo_pos;
 	int  noise_count;
 	int16_t  noise; // must be 16 bits
 	int  keys_down;
-	
+
 	// fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code
 	int fir_pos; // (0 to 7)
 	int fir_buf [dsp_fir_buf_half * 2] [2];
 	int fir_coeff [dsp_voice_count]; // copy of echo FIR constants as int, for faster access
-	
+
 	int gain;
 	int surround_threshold;
-	
+
 	voice_t voice_state [dsp_voice_count];
 };
 
@@ -158,7 +179,7 @@ void dsp_init( void* ram )
 	dsp_disable_surround( 0 );
 	dsp_mute_voices( 0 );
 	dsp_reset();
-	
+
 	// be sure compiler didn't pad structures overlaying dsp registers
 	assert( offsetof (struct globals_t,unused9 [2]) == dsp_register_count );
 	assert( sizeof (d->r.voice) == dsp_register_count );
@@ -169,7 +190,7 @@ void dsp_mute_voices( int mask )
 	int i;
 	for ( i = dsp_voice_count; --i >= 0; )
 		d->voice_state [i].enabled = -(~mask >> i & 1);
-	
+
 	// update cached volume values
 	for ( i = dsp_voice_count * 0x10; (i -= 0x10) >= 0; )
 		dsp_write( i, d->r.reg [i] );
@@ -199,7 +220,7 @@ void dsp_reset()
 	d->noise       = 2;
 	d->echo_pos    = 0;
 	d->fir_pos     = 0;
-	
+
 	int i;
 	for ( i = dsp_voice_count; --i >= 0; )
 	{
@@ -207,7 +228,7 @@ void dsp_reset()
 		memset( v, 0, offsetof (voice_t,enabled) );
 		v->env_mode = state_release;
 	}
-	
+
 	memset( &d->r, 0, sizeof d->r );
 	memset( d->fir_buf, 0, sizeof d->fir_buf );
 	memset( d->fir_coeff, 0, sizeof d->fir_coeff );
@@ -220,11 +241,11 @@ int dsp_read( int addr )
 	assert( (unsigned) addr < dsp_register_count );
 	return d->r.reg [addr];
 }
-	
+
 void dsp_write( int addr, int data )
 {
 	assert( (unsigned) addr < dsp_register_count );
-	
+
 	d->r.reg [addr] = data;
 	int high = addr >> 4;
 	int low  = addr & 0x0F;
@@ -232,7 +253,7 @@ void dsp_write( int addr, int data )
 	{
 		int left  = *(int8_t const*) &d->r.reg [addr & ~1];
 		int right = *(int8_t const*) &d->r.reg [addr |  1];
-		
+
 		// eliminate surround only if enabled and signs of volumes differ
 		if ( left * right < d->surround_threshold )
 		{
@@ -241,7 +262,7 @@ void dsp_write( int addr, int data )
 			else
 				right = -right;
 		}
-		
+
 		// apply per-channel muting
 		voice_t* v = &d->voice_state [high];
 		int enabled = v->enabled;
@@ -266,14 +287,14 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 {
 	if ( d->r.g.flags & 0x80 )
 		soft_reset();
-	
+
 	// Key on/off
 	{
 		int key_ons  = d->r.g.key_ons;
 		int key_offs = d->r.g.key_offs;
 		d->r.g.wave_ended &= ~key_ons;	// keying on a voice resets that bit in ENDX
 		d->r.g.key_ons = key_ons & key_offs; // key_off bits prevent key_on from being acknowledged
-		
+
 		// process key events outside loop, since they won't re-occur
 		voice_t* voice = &d->voice_state [8];
 		int vbit = 0x80;
@@ -292,42 +313,42 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 		}
 		while ( (vbit >>= 1) != 0 );
 	}
-	
+
 	// Global volume
 	int global_vol_0;
 	int global_vol_1;
 	{
 		int vol_0 = d->r.g.volume_0;
 		int vol_1 = d->r.g.volume_1;
-		
+
 		// eliminate surround
 		if ( vol_0 * vol_1 < d->surround_threshold )
 			vol_1 = -vol_1; // eliminate surround
-		
+
 		// scale by gain
 		global_vol_0 = (vol_0 * d->gain) >> gain_bits;
 		global_vol_1 = (vol_1 * d->gain) >> gain_bits;
 	}
-	
+
 	// each period divides exactly into 0x7800
 	#define ENV( period ) (0x7800 / period)
 	int const env_rate_init = ENV( 1 );
 	static int const env_rates [0x20] =
 	{
-		        0, ENV(2048), ENV(1536), 
-		ENV(1280), ENV(1024), ENV( 768), 
-		ENV( 640), ENV( 512), ENV( 384), 
-		ENV( 320), ENV( 256), ENV( 192), 
-		ENV( 160), ENV( 128), ENV(  96), 
-		ENV(  80), ENV(  64), ENV(  48), 
-		ENV(  40), ENV(  32), ENV(  24), 
-		ENV(  20), ENV(  16), ENV(  12), 
-		ENV(  10), ENV(   8), ENV(   6), 
-		ENV(   5), ENV(   4), ENV(   3), 
+		        0, ENV(2048), ENV(1536),
+		ENV(1280), ENV(1024), ENV( 768),
+		ENV( 640), ENV( 512), ENV( 384),
+		ENV( 320), ENV( 256), ENV( 192),
+		ENV( 160), ENV( 128), ENV(  96),
+		ENV(  80), ENV(  64), ENV(  48),
+		ENV(  40), ENV(  32), ENV(  24),
+		ENV(  20), ENV(  16), ENV(  12),
+		ENV(  10), ENV(   8), ENV(   6),
+		ENV(   5), ENV(   4), ENV(   3),
 		ENV(   2), ENV(   1)
 	};
 	#undef ENV
-	
+
 	do // one pair of output samples per iteration
 	{
 		// Noise
@@ -340,7 +361,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 				d->noise = (feedback & 0x8000) ^ ((uint16_t) d->noise >> 1 & ~1);
 			}
 		}
-		
+
 		// Generate one sample for each voice
 		int prev_outx = 0;
 		int echo_0 = 0;
@@ -371,7 +392,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 					voice->env_mode     = state_attack;
 				}
 			}
-			
+
 			if ( !(d->keys_down & vbit) ) // Silent channel
 			{
 		silent_chan:
@@ -380,7 +401,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 				prev_outx = 0;
 				continue;
 			}
-			
+
 			// Envelope
 			{
 				int const env_range = 0x800;
@@ -397,7 +418,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 						{
 							if ( (env_timer -= env_rates [adsr1 & 0x1F]) > 0 )
 								goto write_env_timer;
-							
+
 							int envx = voice->envx;
 							envx--; // envx *= 255 / 256
 							envx -= envx >> 8;
@@ -416,11 +437,11 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 								raw_voice->envx = envx >> 4;
 								env_timer = env_rate_init;
 							}
-							
+
 							int sustain_level = adsr1 >> 5;
 							if ( envx <= (sustain_level + 1) * 0x100 )
 								voice->env_mode = state_sustain;
-							
+
 							goto write_env_timer;
 						}
 						else // state_attack
@@ -428,14 +449,14 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 							int t = adsr0 & 0x0F;
 							if ( (env_timer -= env_rates [t * 2 + 1]) > 0 )
 								goto write_env_timer;
-							
+
 							int envx = voice->envx;
-							
+
 							int const step = env_range / 64;
 							envx += step;
 							if ( t == 15 )
 								envx += env_range / 2 - step;
-							
+
 							// TODO: Anomie claims envx >= env_range - 1
 							if ( envx >= env_range )
 							{
@@ -460,7 +481,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 						{
 							if ( (env_timer -= env_rates [t & 0x1F]) > 0 )
 								goto write_env_timer;
-							
+
 							int envx = voice->envx;
 							int mode = t >> 5;
 							if ( mode < 5 ) // linear decrease
@@ -480,7 +501,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 								envx += step;
 								if ( mode == 7 && envx >= env_range * 3 / 4 + step )
 									envx += env_range / 256 - step;
-								
+
 								if ( envx >= env_range )
 									envx = env_range - 1;
 							}
@@ -512,7 +533,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 				voice->env_timer = env_timer;
 			env_end:;
 			}
-			
+
 			// BRR decoding
 			{
 				int samples_needed = voice->fraction >> 12;
@@ -529,7 +550,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 							if ( block_header & 1 )
 							{
 								d->r.g.wave_ended |= vbit;
-							
+
 								addr = &RAM [GET_LE16A( SD [raw_voice->waveform].loop )];
 								if ( !(block_header & 2) ) // 1% of the time
 								{
@@ -539,27 +560,27 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 						sample_ended:
 									d->r.g.wave_ended |= vbit;
 									d->keys_down ^= vbit; // bit was set, so this clears it
-									
+
 									// since voice->envx is 0, samples and position don't matter
 									raw_voice->envx = 0;
 									voice->envx = 0;
 									break;
 								}
 							}
-							
+
 							if ( addr >= &RAM [0x10000 - 9] )
 								goto sample_ended; // TODO: handle wrap-around samples better?
-							
+
 							voice->block_header = block_header = *addr++;
 							block_remain = 16; // nybbles
 						}
-						
+
 						// if next block has end flag set, this block ends early (verified)
 						// TODO: how early it ends depends on playback rate
 						if ( block_remain == 9 && (addr [5] & 3) == 1 &&
 								(block_header & 3) != 3 )
 							goto sample_ended;
-						
+
 						// Get nybble and sign-extend
 						int delta = *addr;
 						if ( block_remain & 1 )
@@ -568,13 +589,13 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 							addr++;
 						}
 						delta = (int8_t) delta >> 4;
-						
+
 						// Scale delta based on range from header
 						int shift = block_header >> 4;
 						delta = (delta << shift) >> 1;
 						if ( shift > 0x0C ) // handle invalid range
 							delta = (delta >> 25) << 11; // delta = (delta < 0 ? ~0x7FF : 0)
-						
+
 						// Apply IIR filter
 						int smp1 = voice->interp [0];
 						int smp2 = voice->interp [1];
@@ -598,7 +619,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 							delta += smp1 >> 1;
 							delta += (-smp1) >> 5;
 						}
-						
+
 						// Shift samples over and condition new sample
 						voice->interp [3] = voice->interp [2];
 						voice->interp [2] = smp2;
@@ -611,7 +632,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 					voice->addr         = addr - RAM;
 				}
 			}
-			
+
 			// Interleved gauss table (to improve cache coherency).
 			// gauss [i * 2 + j] = normal_gauss [(1 - j) * 256 + i]
 			static short const gauss [512] =
@@ -649,7 +670,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 			  0, 434,   0, 430,   0, 426,   0, 422,   0, 418,   0, 414,   0, 410,   0, 405,
 			  0, 401,   0, 397,   0, 393,   0, 389,   0, 385,   0, 381,   0, 378,   0, 374,
 			};
-			
+
 			// Get rate (with possible modulation)
 			int rate = GET_LE16A( raw_voice->rate ) & 0x3FFF;
 			if ( d->r.g.pitch_mods & vbit )
@@ -659,11 +680,11 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 			unsigned fraction = voice->fraction & 0xFFF;
 			int offset = fraction >> 4;
 			voice->fraction = fraction + rate;
-			
+
 			// Only left half of gaussian kernel is in table, so we must mirror for right half
 			short const* fwd = gauss       + offset * 2;
 			short const* rev = gauss + 510 - offset * 2;
-			
+
 			int output = d->noise;
 			if ( !(d->r.g.noise_enables & vbit) )
 			{
@@ -676,12 +697,12 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 				CLAMP16( output, output );
 			}
 			output = (output * voice->envx) >> 11 & ~1;
-			
+
 			int amp_0 = output * voice->volume [0] >> 7;
 			int amp_1 = output * voice->volume [1] >> 7;
 			prev_outx = output;
 			raw_voice->outx = (int8_t) (output >> 8);
-			
+
 			chans_0 += amp_0;
 			chans_1 += amp_1;
 			if ( d->r.g.echo_ons & vbit )
@@ -691,7 +712,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 			}
 		}
 		// end of voice loop
-		
+
 		// Read feedback from echo buffer
 		int echo_pos = d->echo_pos;
 		uint8_t* const echo_ptr = &RAM [(d->r.g.echo_page * 0x100 + echo_pos) & 0xFFFF];
@@ -701,7 +722,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 		d->echo_pos = echo_pos;
 		int fb_0 = GET_LE16SA( echo_ptr     );
 		int fb_1 = GET_LE16SA( echo_ptr + 2 );
-		
+
 		// Keep last 8 samples
 		int (*fir_ptr) [2] = &d->fir_buf [d->fir_pos];
 		d->fir_pos = (d->fir_pos + 1) & (dsp_fir_buf_half - 1);
@@ -709,7 +730,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 		fir_ptr [               0] [1] = fb_1;
 		fir_ptr [dsp_fir_buf_half] [0] = fb_0; // duplicate at +8 eliminates wrap checking below
 		fir_ptr [dsp_fir_buf_half] [1] = fb_1;
-		
+
 		// Apply FIR
 		fb_0 *= d->fir_coeff [0];
 		fb_1 *= d->fir_coeff [0];
@@ -717,7 +738,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 		#define DO_PT( i )\
 			fb_0 += fir_ptr [i] [0] * d->fir_coeff [i];\
 			fb_1 += fir_ptr [i] [1] * d->fir_coeff [i];
-		
+
 		DO_PT( 1 )
 		DO_PT( 2 )
 		DO_PT( 3 )
@@ -726,7 +747,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 		DO_PT( 6 )
 		DO_PT( 7 )
 		#undef DO_PT
-		
+
 		// Generate output
 		int out_0 = (chans_0 * global_vol_0 >> 7) + (fb_0 * d->r.g.echo_volume_0 >> 14);
 		int out_1 = (chans_1 * global_vol_1 >> 7) + (fb_1 * d->r.g.echo_volume_1 >> 14);
@@ -735,7 +756,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 			out_0 = 0;
 			out_1 = 0;
 		}
-		
+
 		if ( out_buf )
 		{
 			CLAMP16( out_0, out_0 );
@@ -744,7 +765,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 			out_buf [1] = out_1;
 			out_buf += 2;
 		}
-		
+
 		// Feedback into echo buffer
 		int e0 = (fb_0 * d->r.g.echo_feedback >> 14) + echo_0;
 		int e1 = (fb_1 * d->r.g.echo_feedback >> 14) + echo_1;
@@ -779,13 +800,13 @@ void dsp_save_state( dsp_state_t* out )
 	COPY( d, out, keys_down );
 	COPY( d, out, noise_count );
 	COPY( d, out, noise );
-	
+
 	int i;
 	for ( i = dsp_voice_count; --i >= 0; )
 	{
 		voice_t const* vin = &d->voice_state [i];
 		dsp_voice_state_t* vout = &out->voice_state [i];
-		
+
 		COPY( vin, vout, interp [0] );
 		COPY( vin, vout, interp [1] );
 		COPY( vin, vout, interp [2] );
@@ -799,7 +820,7 @@ void dsp_save_state( dsp_state_t* out )
 		COPY( vin, vout, env_mode );
 		COPY( vin, vout, addr );
 	}
-	
+
 	for ( i = dsp_fir_buf_half; --i >= 0; )
 	{
 		out->fir_buf [i] [0] = d->fir_buf [d->fir_pos + i] [0];
@@ -811,18 +832,18 @@ void dsp_save_state( dsp_state_t* out )
 void dsp_load_state( dsp_state_t const* in )
 {
 	dsp_reset();
-	
+
 	COPY( in, d, echo_pos );
 	COPY( in, d, keys_down );
 	COPY( in, d, noise_count );
 	COPY( in, d, noise );
-	
+
 	int i;
 	for ( i = dsp_voice_count; --i >= 0; )
 	{
 		dsp_voice_state_t const* vin = &in->voice_state [i];
 		voice_t* vout = &d->voice_state [i];
-		
+
 		COPY( vin, vout, interp [0] );
 		COPY( vin, vout, interp [1] );
 		COPY( vin, vout, interp [2] );
@@ -836,13 +857,13 @@ void dsp_load_state( dsp_state_t const* in )
 		COPY( vin, vout, env_mode );
 		COPY( vin, vout, addr );
 	}
-	
+
 	for ( i = dsp_fir_buf_half; --i >= 0; )
 	{
 		d->fir_buf [i] [0] = d->fir_buf [i + dsp_fir_buf_half] [0] = in->fir_buf [i] [0];
 		d->fir_buf [i] [1] = d->fir_buf [i + dsp_fir_buf_half] [1] = in->fir_buf [i] [1];
 	}
-	
+
 	// manually writing registers will properly restore cached state
 	for ( i = dsp_register_count; --i >= 0; )
 		dsp_write( i, in->regs [i] );
@@ -866,7 +887,6 @@ void dsp_write_wrap()
 void SoundWrite_ao();
 #endif
 void write_audio(short *sample_buffer, size_t sample_count);
-extern unsigned char SPCRAM[0x10000];
 extern unsigned char cycpbl;
 extern unsigned int spcCycle;
 
@@ -890,10 +910,8 @@ struct sample_control_t
 };
 static struct sample_control_t sample_control;
 
-void dsp_init_wrap(unsigned char is_pal)
+void InitDSPControl(unsigned char is_pal)
 {
-  dsp_init(SPCRAM);
-
   if (is_pal)
   {
     sample_control.hi = 1ULL*32000ULL;
