@@ -21,7 +21,7 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl
+EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,dsp_init_wrap
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
 EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_write_wrap,dsp_reset,dsp_run_wrap
 
@@ -108,7 +108,6 @@ NEWSYM timinl0,  db 0     ; ticks left before incrementing
 NEWSYM timinl1,  db 0     ; ticks left before incrementing
 NEWSYM timinl2,  db 0     ; ticks left before incrementing
 NEWSYM timrcall, db 0     ; alternating bit 0 to correctly timer timer1 & 2 to 8000hz
-NEWSYM DSPInit, dw 0
 NEWSYM spcextraram, times 64 db 0 ; extra ram, used for tcall
 
 NEWSYM FutureExpandS,  times 256-64 db 0
@@ -252,7 +251,7 @@ NEWSYM InitSPC
       mov ecx,256
       mov eax,Invalidopcode
       mov ebp,0
-    mov dword[spcCycle],0
+      mov dword[spcCycle],0
 
 .loop
 %ifdef __MSDOS__
@@ -520,8 +519,8 @@ NEWSYM InitSPC
       mov dword[opcjmptab+03F4h],OpFD
       mov dword[opcjmptab+03F8h],OpFE
       mov dword[opcjmptab+03FCh],OpFF
-	mov word[DSPInit],1
       pushad
+      call dsp_init_wrap
       call dsp_reset
       popad
       ret
