@@ -30,7 +30,7 @@ EXTSYM clocktable,spcCycle
 %macro endloop 0
 ;    test byte[curexecstate],2
 ;    jz near %%skipallspc
-    sub dword[cycpbl],48
+    sub dword[cycpbl],25
     jnc near %%skipallspc
     mov eax,[cycpblt]
     mov bl,[ebp]
