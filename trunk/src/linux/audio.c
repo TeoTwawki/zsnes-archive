@@ -64,7 +64,7 @@ void SoundWrite_ao()
     samples_waiting += dsp_sample_count;
     if (samples_waiting > 1280)
     {
-      pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
+      //pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
     }
     pthread_mutex_unlock(&audio_mutex);
   }
