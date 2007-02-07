@@ -25,7 +25,7 @@ EXTSYM UpdateDevices,Makemode7Table,MusicRelVol,MusicVol
 EXTSYM romloadskip,start65816,showinfogui,inittable,zexit
 EXTSYM SA1inittable,MessageOn,Msgptr,MsgCount,sndrot,SnowTimer
 EXTSYM inittablec,newgfx16b,DisplayInfo,ssautosw,GUIDelayB,pl12s34
-EXTSYM Output_Text,Turbo30hz,CombinDataLocl,current_zst
+EXTSYM Output_Text,Turbo30hz,CombinDataLocl,current_zst,InitSPC
 EXTSYM BackupSystemVars,SnowData,SnowVelDist,Setper2exec,ShowMMXSupport
 EXTSYM JoyRead,pressed,mousebuttons,mousexdir,mouseydir,mousexpos,mouseypos
 EXTSYM pl1selk,pl1startk,pl1upk,pl1downk,pl1leftk,pl1rightk,pl1Xk
@@ -155,6 +155,7 @@ NEWSYM init
     call initregw
     pushad
     call initsnes
+    call InitSPC
     popad
 
     ; Initialize volume
