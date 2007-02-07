@@ -233,6 +233,7 @@ void dsp_reset()
 	memset( d->fir_buf, 0, sizeof d->fir_buf );
 	memset( d->fir_coeff, 0, sizeof d->fir_coeff );
 	soft_reset();
+  d->r.g.flags = 0xE0;
 }
 
 // TODO: make inline and put in dsp.h
