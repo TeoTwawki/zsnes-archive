@@ -188,7 +188,7 @@ CHIPSOBJ=${CHIP_D}/dsp1emu${OE} ${CHIP_D}/fxemu2${OE} ${CHIP_D}/sfxproc${OE}\
 CPUOBJ=${CPU_D}/dma${OE}\
 	${CPU_D}/execute${OE} ${CPU_D}/executec${OE} ${CPU_D}/irq${OE}\
 	${CPU_D}/memory${OE} ${CPU_D}/memtable${OE} ${CPU_D}/spc700${OE}\
-	${CPU_D}/stable${OE} ${CPU_D}/table${OE}\
+	${CPU_D}/stable${OE} ${CPU_D}/table${OE} ${CPU_D}/spc${OE}\
 	${CPU_D}/tablec${OE} ${CPU_D}/dsp${OE}
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
@@ -364,6 +364,7 @@ ${CPU_D}/executec${OE}: ${CPU_D}/executec.c gblvars.h
 ${CPU_D}/irq${OE}: ${CPU_D}/irq.asm macros.mac
 ${CPU_D}/memory${OE}: ${CPU_D}/memory.asm macros.mac
 ${CPU_D}/memtable${OE}: ${CPU_D}/memtable.c gblvars.h ${CPU_D}/memtable.h
+${CPU_D}/spc${OE}: ${CPU_D}/spc.c asm_call.h ${CPU_D}/dsp.h
 ${CPU_D}/spc700${OE}: ${CPU_D}/spc700.asm macros.mac ${CPU_D}/regsw.mac \
 	${CPU_D}/spcaddr.inc ${CPU_D}/spcdef.inc
 ${CPU_D}/stable${OE}: ${CPU_D}/stable.asm macros.mac ${CPU_D}/s65816d.inc \
