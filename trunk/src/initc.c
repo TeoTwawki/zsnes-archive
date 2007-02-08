@@ -1170,6 +1170,7 @@ void loadROM()
   {
     #ifdef NO_JMA
     puts("This binary was built without JMA support.");
+    return;
     #else
     isCompressed = true;
     load_jma_file_dir(ZRomPath, ZCartName);
