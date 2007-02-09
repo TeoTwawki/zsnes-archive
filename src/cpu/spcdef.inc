@@ -24,10 +24,9 @@
 ; branch instructions
 %macro spcbrancher 0
       inc ebp
-      spccycle
       ret
 .branch
-      spccycle
+      spccycles 2
       movsx ebx,byte[ebp]
       inc ebp
       add ebp,ebx
