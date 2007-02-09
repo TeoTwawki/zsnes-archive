@@ -26,6 +26,7 @@ EXTSYM flagnz,flago,flagc,cpucycle,cycpbl,cycpblt,opcjmptab,doirqnext,dmadata
 ;*******************************************************
 EXTSYM clocktable,spcCycle
 
+%include "cpu/spccycle.inc"
 
 %macro endloop 0
     sub dword[cycpbl],26
@@ -36,7 +37,7 @@ EXTSYM clocktable,spcCycle
     ; 1260, 10000/12625
     inc ebp
     mov eax,[clocktable+ebx*4]
-    add dword[spcCycle],eax
+    spccycles eax
     call dword [opcjmptab+ebx*4]
     xor ebx,ebx
 %%skipallspc

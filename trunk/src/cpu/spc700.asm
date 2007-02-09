@@ -24,6 +24,7 @@
 EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
 EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_write_wrap,dsp_run_wrap
+EXTSYM cycpbl, cycpblt
 
 %include "cpu/regsw.mac"
 %include "cpu/spcdef.inc"

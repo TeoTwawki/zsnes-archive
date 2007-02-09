@@ -18,6 +18,7 @@
 ;Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 %include "macros.mac"
+%include "cpu/spccycle.inc"
 
 EXTSYM KeyRewind,statesaver,Voice0Status,UpdateDPage,clocktable,spcCycle
 EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo,lastCycle
@@ -818,7 +819,7 @@ NEWSYM execloop
    ; 1260, 10000/12625
    inc ebp
    mov eax,[clocktable+ebx*4]
-   add dword[spcCycle],eax
+   spccycles eax
    call dword near [opcjmptab+ebx*4]
    xor ebx,ebx
 .skipallspc
@@ -1925,7 +1926,7 @@ NEWSYM execsingle
     xor ebx,ebx
     test byte[curexecstate],2
     jz .nosoundb
-    sub dword[cycpbl],55
+    sub dword[cycpbl],26
     jnc .skipallspc
     mov eax,[cycpblt]
     mov bl,[ebp]
@@ -1933,7 +1934,7 @@ NEWSYM execsingle
     ; 1260, 10000/12625
     inc ebp
     mov eax,[clocktable+ebx*4]
-    add dword[spcCycle],eax
+    spccycles eax
     call dword near [opcjmptab+ebx*4]
     xor ebx,ebx
 .skipallspc

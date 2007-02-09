@@ -17,17 +17,17 @@
 ;along with this program; if not, write to the Free Software
 ;Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
+%include "cpu/spccycle.inc"
 
 ; move al at address ebx
 
 ; branch instructions
 %macro spcbrancher 0
       inc ebp
-      add dword[spcCycle],1
+      spccycle
       ret
 .branch
-      add dword[spcCycle],1
+      spccycle
       movsx ebx,byte[ebp]
       inc ebp
       add ebp,ebx
