@@ -108,6 +108,9 @@ main: makefile.dep $(Z_OBJS)
 	@ZC@ -o @ZSNESEXE@ $(Z_OBJS) @ZCFLAGS@ @LDFLAGS@
 	rm -f version.o
 
+$(CPU_D)/dsp.o: $(CPU_D)/dsp.c
+	@C@ @CFLAGS@ -O3 -o $@ -c $<
+
 $(PSR): parsegen.cpp
 	@CXX@ @CXXFLAGS@ -o $@ $< -lz
 
