@@ -31,9 +31,7 @@ EXTSYM clocktable,spcCycle
 %macro endloop 0
     sub dword[cycpbl],26
     jnc near %%skipallspc
-    mov eax,[cycpblt]
     mov bl,[ebp]
-    add dword[cycpbl],eax
     ; 1260, 10000/12625
     inc ebp
     mov eax,[clocktable+ebx*4]

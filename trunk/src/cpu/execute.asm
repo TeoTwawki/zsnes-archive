@@ -813,9 +813,7 @@ NEWSYM execloop
 %else
    sub dword[cycpbl],38
    jnc .skipallspc
-   mov eax,[cycpblt]
    mov bl,[ebp]
-   add dword[cycpbl],eax
    ; 1260, 10000/12625
    inc ebp
    mov eax,[clocktable+ebx*4]
@@ -1928,9 +1926,7 @@ NEWSYM execsingle
     jz .nosoundb
     sub dword[cycpbl],26
     jnc .skipallspc
-    mov eax,[cycpblt]
     mov bl,[ebp]
-    add dword[cycpbl],eax
     ; 1260, 10000/12625
     inc ebp
     mov eax,[clocktable+ebx*4]
