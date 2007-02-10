@@ -34,9 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 #include <errno.h>
 
-#ifdef __UNIXSDL__
 #include "config.h"
-#endif
 // General time.h checking
 
 #if TIME_WITH_SYS_TIME

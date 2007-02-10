@@ -185,11 +185,10 @@ CHIPSOBJ=${CHIP_D}/dsp1emu${OE} ${CHIP_D}/fxemu2${OE} ${CHIP_D}/sfxproc${OE}\
 	${CHIP_D}/obc1emu${OE} ${CHIP_D}/obc1proc${OE} ${CHIP_D}/c4proc${OE}\
 	${CHIP_D}/7110proc${OE} ${CHIP_D}/st11proc${OE} ${CHIP_D}/seta11${OE}
 
-CPUOBJ=${CPU_D}/dma${OE}\
-	${CPU_D}/execute${OE} ${CPU_D}/executec${OE} ${CPU_D}/irq${OE}\
-	${CPU_D}/memory${OE} ${CPU_D}/memtable${OE} ${CPU_D}/spc700${OE}\
-	${CPU_D}/stable${OE} ${CPU_D}/table${OE} ${CPU_D}/spc${OE}\
-	${CPU_D}/tablec${OE} ${CPU_D}/dsp${OE}
+CPUOBJ=${CPU_D}/dma${OE} ${CPU_D}/execute${OE} ${CPU_D}/executec${OE}\
+	${CPU_D}/irq${OE} ${CPU_D}/memory${OE} ${CPU_D}/memtable${OE}\
+	${CPU_D}/spc700${OE} ${CPU_D}/stable${OE} ${CPU_D}/table${OE}\
+	${CPU_D}/spc${OE} ${CPU_D}/tablec${OE} ${CPU_D}/dsp${OE}
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
 
@@ -197,13 +196,13 @@ GUIOBJ=${GUI_D}/gui${OE} ${GUI_D}/guifuncs${OE} ${GUI_D}/menu${OE}
 
 ifneq (${JMA},no)
 JMAOBJ=${JMA_D}/7zlzma${OE} ${JMA_D}/crc32${OE} ${JMA_D}/iiostrm${OE}\
-	${JMA_D}/inbyte${OE} ${JMA_D}/jma${OE} ${JMA_D}/lzma${OE} ${JMA_D}/lzmadec${OE}\
-	${JMA_D}/winout${OE} ${JMA_D}/zsnesjma${OE}
+	${JMA_D}/inbyte${OE} ${JMA_D}/jma${OE} ${JMA_D}/lzma${OE}\
+	${JMA_D}/lzmadec${OE} ${JMA_D}/winout${OE} ${JMA_D}/zsnesjma${OE}
 endif
 
-MAINOBJ=endmem${OE} init${OE} initc${OE} patch${OE}\
-	ui${OE} vcache${OE} version${OE} zmovie${OE} zstate${OE} zloader${OE}\
-	cfg${OE} md${OE} input${OE} zpath${OE} ztimec${OE} ztime${OE}
+MAINOBJ=endmem${OE} init${OE} initc${OE} patch${OE} ui${OE} vcache${OE}\
+	version${OE} zmovie${OE} zstate${OE} zloader${OE} cfg${OE} md${OE}\
+	input${OE} zpath${OE} ztimec${OE} ztime${OE}
 
 ifneq (${DEBUGGER},no)
   MAINOBJ+= debugger${OE} debugasm${OE}
@@ -220,9 +219,8 @@ NETOBJ=
 
 VIDEOBJ=${VID_D}/makev16b${OE} ${VID_D}/makev16t${OE} ${VID_D}/makevid${OE}\
 	${VID_D}/mode716${OE} ${VID_D}/mode716b${OE} ${VID_D}/mode716d${OE}\
-	${VID_D}/mode716e${OE} ${VID_D}/mode716t${OE}\
-	${VID_D}/mv16tms${OE} ${VID_D}/newg162${OE}\
-	${VID_D}/newgfx16${OE} ${VID_D}/newgfx${OE}\
+	${VID_D}/mode716e${OE} ${VID_D}/mode716t${OE} ${VID_D}/mv16tms${OE}\
+	${VID_D}/newg162${OE} ${VID_D}/newgfx16${OE} ${VID_D}/newgfx${OE}\
 	${VID_D}/m716text${OE} ${VID_D}/procvid${OE} ${VID_D}/procvidc${OE}\
 	${VID_D}/2xsaiw${OE}
 
@@ -232,8 +230,8 @@ OBJS=${CHIPSOBJ} ${CPUOBJ} ${GUIOBJ} ${VIDEOBJ} ${MAINOBJ} ${ZIPOBJ} ${EFFECTSOB
 
 ifeq (${OS},__MSDOS__)
 DOSOBJ=${DOS_D}/dosintrf${OE} ${DOS_D}/gppro${OE} ${DOS_D}/initvid${OE}\
-	${DOS_D}/sound${OE} ${DOS_D}/sw${OE} ${DOS_D}/vesa12${OE}\
-	${DOS_D}/lib${OE} ${DOS_D}/joy${OE} ${DOS_D}/vesa2${OE}
+	${DOS_D}/sound${OE} ${DOS_D}/sw${OE} ${DOS_D}/lib${OE} ${DOS_D}/joy${OE}\
+	${DOS_D}/vesa12${OE} ${DOS_D}/vesa2${OE}
 
 DOSVIDOBJ=${VID_D}/mode7ext${OE} ${VID_D}/newgfx2${OE} ${VID_D}/mode7${OE}
 OBJS+=${DOSOBJ} ${DOSVIDOBJ}
@@ -245,9 +243,8 @@ WINOBJ=${DRESOBJ}\
 	${WIN_D}/safelib${OE} ${MMLIB_D}/mm${OE} ${MMLIB_D}/windows${OE}
 
 WINVIDOBJ=${VID_D}/sw_draw${OE} ${VID_D}/hq2x16${OE} ${VID_D}/hq2x32${OE}\
-	${VID_D}/hq3x16${OE} ${VID_D}/hq3x32${OE}\
-	${VID_D}/hq4x16${OE} ${VID_D}/hq4x32${OE} ${VID_D}/copyvwin${OE}\
-	${VID_D}/ntsc${OE}
+	${VID_D}/hq3x16${OE} ${VID_D}/hq3x32${OE} ${VID_D}/copyvwin${OE}\
+	${VID_D}/hq4x16${OE} ${VID_D}/hq4x32${OE} ${VID_D}/ntsc${OE}
 
 OBJS+=${WINOBJ} ${WINVIDOBJ} ${NETOBJ}
 endif
@@ -307,8 +304,8 @@ debugger${OE}: debugger.c asm_call.h zpath.h ${JMA_D}/zsnesjma.h \
 	${ZIP_D}/zunzip.h
 endmem${OE}: endmem.asm macros.mac
 init${OE}: init.asm macros.mac
-initc${OE}: initc.c asm_call.h cfg${OE} input${OE} numconv.h zpath.h ${CPU_D}/memtable.h \
-	${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
+initc${OE}: initc.c asm_call.h cfg${OE} input${OE} numconv.h zpath.h \
+	${CPU_D}/memtable.h ${CPU_D}/spc.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
 input${OE}: input.psr ${PSR}
 md${OE}: md.psr ${PSR}
 patch${OE}: patch.c zpath.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
@@ -318,12 +315,13 @@ vcache${OE}: vcache.asm macros.mac
 version${OE}: version.c
 zloader${OE}: zloader.c asm_call.h cfg${OE} input${OE} zloader.h zpath.h \
 	${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
-zmovie${OE}: zmovie.c asm_call.h cfg${OE} gblvars.h input${OE} md${OE} numconv.h zmovie.h zpath.h \
-	${JMA_D}/zsnesjma.h ${WIN_D}/lib.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h
+zmovie${OE}: zmovie.c asm_call.h cfg${OE} gblvars.h input${OE} md${OE} \
+	numconv.h zmovie.h zpath.h ${CPU_D}/spc.h ${JMA_D}/zsnesjma.h \
+	${WIN_D}/lib.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h
 zpath${OE}: zpath.c cfg${OE} zpath.h ${DOS_D}/lib.h ${JMA_D}/zsnesjma.h \
 	${WIN_D}/lib.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h
-zstate${OE}: zstate.c asm_call.h cfg${OE} gblvars.h input${OE} numconv.h zmovie.h zpath.h \
-	${CHIP_D}/dsp4emu.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
+zstate${OE}: zstate.c asm_call.h cfg${OE} gblvars.h input${OE} numconv.h \
+	zmovie.h zpath.h ${CHIP_D}/dsp4emu.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
 ztime${OE}: ztime.asm macros.mac
 ztimec${OE}: ztimec.c
 
@@ -358,15 +356,15 @@ ${CHIP_D}/st10proc${OE}: ${CHIP_D}/st10proc.asm macros.mac
 ${CHIP_D}/st11proc${OE}: ${CHIP_D}/st11proc.asm macros.mac
 
 ${CPU_D}/dma${OE}: ${CPU_D}/dma.asm macros.mac
-${CPU_D}/dsp${OE}: ${CPU_D}/dsp.c macros.mac
-${CPU_D}/execute${OE}: ${CPU_D}/execute.asm macros.mac
+${CPU_D}/dsp${OE}: ${CPU_D}/dsp.c ${CPU_D}/dsp.h
+${CPU_D}/execute${OE}: ${CPU_D}/execute.asm macros.mac ${CPU_D}/spccycle.inc
 ${CPU_D}/executec${OE}: ${CPU_D}/executec.c gblvars.h
 ${CPU_D}/irq${OE}: ${CPU_D}/irq.asm macros.mac
 ${CPU_D}/memory${OE}: ${CPU_D}/memory.asm macros.mac
 ${CPU_D}/memtable${OE}: ${CPU_D}/memtable.c gblvars.h ${CPU_D}/memtable.h
-${CPU_D}/spc${OE}: ${CPU_D}/spc.c asm_call.h ${CPU_D}/dsp.h
+${CPU_D}/spc${OE}: ${CPU_D}/spc.c asm_call.h ${CPU_D}/dsp.h ${CPU_D}/spc.h
 ${CPU_D}/spc700${OE}: ${CPU_D}/spc700.asm macros.mac ${CPU_D}/regsw.mac \
-	${CPU_D}/spcaddr.inc ${CPU_D}/spcdef.inc
+	${CPU_D}/spcaddr.inc ${CPU_D}/spccycle.inc ${CPU_D}/spcdef.inc
 ${CPU_D}/stable${OE}: ${CPU_D}/stable.asm macros.mac ${CPU_D}/s65816d.inc \
 	${CPU_D}/saddress.inc ${CPU_D}/saddrni.inc ${CPU_D}/se65816.inc
 ${CPU_D}/table${OE}: ${CPU_D}/table.asm macros.mac ${CPU_D}/65816d.inc \
@@ -374,7 +372,8 @@ ${CPU_D}/table${OE}: ${CPU_D}/table.asm macros.mac ${CPU_D}/65816d.inc \
 	${CPU_D}/regs.inc ${CPU_D}/regs.mac ${CPU_D}/regsw.inc \
 	${CPU_D}/regsw.mac
 ${CPU_D}/tablec${OE}: ${CPU_D}/tablec.asm macros.mac ${CPU_D}/65816dc.inc \
-	${CPU_D}/address.inc ${CPU_D}/addrni.inc ${CPU_D}/e65816c.inc
+	${CPU_D}/address.inc ${CPU_D}/addrni.inc ${CPU_D}/e65816c.inc \
+	${CPU_D}/spccycle.inc
 
 ${DOS_D}/dosintrf${OE}: ${DOS_D}/dosintrf.asm macros.mac
 ${DOS_D}/gppro${OE}: ${DOS_D}/gppro.asm macros.mac
@@ -393,9 +392,9 @@ ${EFF_D}/water${OE}: ${EFF_D}/water.c ${EFF_D}/fixsin.h
 ${GUI_D}/gui${OE}: ${GUI_D}/gui.asm macros.mac ${GUI_D}/guicheat.inc \
 	${GUI_D}/guicombo.inc ${GUI_D}/guikeys.inc ${GUI_D}/guimisc.inc \
 	${GUI_D}/guimouse.inc ${GUI_D}/guitools.inc ${GUI_D}/guiwindp.inc
-${GUI_D}/guifuncs${OE}: ${GUI_D}/guifuncs.c asm_call.h cfg${OE} input${OE} md${OE} \
-	zloader.h zpath.h ${DOS_D}/lib.h ${JMA_D}/zsnesjma.h ${WIN_D}/lib.h \
-	${ZIP_D}/zunzip.h
+${GUI_D}/guifuncs${OE}: ${GUI_D}/guifuncs.c asm_call.h cfg${OE} input${OE} \
+	md${OE} zloader.h zpath.h ${DOS_D}/lib.h ${JMA_D}/zsnesjma.h \
+	${WIN_D}/lib.h ${ZIP_D}/zunzip.h
 ${GUI_D}/menu${OE}: ${GUI_D}/menu.asm macros.mac
 
 ${JMA_D}/7zlzma${OE}: ${JMA_D}/7zlzma.cpp ${JMA_D}/7z.h \
