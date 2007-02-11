@@ -89,6 +89,7 @@ NEWSYM StartUp
 ;   parse commandline data, obtain current directory (One time initialization)
 NEWSYM SystemInit
     ; Be sure to set SBHDMA to a value other than 0 if 16bit sound exists
+%if 0
     push es
 
     call getblaster                     ; get set blaster environment
@@ -97,6 +98,7 @@ NEWSYM SystemInit
     mov byte[SBHDMA],0
 .noforce8b
     pop es
+%endif
     ret
 
 ; Find Selector - DOS only
@@ -244,6 +246,7 @@ NEWSYM InitPreGame   ; Executes before starting/continuing a game
 .nochangemode
 
 .nofs
+%if 0
     cmp byte[NoSoundReinit],1
     je .nosound
     cmp byte[soundon],0
@@ -257,12 +260,14 @@ NEWSYM InitPreGame   ; Executes before starting/continuing a game
     mov [oldhandSBs],cx
     mov [oldhandSBo],edx
 .nosound
+%endif
     sti
     ret
 
 NEWSYM SetupPreGame   ; Executes after pre-game init, can execute multiple
                       ; times after a single InitPreGame
     ; set new handler
+%if 0
     cmp byte[soundon],0
     je near .nosound2
     cmp byte[DSPDisable],1
@@ -304,6 +309,7 @@ NEWSYM SetupPreGame   ; Executes after pre-game init, can execute multiple
     call InitSB
     sti
 .nosound2
+%endif
     cli
     mov ax,205h
     mov bl,09h
@@ -344,6 +350,7 @@ NEWSYM DeInitPostGame           ; Called after game is ended
     sti
 
     ; DeINITSPC
+%if 0
     cmp byte[soundon],0
     je .nosoundb
     cmp byte[DSPDisable],1
@@ -356,6 +363,7 @@ NEWSYM DeInitPostGame           ; Called after game is ended
     int 31h
     jc near interror
 .nosoundb
+%endif
     ret
 
 NEWSYM GUIInit
