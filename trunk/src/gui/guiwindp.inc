@@ -2472,10 +2472,10 @@ DisplayGUISound:                     ; Sound Related Options
   je .okay
   cmp byte[StereoSound],1
   jne .okay
-  cmp byte[SBHDMA],0
-  jne .okay
-  cmp byte[vibracard], 1
-  je .okay
+;  cmp byte[SBHDMA],0
+;  jne .okay
+;  cmp byte[vibracard], 1
+;  je .okay
   GUIDisplayBBox 6,15,101,69,109,167
   GUIDisplayTextG 6,23,104,GUISoundTextB0
   jmp .nosrate

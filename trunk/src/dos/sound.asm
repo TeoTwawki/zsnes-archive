@@ -19,6 +19,7 @@
 
 %include "macros.mac"
 
+%if 0
 EXTSYM DosExit,getenv,PrintStr,printhex,WaitForKey,soundon,csounddisable
 EXTSYM DisplayS,SPCRAM,StereoSound,SoundQuality,dssel,PrintChar
 ;EXTSYM DSPMem,DSPBuffer,BufferSizeB,BufferSizeW,SBToSPCSpeeds2
@@ -1416,3 +1417,4 @@ NEWSYM vibradetect
                  db 13,10, 'you have now full 16-bit stereo sound with the surround option!', 13, 10, 0
 
 
+%endif

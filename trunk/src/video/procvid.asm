@@ -1563,7 +1563,7 @@ NEWSYM saveselect
     je .nosound
     mov byte[csounddisable],1
 %ifdef __MSDOS__
-    call SB_blank
+;    call SB_blank
 %endif
 .nosound
 %ifdef __MSDOS__
