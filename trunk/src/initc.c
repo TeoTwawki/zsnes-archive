@@ -38,7 +38,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "input.h"
 #include "zpath.h"
 #include "cpu/memtable.h"
-#include "cpu/spc.h"
+#include "cpu/dspwrap.h"
 
 #define NUMCONV_FR4
 #include "numconv.h"

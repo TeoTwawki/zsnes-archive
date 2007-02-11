@@ -305,7 +305,7 @@ debugger${OE}: debugger.c asm_call.h zpath.h ${JMA_D}/zsnesjma.h \
 endmem${OE}: endmem.asm macros.mac
 init${OE}: init.asm macros.mac
 initc${OE}: initc.c asm_call.h cfg${OE} input${OE} numconv.h zpath.h \
-	${CPU_D}/memtable.h ${CPU_D}/spc.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
+	${CPU_D}/memtable.h ${CPU_D}/dspwrap.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
 input${OE}: input.psr ${PSR}
 md${OE}: md.psr ${PSR}
 patch${OE}: patch.c zpath.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
@@ -316,7 +316,7 @@ version${OE}: version.c
 zloader${OE}: zloader.c asm_call.h cfg${OE} input${OE} zloader.h zpath.h \
 	${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
 zmovie${OE}: zmovie.c asm_call.h cfg${OE} gblvars.h input${OE} md${OE} \
-	numconv.h zmovie.h zpath.h ${CPU_D}/spc.h ${JMA_D}/zsnesjma.h \
+	numconv.h zmovie.h zpath.h ${CPU_D}/dspwrap.h ${JMA_D}/zsnesjma.h \
 	${WIN_D}/lib.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h
 zpath${OE}: zpath.c cfg${OE} zpath.h ${DOS_D}/lib.h ${JMA_D}/zsnesjma.h \
 	${WIN_D}/lib.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h
@@ -362,7 +362,7 @@ ${CPU_D}/executec${OE}: ${CPU_D}/executec.c gblvars.h
 ${CPU_D}/irq${OE}: ${CPU_D}/irq.asm macros.mac
 ${CPU_D}/memory${OE}: ${CPU_D}/memory.asm macros.mac
 ${CPU_D}/memtable${OE}: ${CPU_D}/memtable.c gblvars.h ${CPU_D}/memtable.h
-${CPU_D}/spc${OE}: ${CPU_D}/spc.c asm_call.h ${CPU_D}/dsp.h ${CPU_D}/spc.h
+${CPU_D}/dspwrap${OE}: ${CPU_D}/dspwrap.c asm_call.h ${CPU_D}/dsp.h ${CPU_D}/dspwrap.h
 ${CPU_D}/spc700${OE}: ${CPU_D}/spc700.asm macros.mac ${CPU_D}/regsw.mac \
 	${CPU_D}/spcaddr.inc ${CPU_D}/spccycle.inc ${CPU_D}/spcdef.inc
 ${CPU_D}/stable${OE}: ${CPU_D}/stable.asm macros.mac ${CPU_D}/s65816d.inc \

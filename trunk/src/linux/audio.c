@@ -30,7 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "../asm_call.h"
 #include "../cfg.h"
-#include "cpu/spc.h"
+#include "cpu/dspwrap.h"
 unsigned int BufferSizeB, BufferSizeW;
 short DSPBuffer[1280];
 
