@@ -131,13 +131,13 @@ int DSP_midframe;
 
 void dsp_run_wrap()
 {
-#ifdef __UNIXSDL__
   //if (DSP_midframe)
   //{
     int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 5;
     cycles_remaining = i & 31;
 
-    dsp_fill(samples);
+    if (samples > 0)
+      dsp_fill(samples);
 /*
     while (samples > next_samples)
     {
@@ -174,5 +174,4 @@ void dsp_run_wrap()
       printf("frame cycles: %d\n", lastCycle-lastframe);
       lastframe = lastCycle;
   }
-#endif
 }
