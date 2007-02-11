@@ -188,7 +188,7 @@ CHIPSOBJ=${CHIP_D}/dsp1emu${OE} ${CHIP_D}/fxemu2${OE} ${CHIP_D}/sfxproc${OE}\
 CPUOBJ=${CPU_D}/dma${OE} ${CPU_D}/execute${OE} ${CPU_D}/executec${OE}\
 	${CPU_D}/irq${OE} ${CPU_D}/memory${OE} ${CPU_D}/memtable${OE}\
 	${CPU_D}/spc700${OE} ${CPU_D}/stable${OE} ${CPU_D}/table${OE}\
-	${CPU_D}/spc${OE} ${CPU_D}/tablec${OE} ${CPU_D}/dsp${OE}
+	${CPU_D}/tablec${OE} ${CPU_D}/dsp${OE} ${CPU_D}/dspwrap${OE}
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
 
