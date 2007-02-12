@@ -11,6 +11,8 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #ifndef SPC_H
 #define SPC_H
+
+typedef int spc_time_t;
  
 //// Setup
  
@@ -31,9 +33,6 @@ void spc_reset( void );
  
 // SPC-700 clock rate, in Hz
 enum { spc_clock_rate = 1024000 };
- 
-// Runs SPC for given number of clocks
-void spc_run( int clocks );
  
 // Number of I/O ports
 enum { spc_port_count = 4 };
