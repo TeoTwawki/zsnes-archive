@@ -9,8 +9,8 @@
 void zspc_init( void );
 
 // Sets destination for output samples to zspc_buf, which can hold zspc_buf_size samples
-short *zspc_buf;
-int zspc_buf_size;
+extern short *zspc_buf;
+extern int zspc_buf_size;
 void zspc_set_output( void );
 
 // Number of samples written to output since it was last set
@@ -22,9 +22,9 @@ int zspc_sample_count( void );
 // Resets SPC
 void zspc_reset( void );
 
-spc_time_t zspc_time;
-int zspc_port;
-int zspc_data;
+extern spc_time_t zspc_time;
+extern int zspc_port;
+extern int zspc_data;
 
 // Reads/writes zspc_data from zspc_port at zspc_time
 int zspc_read_port( void );
