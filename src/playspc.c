@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ao/ao.h>
-#include "cpu/spc.h"
+#include "cpu/dspwrap.h"
 #include "cpu/dsp.h"
 
 int romispal = 0, spc700read = 0, cycpbl = 0, cycpblt = 0, curexecstate = 0;
@@ -20,6 +20,8 @@ extern unsigned char SPCRAM[];
 extern unsigned char* spcPCRam;
 extern unsigned int spcA, spcX, spcY, spcP, spcNZ, spcS;
 extern int DSP_midframe;
+extern void InitSPC();
+
 ao_device *dev;
 
 int main(int argc, char *argv[]) {
