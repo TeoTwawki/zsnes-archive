@@ -45,9 +45,9 @@ void InitSPC()
 
 int DSP_reg, DSP_val;
 
-int dsp_read_wrap()
+void dsp_read_wrap()
 {
-  return dsp_read(DSP_reg);
+  DSP_val = dsp_read(DSP_reg);
 }
 
 void dsp_write_wrap()
@@ -120,9 +120,9 @@ void dsp_fill(unsigned int stereo_samples)
 
   if (dsp_sample_count >= 512) //Prevent slowing down from crazy little writing
   {
-#ifdef __LIBAO__
+//#ifdef __LIBAO__
     SoundWrite_ao();
-#endif
+//#endif
     dsp_sample_count = 0;
   }
 }
@@ -171,7 +171,7 @@ void dsp_run_wrap()
 #ifndef __MSDOS__
   // debug stuff
   if (!DSP_midframe) {
-      static lastframe = 0;
+      static int lastframe = 0;
       printf("frame cycles: %d\n", lastCycle-lastframe);
       lastframe = lastCycle;
   }

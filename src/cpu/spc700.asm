@@ -23,7 +23,7 @@
 
 EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,cycpblt
 EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
-EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_write_wrap,dsp_run_wrap
+EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_read_wrap,dsp_write_wrap,dsp_run_wrap
 
 %include "cpu/regsw.mac"
 %include "cpu/spcdef.inc"
@@ -750,7 +750,19 @@ NEWSYM RSPCRegF2
     mov al,[SPCRAM+0f2h]
     ret
 NEWSYM RSPCRegF3
-    mov al,[SPCRAM+0f3h]
+    push ebx
+    xor ebx,ebx
+    mov bl,[SPCRAM+0F2h]
+    and bl,07fh
+    mov [DSP_reg],bl
+    mov byte[DSP_midframe],1
+    pushad
+    call dsp_run_wrap
+    call dsp_read_wrap
+    popad
+    mov byte[DSP_midframe],0
+    pop ebx
+    mov eax,[DSP_val]
     ret
 NEWSYM RSPCRegF4
     mov al,[SPCRAM+0f4h]

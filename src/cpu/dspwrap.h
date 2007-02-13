@@ -23,7 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define SPC_H
 
 extern int DSP_reg, DSP_val;
-int dsp_read_wrap();
+void dsp_read_wrap();
 void dsp_write_wrap();
 
 extern short dsp_samples_buffer[];
