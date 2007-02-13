@@ -120,9 +120,9 @@ void dsp_fill(unsigned int stereo_samples)
 
   if (dsp_sample_count >= 512) //Prevent slowing down from crazy little writing
   {
-//#ifdef __LIBAO__
+#ifdef __LIBAO__
     SoundWrite_ao();
-//#endif
+#endif
     dsp_sample_count = 0;
   }
 }

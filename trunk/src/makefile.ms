@@ -242,9 +242,10 @@ WINOBJ=${DRESOBJ}\
 	${WIN_D}/winintrf${OE} ${WIN_D}/winlink${OE} ${WIN_D}/lib${OE}\
 	${WIN_D}/safelib${OE} ${MMLIB_D}/mm${OE} ${MMLIB_D}/windows${OE}
 
-WINVIDOBJ=${VID_D}/sw_draw${OE} ${VID_D}/hq2x16${OE} ${VID_D}/hq2x32${OE}\
-	${VID_D}/hq3x16${OE} ${VID_D}/hq3x32${OE} ${VID_D}/copyvwin${OE}\
-	${VID_D}/hq4x16${OE} ${VID_D}/hq4x32${OE} ${VID_D}/ntsc${OE}
+WINVIDOBJ=${VID_D}/sw_draw${OE} ${VID_D}/copyvwin${OE} ${VID_D}/ntsc${OE}\
+	${VID_D}/hq2x16${OE} ${VID_D}/hq2x32${OE}\
+	${VID_D}/hq3x16${OE} ${VID_D}/hq3x32${OE}\
+	${VID_D}/hq4x16${OE} ${VID_D}/hq4x32${OE}
 
 OBJS+=${WINOBJ} ${WINVIDOBJ} ${NETOBJ}
 endif
