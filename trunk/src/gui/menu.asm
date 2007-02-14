@@ -364,9 +364,11 @@ NEWSYM showmenu
     mov eax,[MsgCount]
     mov [MessageOn],eax
     call copyvid
+%if 0
     mov byte[SPCSave],1
     call breakatsignb
     mov byte[SPCSave],0
+%endif
     pushad
     call savespcdata
     popad
