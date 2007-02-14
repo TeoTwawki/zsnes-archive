@@ -169,11 +169,13 @@ void dsp_run_wrap()
   lastCycle = spcCycle;
 
 #ifndef __MSDOS__
+/*
   // debug stuff
   if (!DSP_midframe) {
       static int lastframe = 0;
       printf("frame cycles: %d\n", lastCycle-lastframe);
       lastframe = lastCycle;
   }
+*/
 #endif
 }
