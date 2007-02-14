@@ -21,8 +21,8 @@
 
 %include "macros.mac"
 
-EXTSYM DSPMem,disablespcclr,SPCSkipXtraROM,cycpbl,cycpblt
-EXTSYM spc700read,dspWptr,curexecstate,tableadc,opcjmptab
+EXTSYM disablespcclr,SPCSkipXtraROM,cycpbl,cycpblt
+EXTSYM spc700read,curexecstate,tableadc,opcjmptab
 EXTSYM DSP_val,DSP_reg,DSP_midframe,dsp_read_wrap,dsp_write_wrap,dsp_run_wrap
 
 %include "cpu/regsw.mac"
@@ -613,7 +613,7 @@ NEWSYM updatetimer
     mov dword[timer2upd],0
     jmp .another
 .noanother
-    
+
     add dword[spc_scantime],65
 
 .catchup
@@ -632,7 +632,7 @@ NEWSYM updatetimer
 
 .done
     ret
-    
+
 
 ; SPC Write Registers
 ; DO NOT MODIFY DX OR ECX!

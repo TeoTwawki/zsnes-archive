@@ -13,18 +13,18 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 #define SPC_H
 
 //// Setup
- 
+
 // Initializes module
 void spc_init( void );
- 
+
 // Sets destination for output samples
 typedef short spc_sample_t;
 void spc_set_output( spc_sample_t* out, int out_size );
 
 // Number of samples written to output since it was last set
 int spc_sample_count( void );
- 
- 
+
+
 //// Emulation
 
 // Clock cycle count (at spc_clock_rate)
@@ -41,15 +41,15 @@ enum { spc_sample_rate = 32000 };
 
 // Number of I/O ports
 enum { spc_port_count = 4 };
- 
+
  // Reads/writes port at specified time
 int spc_read_port( spc_time_t, int port );
 void spc_write_port( spc_time_t, int port, int data );
- 
+
 // Runs SPC to end_time and starts a new time frame at 0
 void spc_end_frame( spc_time_t end_time );
 
 
 // TODO: save/load state
- 
+
 #endif

@@ -44,7 +44,7 @@ EXTSYM zst_determine_newest,newestfiledate,zst_exists,ClockBox,SSAutoFire
 %ifndef __MSDOS__
 EXTSYM MouseMoveX,MouseMoveY,MouseButtons,MultiMouseProcess,mouse
 %else
-EXTSYM SB_blank,vsyncon,Triplebufen,granadd,Palette0,smallscreenon,ScreenScale,vesa2selec
+EXTSYM vsyncon,Triplebufen,granadd,Palette0,smallscreenon,ScreenScale,vesa2selec
 EXTSYM displayfpspal,superscopepal,saveselectpal
 %endif
 

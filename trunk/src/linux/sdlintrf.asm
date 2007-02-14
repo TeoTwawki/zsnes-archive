@@ -21,8 +21,8 @@
 
 %include "macros.mac"
 
-EXTSYM getchar,PrevFSMode,sem_sleep,SBHDMA,putchar,Start60HZ
-EXTSYM pressed,AdjustFrequency,vidbufferofsb,vidbuffer,clearwin
+EXTSYM getchar,PrevFSMode,sem_sleep,putchar,Start60HZ
+EXTSYM pressed,vidbufferofsb,vidbuffer,clearwin
 EXTSYM Stop60HZ,initwinvideo,vesa2_rpos,vesa2_gpos,vesa2_bpos,vesa2_rposng
 EXTSYM vesa2_gposng,vesa2_bposng,vesa2_usbit,vesa2_clbit,vesa2_clbitng
 EXTSYM vesa2_clbitng2,vesa2_clbitng3,vesa2red10,res640,res480,cbitmode,cvidmode

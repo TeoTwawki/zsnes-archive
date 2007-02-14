@@ -24,7 +24,6 @@ EXTSYM SPC7110Reset,RTCReset2,NextLineCache,vidmemch2,vidmemch4
 EXTSYM vidmemch8,vrama,nmirept,SPCRAM,HIRQCycNext,HIRQNextExe,tableadc
 EXTSYM cycpb268,cycpb358,cycpbl,cycpblt,opexec268,opexec268cph,opexec358
 EXTSYM opexec358cph
-EXTSYM spcCycle
 
 %ifndef NO_DEBUGGER
 EXTSYM sndwrit,debstop
