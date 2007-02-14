@@ -12,28 +12,33 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 #ifndef SPC_H
 #define SPC_H
 
-typedef int spc_time_t;
- 
 //// Setup
  
 // Initializes module
 void spc_init( void );
  
 // Sets destination for output samples
-void spc_set_output( short* out, int out_size );
+typedef short spc_sample_t;
+void spc_set_output( spc_sample_t* out, int out_size );
 
 // Number of samples written to output since it was last set
 int spc_sample_count( void );
  
  
 //// Emulation
- 
+
+// Clock cycle count (at spc_clock_rate)
+typedef int spc_time_t;
+
 // Resets SPC
 void spc_reset( void );
- 
+
 // SPC-700 clock rate, in Hz
 enum { spc_clock_rate = 1024000 };
- 
+
+// Number of sample pairs per second
+enum { spc_sample_rate = 32000 };
+
 // Number of I/O ports
 enum { spc_port_count = 4 };
  
