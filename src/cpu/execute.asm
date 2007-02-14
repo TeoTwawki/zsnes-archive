@@ -800,6 +800,7 @@ NEWSYM execloop
    jmp cpuover
 .sound
    mov edi,[tableadc+ebx*4]
+%if 0
 %ifdef OPENSPC
    pushad
    mov bl,[esi]
@@ -821,6 +822,7 @@ NEWSYM execloop
    call dword near [opcjmptab+ebx*4]
    xor ebx,ebx
 .skipallspc
+%endif
 %endif
    mov bl,[esi]
    inc esi

@@ -110,6 +110,8 @@ NEWSYM timinl2,  db 0     ; ticks left before incrementing
 NEWSYM timrcall, db 0     ; alternating bit 0 to correctly timer timer1 & 2 to 8000hz
 NEWSYM spcextraram, times 64 db 0 ; extra ram, used for tcall
 
+NEWSYM spc_scantime, db 0
+
 NEWSYM FutureExpandS,  times 256-64 db 0
 
 spcsave equ $-SPCRAM
@@ -252,6 +254,7 @@ NEWSYM InitSPCRegs
       mov eax,Invalidopcode
       mov ebp,0
       mov dword[spcCycle],0
+      mov dword[spc_scantime],0
 
 .loop
 %ifdef __MSDOS__
@@ -610,8 +613,26 @@ NEWSYM updatetimer
     mov dword[timer2upd],0
     jmp .another
 .noanother
-    ret
+    
+    add dword[spc_scantime],65
 
+.catchup
+    mov eax,[spc_scantime]
+    cmp eax,[spcCycle]
+    jc .done
+
+    mov bl,[ebp]
+    ; 1260, 10000/12625
+    inc ebp
+    mov eax,[clocktable+ebx*4]
+    spccycles eax
+    call dword near [opcjmptab+ebx*4]
+    xor ebx,ebx
+    jmp .catchup
+
+.done
+    ret
+    
 
 ; SPC Write Registers
 ; DO NOT MODIFY DX OR ECX!
