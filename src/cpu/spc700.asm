@@ -626,6 +626,7 @@ NEWSYM catchup
     cmp eax,[spcCycle]
     jc .done
 
+    xor ebx,ebx
     mov bl,[ebp]
     ; 1260, 10000/12625
     inc ebp
