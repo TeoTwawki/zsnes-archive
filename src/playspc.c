@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     fread(header, 0x100, 1, fin);
     fread(SPCRAM, 0x1000, 1, fin);
     fread(DSPRegs, 0x80, 1, fin);
-    
+
     spcPCRam = SPCRAM+(header[0x25]+(header[0x26]<<8));
     spcA = header[0x27];
     spcX = header[0x28];

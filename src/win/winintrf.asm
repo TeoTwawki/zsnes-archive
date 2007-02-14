@@ -21,7 +21,7 @@
 
 %include "macros.mac"
 
-EXTSYM GUIkeydelay2,SBHDMA
+EXTSYM GUIkeydelay2
 EXTSYM soundon,DSPDisable,Start60HZ,pressed,putchar,getch
 EXTSYM vidbufferofsb,vidbuffer,clearwin,Stop60HZ,initwinvideo,vesa2_rpos
 EXTSYM vesa2_gpos,vesa2_bpos,vesa2_rposng,vesa2_gposng,vesa2_bposng,vesa2_usbit
@@ -32,7 +32,7 @@ EXTSYM ngrposng,nggposng,ngbposng,HalfTransB,HalfTransC
 EXTSYM WinUpdateDevices,UpdateVFrame,GetMouseX,GetMouseY,GetMouseMoveX
 EXTSYM GetMouseMoveY,GetMouseButton,SetMouseMinX,SetMouseMaxX,SetMouseMinY
 EXTSYM SetMouseMaxY,SetMouseX,SetMouseY,T36HZEnabled,MouseButton,Start36HZ
-EXTSYM Stop36HZ,BufferSizeW,BufferSizeB,ProcessSoundBuffer,CheckTimers
+EXTSYM Stop36HZ,CheckTimers
 EXTSYM vesa2_rfull,vesa2_rtrcl,vesa2_rtrcla,vesa2_gfull,vesa2_gtrcl,vesa2_gtrcla
 EXTSYM vesa2_bfull,vesa2_btrcl,vesa2_btrcla,Init_2xSaIMMX,DoSleep
 EXTSYM V8Mode,GrayscaleMode,PrevWinMode,PrevFSMode,FrameSemaphore

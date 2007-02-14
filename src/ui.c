@@ -624,6 +624,7 @@ extern unsigned char Voice4Disable, Voice5Disable, Voice6Disable, Voice7Disable;
 extern unsigned char Voice0Status, Voice1Status, Voice2Status, Voice3Status;
 extern unsigned char Voice4Status, Voice5Status, Voice6Status, Voice7Status;
 */
+void Get_MousePositionDisplacement();
 
 void adjbglayermsg(char num, char toggleon)
 {

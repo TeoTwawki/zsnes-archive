@@ -20,11 +20,11 @@
 %include "macros.mac"
 %include "cpu/spccycle.inc"
 
-EXTSYM KeyRewind,statesaver,Voice0Status,UpdateDPage,clocktable,spcCycle
-EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo,lastCycle
+EXTSYM KeyRewind,statesaver,UpdateDPage,clocktable,spcCycle
+EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo
 EXTSYM vidbufferofsa,device2,RawDumpInProgress,KeySaveState,KeyLoadState
 EXTSYM KeyQuickExit,KeyQuickLoad,KeyQuickRst,GUIDoReset,GUIReset,KeyOnStA
-EXTSYM KeyOnStB,ProcessKeyOn,C4Enable,KeyQuickClock,KeyQuickSaveSPC,TimerEnable
+EXTSYM KeyOnStB,C4Enable,KeyQuickClock,KeyQuickSaveSPC,TimerEnable
 EXTSYM splitflags,joinflags,KeyQuickSnapShot,csounddisable,videotroub
 EXTSYM InitPreGame,Curtableaddr,curcyc,debugdisble,dmadata,guioff,memtabler8
 EXTSYM SetupPreGame,memtablew8,regaccessbankr8,showmenu,snesmap2,snesmmap
@@ -38,8 +38,8 @@ EXTSYM curypos,cycpl,doirqnext,drawline,exechdma,hdmadelay,intrset,newengen
 EXTSYM oamaddr,oamaddrs,resolutn,showvideo,starthdma,switchtonmi,switchtovirq
 EXTSYM totlines,updatetimer,SA1Swap,SA1DoIRQ,JoyAOrig,JoyANow,JoyBOrig,JoyBNow
 EXTSYM JoyCOrig,JoyCNow,JoyDOrig,JoyDNow,JoyEOrig,JoyENow,SA1Message
-EXTSYM MultiTapStat,idledetectspc,SA1Control,SA1Enable,SA1IRQEnable,SPC700read
-EXTSYM SPC700write,numspcvblleft,spc700idle,SA1IRQExec,ForceNewGfxOff,LethEnData
+EXTSYM MultiTapStat,SA1Control,SA1Enable,SA1IRQEnable,SPC700read
+EXTSYM SPC700write,SA1IRQExec,ForceNewGfxOff,LethEnData
 EXTSYM GUIQuit,IRAM,SA1Ptr,SA1BWPtr,outofmemfix,yesoutofmemory,ProcessMovies
 EXTSYM MovieStop,ppustatus,C4VBlank,ReturnFromSPCStall,scanlines,MainLoop
 EXTSYM MoviePassWaiting,MovieDumpRaw,NumberOfOpcodes,SfxCLSR,SfxSCMR,SfxPOR
