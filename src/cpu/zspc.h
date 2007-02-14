@@ -13,8 +13,9 @@ extern short *zspc_buf;
 extern int zspc_buf_size;
 void zspc_set_output( void );
 
-// Number of samples written to output since it was last set
-int zspc_sample_count( void );
+// Get number of samples written to output since it was last set
+void zspc_sample_count( void );
+extern int zspc_sample_count_return;
 
 
 //// Emulation
