@@ -777,7 +777,7 @@ NEWSYM execute
 NEWSYM execloop
    mov bl,dl
    test byte[curexecstate],2
-   jnz .sound
+   jmp .sound
 .startagain
    cmp byte[xe],1
    je .notxe

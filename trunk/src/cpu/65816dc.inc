@@ -29,7 +29,7 @@ EXTSYM clocktable,spcCycle
 %include "cpu/spccycle.inc"
 
 %macro endloop 0
-    sub dword[cycpbl],26
+    sub dword[cycpbl],170
     jnc near %%skipallspc
     mov bl,[ebp]
     ; 1260, 10000/12625
