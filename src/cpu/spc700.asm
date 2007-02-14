@@ -616,6 +616,7 @@ NEWSYM updatetimer
 
     add dword[spc_scantime],65
 
+NEWSYM catchup
 .catchup
     mov eax,[spc_scantime]
     cmp eax,[spcCycle]
