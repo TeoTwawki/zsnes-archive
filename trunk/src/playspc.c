@@ -51,25 +51,16 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < 128; i++)
 	dsp_write(i, DSPRegs[i]);
 
-    dev = ao_open_live(0, &format, NULL);
+    
+    ao_initialize();
+    dev = ao_open_live(ao_default_driver_id(), &format, NULL);
 
     while (1) {
 	__asm__(
        ".intel_syntax       \n\
 	pushad              \n\
         mov %ebp,[spcPCRam] \n\
-        mov %edx,1024       \n\
-.loop:                      \n\
-        xor %ebx,%ebx       \n\
-        mov %bl,[%ebp]      \n\
-        inc %ebp            \n\
-        mov %eax,[clocktable+%ebx*4] \n\
-        add [spcCycle],%eax \n\
-        push %edx           \n\
-        call [opcjmptab+%ebx*4] \n\
-        pop %edx            \n\
-        dec %edx            \n\
-        jnc .loop           \n\
+        call updatetimer    \n\
         mov [spcPCRam],%ebp \n\
         popad               \n\
         .att_syntax"
