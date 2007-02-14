@@ -765,10 +765,6 @@ NEWSYM execloop
    sub dh,12
 .noirq
    call dword near [edi+ebx*4]
-    pushad
-    call dsp_run_wrap
-    popad
-
 .cpuover
    jmp cpuover
 .sound
@@ -790,7 +786,7 @@ NEWSYM execloop
    inc esi
    sub dh,[cpucycle+ebx]
    jc .cpuovers
-   call dword near [edi+ebx*4]
+   ;call dword near [edi+ebx*4]
 .cpuovers
 
    jmp cpuover
@@ -1452,7 +1448,9 @@ NEWSYM cpuover
     inc esi
     jmp execloop.startagain
 .overy
-
+    pushad
+    call dsp_run_wrap
+    popad
     mov dh,80
 %ifdef __MSDOS__
     cmp byte[smallscreenon],1

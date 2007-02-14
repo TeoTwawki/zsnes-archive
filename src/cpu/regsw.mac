@@ -37,7 +37,7 @@
     pop ebx
     call catchup
     pushad
-    call dsp_run_wrap
+;    call dsp_run_wrap
     popad
 %%enspc
 %endmacro
