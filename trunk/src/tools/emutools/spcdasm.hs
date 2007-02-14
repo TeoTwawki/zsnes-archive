@@ -65,7 +65,7 @@ comment = many (noneOf "\r\n") >> newline
 
 -- Disassembler (doesn't support most TASM constructs)
 
-optable = either (error . show) id (unsafePerformIO (parseFromFile pTable "spc_asm.tab"))
+optable = either (error . show) id (unsafePerformIO (parseFromFile pTable "tools/emutools/spc_asm.tab"))
 opmap = IM.fromList [(opOpcode op, op) | op <- optable]
 
 disasmOp :: BS.ByteString -> Int -> (String, Int)
@@ -97,9 +97,9 @@ disasmOp mem addr = (str, addr')
              case opRule op of
              "NOP" -> [baseArg]
              "CSWAP" -> [(baseArg `shiftR` 8) .&. 0xFF, baseArg .&. 0xFF]
-             "CREL" -> [baseArg .&. 0xFF, fromIntegral addr + ((baseArg `shiftR` 8) .&. 0xFF)]
-             "R1" -> [fromIntegral (addr + (fromIntegral (fromIntegral baseArg :: Int8)))]
-             "R2" -> [fromIntegral (addr + (fromIntegral (fromIntegral baseArg :: Int16)))]
+             "CREL" -> [baseArg .&. 0xFF,
+                        fromIntegral (addr + 2 + (fromIntegral (fromIntegral (baseArg `shiftR` 8) :: Int8)))]
+             "R1" -> [fromIntegral (addr + 2 + (fromIntegral (fromIntegral baseArg :: Int8)))]
              rule -> error ("unimplemented rule "++rule)
 
     baseArg = realBaseArg `shiftR` opArgShift op

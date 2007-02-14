@@ -243,6 +243,26 @@ SBC     *,#*    B8 3 CSWAP 1
 SBC     *,*     A9 3 CSWAP 1
 
 TCALL   *       01 1 T1 1 4 F0
+TCALL   $0      01 1 NOP 1
+TCALL   $1      11 1 NOP 1
+TCALL   $2      21 1 NOP 1
+TCALL   $3      31 1 NOP 1
+
+TCALL   $4      41 1 NOP 1
+TCALL   $5      51 1 NOP 1
+TCALL   $6      61 1 NOP 1
+TCALL   $7      71 1 NOP 1
+
+TCALL   $8      81 1 NOP 1
+TCALL   $9      91 1 NOP 1
+TCALL   $A      A1 1 NOP 1
+TCALL   $B      B1 1 NOP 1
+
+TCALL   $C      C1 1 NOP 1
+TCALL   $D      D1 1 NOP 1
+TCALL   $E      E1 1 NOP 1
+TCALL   $F      F1 1 NOP 1
+
 TSET1   *       0E 3 NOP 1
 TCLR1   *       4E 3 NOP 1
 
