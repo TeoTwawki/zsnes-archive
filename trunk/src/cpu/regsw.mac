@@ -36,9 +36,6 @@
     mov edi,[tableadc+ebx*4]
     pop ebx
     call catchup
-    pushad
-;    call dsp_run_wrap
-    popad
 %%enspc
 %endmacro
 
