@@ -777,7 +777,7 @@ NEWSYM execute
 NEWSYM execloop
    mov bl,dl
    test byte[curexecstate],2
-   jmp .sound
+   jnz .sound
 .startagain
    cmp byte[xe],1
    je .notxe
@@ -796,11 +796,14 @@ NEWSYM execloop
    sub dh,12
 .noirq
    call dword near [edi+ebx*4]
+    pushad
+    call dsp_run_wrap
+    popad
+
 .cpuover
    jmp cpuover
 .sound
    mov edi,[tableadc+ebx*4]
-%if 0
 %ifdef OPENSPC
    pushad
    mov bl,[esi]
@@ -812,7 +815,7 @@ NEWSYM execloop
    call OSPC_Run
    popad
 %else
-   sub dword[cycpbl],38
+   sub dword[cycpbl],170
    jnc .skipallspc
    mov bl,[ebp]
    ; 1260, 10000/12625
@@ -823,13 +826,13 @@ NEWSYM execloop
    xor ebx,ebx
 .skipallspc
 %endif
-%endif
    mov bl,[esi]
    inc esi
    sub dh,[cpucycle+ebx]
    jc .cpuovers
    call dword near [edi+ebx*4]
 .cpuovers
+
    jmp cpuover
 
 
@@ -1489,9 +1492,6 @@ NEWSYM cpuover
     inc esi
     jmp execloop.startagain
 .overy
-    pushad
-    call dsp_run_wrap
-    popad
 
     mov dh,80
 %ifdef __MSDOS__
