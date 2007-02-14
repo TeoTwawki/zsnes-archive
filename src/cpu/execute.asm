@@ -784,15 +784,6 @@ NEWSYM execloop
    call OSPC_Run
    popad
 %else
-   sub dword[cycpbl],170
-   jnc .skipallspc
-   mov bl,[ebp]
-   ; 1260, 10000/12625
-   inc ebp
-   mov eax,[clocktable+ebx*4]
-   spccycles eax
-   call dword near [opcjmptab+ebx*4]
-   xor ebx,ebx
 .skipallspc
 %endif
    mov bl,[esi]
