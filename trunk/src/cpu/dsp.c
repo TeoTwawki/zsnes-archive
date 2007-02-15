@@ -165,7 +165,7 @@ void dsp_init( void* ram_64k )
 	dsp_disable_surround( 0 );
 	dsp_mute_voices( 0 );
 	dsp_reset();
-	
+
 	// be sure compiler didn't pad structures overlaying dsp registers
 	assert( offsetof (struct globals_t,x9 [2]) == dsp_register_count );
 	assert( sizeof (raw_voice_t) * dsp_voice_count == dsp_register_count );
@@ -174,7 +174,7 @@ void dsp_init( void* ram_64k )
 void dsp_mute_voices( int mask )
 {
 	m_mute_mask = mask;
-	
+
 	// update cached volume values
 	int i;
 	for ( i = dsp_voice_count * 0x10; (i -= 0x10) >= 0; )
@@ -210,7 +210,7 @@ void dsp_reset()
 	m_noise       = 1;
 	m_echo_pos    = 0;
 	m_fir_pos     = 0;
-	
+
 	memset( REGS,          0, sizeof REGS );
 	memset( m_voice_state, 0, sizeof m_voice_state );
 	memset( m_fir_buf,     0, sizeof m_fir_buf );
@@ -221,7 +221,7 @@ void dsp_reset()
 void dsp_write( int addr, int data )
 {
 	assert( (unsigned) addr < dsp_register_count );
-	
+
 	REGS [addr] = data;
 	int high = addr >> 4;
 	int low  = addr & 0x0F;
@@ -229,7 +229,7 @@ void dsp_write( int addr, int data )
 	{
 		int left  = *(int8_t const*) &REGS [addr & ~1];
 		int right = *(int8_t const*) &REGS [addr |  1];
-		
+
 		// eliminate surround only if enabled and signs of volumes differ
 		if ( left * right < m_surround_threshold )
 		{
@@ -238,7 +238,7 @@ void dsp_write( int addr, int data )
 			else
 				right = -right;
 		}
-		
+
 		// apply per-voice muting
 		voice_t* v = &m_voice_state [high];
 		int enabled = (m_mute_mask >> high & 1) - 1;
@@ -315,16 +315,16 @@ static short const gauss [512] =
 enum { env_rate_init = ENV( 1 ) };
 static int const env_rates [0x20] =
 {
-	        0, ENV(2048), ENV(1536), 
-	ENV(1280), ENV(1024), ENV( 768), 
-	ENV( 640), ENV( 512), ENV( 384), 
-	ENV( 320), ENV( 256), ENV( 192), 
-	ENV( 160), ENV( 128), ENV(  96), 
-	ENV(  80), ENV(  64), ENV(  48), 
-	ENV(  40), ENV(  32), ENV(  24), 
-	ENV(  20), ENV(  16), ENV(  12), 
-	ENV(  10), ENV(   8), ENV(   6), 
-	ENV(   5), ENV(   4), ENV(   3), 
+	        0, ENV(2048), ENV(1536),
+	ENV(1280), ENV(1024), ENV( 768),
+	ENV( 640), ENV( 512), ENV( 384),
+	ENV( 320), ENV( 256), ENV( 192),
+	ENV( 160), ENV( 128), ENV(  96),
+	ENV(  80), ENV(  64), ENV(  48),
+	ENV(  40), ENV(  32), ENV(  24),
+	ENV(  20), ENV(  16), ENV(  12),
+	ENV(  10), ENV(   8), ENV(   6),
+	ENV(   5), ENV(   4), ENV(   3),
 	ENV(   2), ENV(   1)
 };
 #undef ENV
@@ -341,7 +341,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 {
 	if ( GLOBALS.flg & 0x80 )
 		soft_reset();
-	
+
 	{
 		int kon = m_new_kon;
 		GLOBALS.endx &= ~kon;
@@ -360,7 +360,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 			assert( v <= &m_voice_state [dsp_voice_count] );
 		}
 	}
-	
+
 	// Global volumes
 	int mvoll = GLOBALS.mvoll;
 	int mvolr = GLOBALS.mvolr;
@@ -368,10 +368,10 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 		mvolr = -mvolr; // eliminate surround
 	mvoll = (mvoll * m_gain) >> gain_bits; // scale by emulator gain
 	mvolr = (mvolr * m_gain) >> gain_bits;
-	
+
 	int evoll = (GLOBALS.evoll * m_gain) >> gain_bits;
 	int evolr = (GLOBALS.evolr * m_gain) >> gain_bits;
-	
+
 	while ( --count >= 0 ) // generates one pair of output samples per iteration
 	{
 		// Run noise generator
@@ -384,7 +384,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 				m_noise = (feedback & 0x4000) ^ (m_noise >> 1);
 			}
 		}
-		
+
 		// Generate one sample for each voice
 		int prev_outx = 0;
 		int echol     = 0;
@@ -415,7 +415,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 					voice->env_mode     = state_attack;
 				}
 			}
-			
+
 			// Envelope
 			{
 				int const env_range = 0x800;
@@ -441,7 +441,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 								envx--; // envx *= 255 / 256
 								envx -= envx >> 8;
 							}
-							
+
 							int sustain_level = raw_voice->adsr [1] >> 5;
 							if ( envx <= (sustain_level + 1) * 0x100 )
 								voice->env_mode = state_sustain;
@@ -453,7 +453,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 							{
 								voice->env_timer = env_rate_init;
 								envx += (t < 15 ? env_range / 64 : env_range / 2);
-								
+
 								// TODO: Anomie claims envx >= env_range - 1
 								if ( envx >= env_range )
 								{
@@ -501,12 +501,12 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 				voice->envx = envx;
 				raw_voice->envx = envx >> 4;
 			}
-			
+
 			// BRR decoding
 			while ( voice->fraction >= 0x1000 )
 			{
 				voice->fraction -= 0x1000;
-				
+
 				// Starting new block
 				if ( !--voice->block_remain )
 				{
@@ -514,7 +514,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 					{
 						GLOBALS.endx |= vbit;
 						voice->addr = GET_LE16A( SD [raw_voice->srcn].loop );
-						
+
 						if ( !(voice->block_header & 2) ) // 1% of the time
 						{
 							// first block was end block; don't play anything (verified)
@@ -522,7 +522,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 							// sample, but you don't hear it because envx is set to 0.
 				sample_ended:
 							GLOBALS.endx |= vbit;
-							
+
 							// since voice->envx is 0, samples and position don't matter
 							raw_voice->envx = 0;
 							voice->envx = 0;
@@ -530,18 +530,18 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 							break;
 						}
 					}
-					
+
 					voice->block_remain = 16; // nybbles
 					voice->block_header = RAM [voice->addr];
 					voice->addr = (voice->addr + 1) & 0xFFFF;
 				}
-				
+
 				// if next block has end flag set, this block ends early (verified)
 				// TODO: how early it ends depends on playback rate
 				if ( voice->block_remain == 9 && (RAM [(voice->addr + 5) & 0xFFFF] & 3) == 1 &&
 						(voice->block_header & 3) != 3 )
 					goto sample_ended;
-				
+
 				// Get nybble and sign-extend
 				int delta = RAM [voice->addr];
 				if ( voice->block_remain & 1 )
@@ -550,13 +550,13 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 					voice->addr = (voice->addr + 1) & 0xFFFF;
 				}
 				delta = (int8_t) delta >> 4;
-				
+
 				// Scale delta based on range from header
 				int shift = voice->block_header >> 4;
 				delta = (delta << shift) >> 1;
 				if ( shift > 0x0C ) // handle invalid range
 					delta = (delta >> 25) << 11; // delta = (delta < 0 ? ~0x7FF : 0)
-				
+
 				// Apply IIR filter
 				if ( voice->block_header & 8 )
 				{
@@ -578,7 +578,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 					delta += voice->interp [0] >> 1;
 					delta += (-voice->interp [0]) >> 5;
 				}
-				
+
 				// Shift samples over and condition new sample
 				voice->interp [3] = voice->interp [2];
 				voice->interp [2] = voice->interp [1];
@@ -586,7 +586,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 				CLAMP16( delta );
 				voice->interp [0] = (int16_t) (delta * 2); // sign-extend
 			}
-			
+
 			// Get rate (with possible modulation)
 			int rate = GET_LE16A( raw_voice->pitch ) & 0x3FFF; // verified
 			if ( GLOBALS.pmon & vbit ) // verified
@@ -594,11 +594,11 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 				rate += ((prev_outx >> 5) * rate) >> 10; // verified
 				if ( rate > 0x3FFF ) rate = 0x4000; // verified
 			}
-			
+
 			// Gaussian interpolation using most recent 4 samples
 			int offset = voice->fraction >> 4; // verified
 			voice->fraction += rate;
-			
+
 			// Gaussian interpolation using most recent 4 samples
 			short const* fwd = gauss       + offset * 2;
 			short const* rev = gauss + 510 - offset * 2; // mirror left half of gaussian
@@ -610,60 +610,60 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 			output += (rev [0] * voice->interp [0]) >> 11; // verified: low bit is preserved
 			CLAMP16( output ); // verified
 			output &= ~1; // verified
-			
+
 			if ( GLOBALS.non & vbit )
 				output = (int16_t) (m_noise * 2);
-			
+
 			output = (output * voice->envx) >> 11 & ~1; // verified: low bit cleared here
 			prev_outx = output; // verified
 			raw_voice->outx = (int8_t) (output >> 8); // TODO: verify
-			
+
 			int amp_0 = (output * voice->volume [0]) >> 7;
 			int amp_1 = (output * voice->volume [1]) >> 7;
-			
+
 			//amp_0 &= ~1; // verified: low bit not cleared here
 			//amp_1 &= ~1;
-			
+
 			voicesl += amp_0;
 			voicesr += amp_1;
-			
+
 			CLAMP16( voicesl );
 			CLAMP16( voicesr );
-			
+
 			if ( GLOBALS.eon & vbit )
 			{
 				echol += amp_0;
 				echor += amp_1;
-				
+
 				CLAMP16( echol );
 				CLAMP16( echor );
-				
+
 				//echol &= ~1; // verified: low bit not cleared here
 				//echor &= ~1;
 			}
 		}
 		// end of voice loop
-		
+
 		// Echo buffer position
 		uint8_t* const echo_ptr = &RAM [(GLOBALS.esa * 0x100 + m_echo_pos) & 0xFFFF];
 		m_echo_pos += 4;
 		if ( m_echo_pos >= (GLOBALS.edl & 15) * 0x800 )
 			m_echo_pos = 0;
-		
+
 		// Keep most recent 8 echo samples
 		int (*fir_ptr) [2] = &m_fir_buf [m_fir_pos];
 		m_fir_pos = (m_fir_pos + 1) & (dsp_fir_buf_half - 1);
 		fir_ptr [dsp_fir_buf_half] [0] = fir_ptr [0] [0] = GET_LE16SA( echo_ptr     ) >> 1;
 		fir_ptr [dsp_fir_buf_half] [1] = fir_ptr [0] [1] = GET_LE16SA( echo_ptr + 2 ) >> 1;
-		
+
 		// Apply FIR
 		int fbl = 0;
 		int fbr = 0;
-		
+
 		#define CALC_FIR( i )\
 			fbl += (fir_ptr [i + 1] [0] * m_fir_coeff [i]) >> 6;\
 			fbr += (fir_ptr [i + 1] [1] * m_fir_coeff [i]) >> 6;
-		
+
 		CALC_FIR( 0 )
 		CALC_FIR( 1 )
 		CALC_FIR( 2 )
@@ -671,51 +671,51 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 		CALC_FIR( 4 )
 		CALC_FIR( 5 )
 		CALC_FIR( 6 )
-		
+
 		fbl = (int16_t) fbl;
 		fbr = (int16_t) fbr;
-		
+
 		CALC_FIR( 7 )
-		
+
 		#undef CALC_FIR
-		
+
 		CLAMP16( fbl );
 		CLAMP16( fbr );
-		
+
 		// Feedback into echo buffer
 		if ( !(GLOBALS.flg & 0x20) )
 		{
 			int efb = GLOBALS.efb;
 			int el = (((fbl & ~1) * efb) >> 7) + echol;
 			int er = (((fbr & ~1) * efb) >> 7) + echor;
-			
+
 			CLAMP16( el );
 			CLAMP16( er );
-			
+
 			el &= ~1;
 			er &= ~1;
-			
+
 			SET_LE16A( echo_ptr    , el );
 			SET_LE16A( echo_ptr + 2, er );
 		}
-		
+
 		// Generate output
 		if ( out_buf )
 		{
 			// low bits probably cleared at various points, but DAC noise makes it irrelevant
-			
+
 			int outl = ((voicesl * mvoll) >> 7) + ((fbl * evoll) >> 7);
 			int outr = ((voicesr * mvolr) >> 7) + ((fbr * evolr) >> 7);
-			
+
 			if ( GLOBALS.flg & 0x40 ) // global muting
 			{
 				outl = 0;
 				outr = 0;
 			}
-			
+
 			CLAMP16( outl );
 			CLAMP16( outr );
-			
+
 			out_buf [0] = outl;
 			out_buf [1] = outr;
 			out_buf += 2;
