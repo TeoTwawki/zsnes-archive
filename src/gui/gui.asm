@@ -56,7 +56,7 @@ EXTSYM memtablew8,writeon,JoyRead,SetInputDevice,delay,FPSOn,RevStereo,
 EXTSYM pl12s34,resolutn,Makemode7Table,vidbufferofsb,wramdata,bgfixer
 EXTSYM videotroub,CheatCodeSave,CheatCodeLoad,LoadCheatSearchFile
 EXTSYM SaveCheatSearchFile,Get_Date,Check_Key,Get_Key,sram
-EXTSYM ScanCodeListing
+EXTSYM ScanCodeListing,RelPathBase
 EXTSYM GUISaveVars,Init_Mouse,Get_MouseData,Set_MouseXMax
 EXTSYM Set_MouseYMax,Set_MousePosition,Get_MousePositionDisplacement,GUIInit
 EXTSYM GUIDeInit,SpecialLine,DrawWater,DrawBurn,DrawSmoke
