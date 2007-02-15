@@ -3132,3 +3132,8 @@ void write_audio(short *sample_buffer, size_t sample_count)
     fwrite(sample_buffer, 2, sample_count, fp);
   }
 }
+
+bool MovieInProgress()
+{
+  return((MovieProcessing == MOVIE_PLAYBACK) || (MovieProcessing == MOVIE_RECORD));
+}
