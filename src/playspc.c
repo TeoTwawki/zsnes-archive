@@ -18,9 +18,9 @@ void (*opcjmptab[256])(void);
 
 extern unsigned char SPCRAM[];
 extern unsigned char* spcPCRam;
-extern unsigned char spcextraram[];
-extern unsigned char timincr0, timincr1, timincr2;
-extern unsigned int spcA, spcX, spcY, spcP, spcNZ, spcS;
+extern unsigned char spcextraram[64];
+extern unsigned char timeron, timincr0, timincr1, timincr2;
+extern unsigned char spcA, spcX, spcY, spcP, spcNZ, spcS;
 extern int DSP_midframe;
 extern void InitSPC();
 
@@ -49,10 +49,11 @@ int main(int argc, char *argv[]) {
     spcA = header[0x27];
     spcX = header[0x28];
     spcY = header[0x29];
-    spcP = header[0x2A] & 0xFD;
-    spcNZ = -(header[0x2A]&2);
+    spcP = header[0x2A];
+    spcNZ = (spcP & 82) ^ (spcP & 0x80);
     spcS = 0x100+header[0x2B];
 
+    timeron = SPCRAM[0xf1] & 7;
     timincr0 = SPCRAM[0xfa];
     timincr1 = SPCRAM[0xfb];
     timincr2 = SPCRAM[0xfc];
