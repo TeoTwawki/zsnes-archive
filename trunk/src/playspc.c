@@ -55,11 +55,12 @@ int main(int argc, char *argv[]) {
     struct header_t header;
     unsigned char DSPRegs[0x100];
     unsigned char junk[0x40];
+    char *emulator;
 
     InitSPC();
 
     fin = fopen(argv[1], "r");
-    fread(header,      0x100,   1, fin);
+    fread(&header,     0x100,   1, fin);
     fread(SPCRAM,      0x10000, 1, fin);
     fread(DSPRegs,     0x80,    1, fin);
     fread(junk,        0x40,    1, fin);
