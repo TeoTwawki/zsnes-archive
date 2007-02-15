@@ -1,16 +1,7 @@
-/* Copyright (C) 2007 Shay Green. This module is free software; you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version. This
-module is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-details. You should have received a copy of the GNU Lesser General Public
-License along with this module; if not, write to the Free Software Foundation,
-Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
-
 #ifndef SPC_H
 #define SPC_H
+
+#include <stdint.h>
 
 //// Setup
 
@@ -42,14 +33,29 @@ enum { spc_sample_rate = 32000 };
 // Number of I/O ports
 enum { spc_port_count = 4 };
 
- // Reads/writes port at specified time
+// Reads/writes port at specified time
 int spc_read_port( spc_time_t, int port );
 void spc_write_port( spc_time_t, int port, int data );
 
 // Runs SPC to end_time and starts a new time frame at 0
 void spc_end_frame( spc_time_t end_time );
 
-
 // TODO: save/load state
+
+
+//// Private
+
+typedef struct spc_cpu_regs_t
+{
+	long pc; // more than 16 bits to allow overflow detection
+	uint8_t a;
+	uint8_t x;
+	uint8_t y;
+	uint8_t status;
+	uint8_t sp;
+} spc_cpu_regs_t;
+
+void spc_load_state_( spc_cpu_regs_t const* cpu_state,
+		void const* ram_64k, void const* dsp_128regs );
 
 #endif

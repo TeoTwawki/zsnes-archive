@@ -790,6 +790,9 @@ reg2140r:
     inc dword[SPC700read]
     mov al,[reg1read]
     mov byte[spcnumread],0
+pushad
+    call catchup
+popad
     ret
 .nosound
     ; Find for D0
