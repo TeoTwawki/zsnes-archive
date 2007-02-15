@@ -110,7 +110,8 @@ NEWSYM timinl2,  db 0     ; ticks left before incrementing
 NEWSYM timrcall, db 0     ; alternating bit 0 to correctly timer timer1 & 2 to 8000hz
 NEWSYM spcextraram, times 64 db 0 ; extra ram, used for tcall
 
-NEWSYM spc_scantime, db 0
+NEWSYM spc_scantime, dd 0
+NEWSYM spc_time, dd 0
 
 NEWSYM FutureExpandS,  times 256-64 db 0
 
@@ -615,6 +616,8 @@ NEWSYM updatetimer
 .noanother
 
     add dword[spc_scantime],65
+    mov eax,[spc_scantime]
+    mov [spc_time],eax
 
 NEWSYM catchup
     pushad
@@ -622,7 +625,7 @@ NEWSYM catchup
     popad
 
 .catchup
-    mov eax,[spc_scantime]
+    mov eax,[spc_time]
     cmp eax,[spcCycle]
     jc .done
 
