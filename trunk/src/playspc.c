@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < 128; i++)
 	dsp_write(i, DSPRegs[i]);
 
-    
+
     ao_initialize();
     dev = ao_open_live(ao_driver_id("oss"), &format, NULL);
 
