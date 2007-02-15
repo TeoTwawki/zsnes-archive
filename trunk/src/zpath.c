@@ -60,7 +60,7 @@ char *ZSnapPath = 0, *ZSpcPath = 0, *ZIpsPath = 0, *ZMoviePath = 0;
 char *ZChtPath = 0, *ZComboPath = 0, *ZInpPath = 0, *ZSStatePath = 0;
 char *ZCartName = 0, *ZSaveName = 0, *ZStateName = 0, *ZSaveST2Name = 0;
 
-static bool ZStartAlloc = false, ZCfgAlloc = false, ZSramAlloc = false, ZRomAlloc = false;
+static bool ZStartAlloc = false, ZCfgAlloc = false, ZRomAlloc = false;
 static bool ZCartAlloc = false, ZSaveAlloc = false, ZStateAlloc = false, ZSaveST2Alloc = false;
 
 #ifdef __UNIXSDL__
@@ -174,7 +174,6 @@ void deinit_paths()
   //Now deallocate the paths
   if (ZStartAlloc && ZStartPath) { free(ZStartPath); }
   if (ZCfgAlloc && ZCfgPath) { free(ZCfgPath); }
-  if (ZSramAlloc && ZSramPath) { free(ZSramPath); }
   if (ZRomAlloc && ZRomPath) { free(ZRomPath); }
 
   if (ZCartAlloc && ZCartName) { free(ZCartName); }
