@@ -59,33 +59,33 @@ int main(int argc, char *argv[]) {
     timincr2 = SPCRAM[0xfc];
 
     for (i = 0; i < 128; i++)
-	dsp_write(i, DSPRegs[i]);
+        dsp_write(i, DSPRegs[i]);
 
 
     ao_initialize();
     dev = ao_open_live(ao_driver_id("oss"), &format, NULL);
 
     if (dev) {
-	ao_info *di = ao_driver_info(dev->driver_id);
-	printf("\nAudio Opened.\nDriver: %s\nChannels: %u\nRate: %u\n\n", di->name, format.channels, format.rate);
+        ao_info *di = ao_driver_info(dev->driver_id);
+        printf("\nAudio Opened.\nDriver: %s\nChannels: %u\nRate: %u\n\n", di->name, format.channels, format.rate);
     } else {
-	exit(1);
+        exit(1);
     }
 
     while (1) {
-	__asm__(
+        __asm__(
        ".intel_syntax       \n\
-	pushad              \n\
+        pushad              \n\
         mov %ebp,[spcPCRam] \n\
         call updatetimer    \n\
         mov [spcPCRam],%ebp \n\
         popad               \n\
         .att_syntax"
-	    );
-	//DSP_midframe = 0;
-	dsp_run_wrap();
-	DSP_midframe = 1;
-	// printf("PC = 0x%04x\n", spcPCRam-SPCRAM);
+            );
+        //DSP_midframe = 0;
+        dsp_run_wrap();
+        DSP_midframe = 1;
+        // printf("PC = 0x%04x\n", spcPCRam-SPCRAM);
     }
 }
 
@@ -93,6 +93,6 @@ void SoundWrite_ao() {}
 
 void write_audio(short *sample_buffer, size_t sample_count) {
     if (!ao_play(dev, (char*)sample_buffer, sample_count*2))
-	exit(1);
+        exit(1);
 }
 
