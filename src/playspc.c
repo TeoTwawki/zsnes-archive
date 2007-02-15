@@ -26,32 +26,54 @@ extern void InitSPC();
 
 ao_device *dev;
 
+struct header_t {
+	char          tag[35];
+	unsigned char format;
+	unsigned char version;
+	unsigned char pc[2];
+	unsigned char a, x, y, psw, sp;
+	unsigned char unused[2];
+	char          song[32];
+	char          game[32];
+	char          dumper[16];
+	char          comment[32];
+	unsigned char date[11];
+	unsigned char len_secs[3];
+	unsigned char fade_msec[5];
+	char          author[32];
+	unsigned char mute_mask;
+	unsigned char emulator;
+	unsigned char unused2[45];
+};
+
 int main(int argc, char *argv[]) {
     int i;
 
     struct ao_sample_format format = { 16, 32000, 2, AO_FMT_LITTLE };
 
     FILE *fin;
-    unsigned char header[0x100];
+    struct header_t header;
     unsigned char DSPRegs[0x100];
     unsigned char junk[0x40];
 
     InitSPC();
 
     fin = fopen(argv[1], "r");
-    fread(header, 0x100, 1, fin);
-    fread(SPCRAM, 0x10000, 1, fin);
-    fread(DSPRegs, 0x80, 1, fin);
-    fread(junk, 0x40, 1, fin);
-    fread(spcextraram, 0x40, 1, fin);
+    fread(header,      0x100,   1, fin);
+    fread(SPCRAM,      0x10000, 1, fin);
+    fread(DSPRegs,     0x80,    1, fin);
+    fread(junk,        0x40,    1, fin);
+    fread(spcextraram, 0x40,    1, fin);
 
-    spcPCRam = SPCRAM+(header[0x25]+(header[0x26]<<8));
-    spcA = header[0x27];
-    spcX = header[0x28];
-    spcY = header[0x29];
-    spcP = header[0x2A];
-    spcNZ = (spcP & 82) ^ (spcP & 0x80);
-    spcS = 0x100+header[0x2B];
+    spcPCRam = SPCRAM+(header.pc[0]+(header.pc[1]<<8));
+    spcA = header.a;
+    spcX = header.x;
+    spcY = header.y;
+    spcP = header.psw;
+    spcNZ = (spcP & 0x82)^2;
+    spcS = 0x100+header.sp;
+
+    emulator = (header.emulator == 1) ? "ZSNES" : ((header.emulator == 2) ? "SNES9x" : "Unknown");
 
     timeron = SPCRAM[0xf1] & 7;
     timincr0 = SPCRAM[0xfa];
@@ -68,6 +90,7 @@ int main(int argc, char *argv[]) {
     if (dev) {
         ao_info *di = ao_driver_info(dev->driver_id);
         printf("\nAudio Opened.\nDriver: %s\nChannels: %u\nRate: %u\n\n", di->name, format.channels, format.rate);
+        printf("Dumper: %s\n  Game: %s\n Title: %s\nArtist: %s\n\n", header.dumper, header.game, header.song, header.author);       
     } else {
         exit(1);
     }
