@@ -882,7 +882,7 @@ GUIOuttextwin2 %1,%2-1,%3-1,%4
 %macro BlinkCursorCheck 2
   cmp dword[GUIInputBox],%2+1
   jne %%notselected
-  mov ebx,[%1+%2*4] 
+  mov ebx,[%1+%2*4]
 %%notselected
 %endmacro
 

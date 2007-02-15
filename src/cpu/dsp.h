@@ -48,5 +48,5 @@ static inline int dsp_read( int addr )
 	assert( (unsigned) addr < dsp_register_count );
 	return m_dsp_regs [addr];
 }
-	
+
 #endif
