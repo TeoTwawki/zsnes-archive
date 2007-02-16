@@ -67,7 +67,7 @@ static void enable_rom( bool enable )
 	if ( m_rom_enabled != enable )
 	{
 		m_rom_enabled = enable;
-		
+
 		static uint8_t const boot_rom [rom_size] = {
 			0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0,
 			0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
@@ -110,25 +110,25 @@ void spc_load_state_( spc_cpu_regs_t const* cpu_state,
         int i;
 	SPC_TIME        = 0;
 	m_dsp_next_time = 1 << dsp_rate_shift;
-	
+
 	// CPU
 	spc_cpu_regs = *cpu_state;
-	
+
 	// Memory
 	memcpy( RAM, ram_64k, sizeof RAM );
 	memcpy( m_extra_ram, RAM + rom_addr, sizeof m_extra_ram );
 	m_rom_enabled = !(RAM [0xF1] & 0x80); // force update
 	enable_rom( !m_rom_enabled );
-	
+
 	// Put STOP instruction around memory to catch PC underflow/overflow
 	memset( spc_ram_.padding1, 0xFF, sizeof spc_ram_.padding1 );
 	memset( spc_ram_.padding2, 0xFF, sizeof spc_ram_.padding2 );
-	
+
 	// DSP
 	dsp_reset();
 	for ( i = 0; i < dsp_register_count; i++ )
 		dsp_write( i, ((uint8_t const*) dsp_128regs) [i] );
-	
+
 	// Timers
 	m_timers [0].shift = 4 + 3; // 8 kHz
 	m_timers [1].shift = 4 + 3; // 8 kHz
@@ -136,7 +136,7 @@ void spc_load_state_( spc_cpu_regs_t const* cpu_state,
 	for ( i = 0; i < timer_count; i++ )
 	{
 		Timer* t = &m_timers [i];
-		
+
 		int p = RAM [0xFA + i];
 		t->period    = (p ? p : 0x100);
 		t->counter   = RAM [0xFD + i] & 0x0F;
@@ -144,7 +144,7 @@ void spc_load_state_( spc_cpu_regs_t const* cpu_state,
 		t->enabled   = (RAM [0xF1] >> i) & 1;
 		t->next_time = (t->enabled ? 0 : timer_disabled_time);
 	}
-	
+
 	// Handle registers which already give 0 when read by setting RAM and not changing it.
 	// Put STOP instruction in registers which can be read, to catch attempted execution.
 	RAM [0xF0] = 0;
@@ -156,7 +156,7 @@ void spc_load_state_( spc_cpu_regs_t const* cpu_state,
 	RAM [0xFD] = 0xFF;
 	RAM [0xFE] = 0xFF;
 	RAM [0xFF] = 0xFF;
-	
+
 	m_out_ports [0] = 0;
 	m_out_ports [1] = 0;
 	m_out_ports [2] = 0;
@@ -166,20 +166,20 @@ void spc_load_state_( spc_cpu_regs_t const* cpu_state,
 void spc_reset( void )
 {
 	// prepare state and restore it in place
-	
+
 	memset( RAM, 0, 0x10000 );
 	RAM [0xF0] = 0x0A; // TEST
 	RAM [0xF1] = 0xB0; // CONTROL
 	RAM [0xFD] = 0x0F; // T0OUT
 	RAM [0xFE] = 0x0F; // T1OUT
 	RAM [0xFF] = 0x0F; // T2OUT
-	
+
 	uint8_t dsp [dsp_register_count];
 	memset( dsp, 0, sizeof dsp );
 	dsp [0x6C] = 0xE0; // FLG
 	dsp [0x6D] = 0xFF; // ESA
 	dsp [0x7D] = 0x01; // EDL
-	
+
 	static spc_cpu_regs_t cpu = { 0, 0, 0, 0, 0, 0 };
 	cpu.pc = rom_addr;
 	spc_load_state_( &cpu, RAM, dsp );
@@ -191,10 +191,10 @@ void spc_reset( void )
 static void run_timer_( Timer* t, spc_time_t time )
 {
 	assert( t->enabled ); // disabled timer's next_time should always be in the future
-	
+
 	int elapsed = ((time - t->next_time) >> t->shift) + 1;
 	t->next_time += elapsed << t->shift;
-	
+
 	elapsed += t->count;
 	if ( elapsed >= t->period ) // avoid unnecessary division
 	{
@@ -219,9 +219,9 @@ static void run_dsp_( spc_time_t time )
 	int count = ((time - m_dsp_next_time) >> dsp_rate_shift) + 1;
 	spc_sample_t* out = m_dsp_out;
 	m_dsp_out = out + count * 2; // stereo
-	
+
 	assert( m_dsp_out <= m_dsp_out_end ); // fails if output buffer becomes full
-	
+
 	m_dsp_next_time += count << dsp_rate_shift;
 	dsp_run( count, out );
 }
@@ -255,7 +255,7 @@ int spc_cpu_read( int addr )
 			result = dsp_read( RAM [0xF2] & 0x7F );
 		}
 	}
-	
+
 	return result;
 }
 
@@ -286,11 +286,11 @@ void spc_cpu_write( int addr, int data )
 					RAM [addr] = (uint8_t) data;
 			}
 			break;
-		
+
 		case 0xF0: // Test register
 			dprintf( "SPC wrote to test register\n" );
 			break;
-		
+
 		// Config
 		case 0xF1:
 			// port clears
@@ -304,7 +304,7 @@ void spc_cpu_write( int addr, int data )
 				RAM [0xF6] = 0;
 				RAM [0xF7] = 0;
 			}
-			
+
 			// timers
 			for ( i = 0; i < timer_count; i++ )
 			{
@@ -324,10 +324,10 @@ void spc_cpu_write( int addr, int data )
 					t->next_time = SPC_TIME;
 				}
 			}
-			
+
 			enable_rom( (data & 0x80) != 0 );
 			break;
-		
+
 		// DSP
 		//case 0xF2: // mapped to RAM
 		case 0xF3: {
@@ -339,7 +339,7 @@ void spc_cpu_write( int addr, int data )
 				dprintf( "SPC DSP write above 0x7F: $%02X\n", (int) reg );
 			break;
 		}
-		
+
 		// Ports
 		case 0xF4:
 		case 0xF5:
@@ -347,10 +347,10 @@ void spc_cpu_write( int addr, int data )
 		case 0xF7:
 			m_out_ports [addr - 0xF4] = (uint8_t) data;
 			break;
-		
+
 		//case 0xF8: // verified on SNES that these are read/write (RAM)
 		//case 0xF9:
-		
+
 		// Timers
 		case 0xFA:
 		case 0xFB:
@@ -365,7 +365,7 @@ void spc_cpu_write( int addr, int data )
 			}
 			break;
 		}
-		
+
 		// Counters (cleared on write)
 		case 0xFD:
 		case 0xFE:
@@ -408,12 +408,12 @@ void spc_end_frame( spc_time_t end )
 	run_dsp( end );
 	m_dsp_next_time -= end;
 	assert( m_dsp_next_time >= 0 );
-	
+
 	SPC_TIME -= end;
 	assert( SPC_TIME <= 0 );
 	int const longest_instruction = 12; // DIV
 	assert( SPC_TIME > -longest_instruction );
-	
+
 	for ( i = 0; i < timer_count; i++ )
 	{
 		Timer* t = &m_timers [i];

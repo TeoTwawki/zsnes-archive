@@ -5,6 +5,7 @@
 
 
 #include <stdlib.h>
+#include <assert.h>
 #include <stdio.h>
 #include <ao/ao.h>
 #include "cpu/dspwrap.h"
@@ -27,23 +28,24 @@ extern void InitSPC();
 ao_device *dev;
 
 struct header_t {
-	char          tag[35];
-	unsigned char format;
-	unsigned char version;
-	unsigned char pc[2];
-	unsigned char a, x, y, psw, sp;
-	unsigned char unused[2];
+	char          tag[33];
+	unsigned char marker[3];
+	unsigned char marker2;
+	unsigned char PCReg[2];
+	unsigned char a, x, y, statflags, stack;
+	unsigned char reserved;
 	char          song[32];
 	char          game[32];
 	char          dumper[16];
 	char          comment[32];
-	unsigned char date[11];
-	unsigned char len_secs[3];
-	unsigned char fade_msec[5];
+	unsigned char date[4];
+	unsigned char reserved2[7]
+	unsigned char len_secs[4];
+	unsigned char fade_msec[3];
 	char          author[32];
 	unsigned char mute_mask;
 	unsigned char emulator;
-	unsigned char unused2[45];
+	unsigned char reserved3[46];
 };
 
 int main(int argc, char *argv[]) {
@@ -56,9 +58,7 @@ int main(int argc, char *argv[]) {
     unsigned char DSPRegs[0x100];
     unsigned char junk[0x40];
     char *emulator;
-
-    if (sizeof header != 0x100) 
-        printf("Compiler is stupid!\n");
+    assert (sizeof(header) == 0x100);
 
     InitSPC();
 
@@ -73,11 +73,21 @@ int main(int argc, char *argv[]) {
     spcA = header.a;
     spcX = header.x;
     spcY = header.y;
-    spcP = header.psw;
+    spcP = header.statflags;
     spcNZ = (spcP & 0x82)^2;
-    spcS = 0x100+header.sp;
+    spcS = 0x100+header.stack;
 
-    emulator = (header.emulator == 1) ? "ZSNES" : ((header.emulator == 2) ? "SNES9x" : "Unknown");
+    switch (header.emulator) {
+        case 1:
+            emulator = "ZSNES";
+            break;
+        case 2:
+            emulator = "SNES9x";
+            break;
+        default:
+            emulator = "Unknown";
+            break;
+    }
 
     timeron = SPCRAM[0xf1] & 7;
     timincr0 = SPCRAM[0xfa];

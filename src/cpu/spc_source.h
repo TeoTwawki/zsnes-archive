@@ -10,7 +10,7 @@
 #ifndef BLARGG_DEBUG_H
 	#undef check
 	#define check( expr ) ((void) 0)
-	
+
 	#undef dprintf
 	#define dprintf( ... ) ((void) 0)
 #endif

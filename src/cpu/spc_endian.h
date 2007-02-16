@@ -28,7 +28,7 @@ static inline void set_le16( void* p, unsigned n )
 	#define GET_LE16A( addr )       (*(uint16_t const*) (addr))
 	#define GET_LE16SA( addr )      (*( int16_t const*) (addr))
 	#define SET_LE16A( addr, data ) (void) (*(uint16_t*) (addr) = (data))
-	
+
 #else
 	#define GET_LE16A( addr )       get_le16 ( addr )
 	#define GET_LE16SA( addr )      get_le16s( addr )
