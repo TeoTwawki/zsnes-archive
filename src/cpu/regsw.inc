@@ -23,7 +23,7 @@ EXTSYM initsfxregsw,reg420Bw,reg420Cw,regptw,initSA1regsw,SDD1Reset
 EXTSYM SPC7110Reset,RTCReset2,NextLineCache,vidmemch2,vidmemch4
 EXTSYM vidmemch8,vrama,nmirept,SPCRAM,HIRQCycNext,HIRQNextExe,tableadc
 EXTSYM cycpb268,cycpb358,cycpbl,cycpblt,opexec268,opexec268cph,opexec358
-EXTSYM opexec358cph,catchup
+EXTSYM opexec358cph
 
 %ifndef NO_DEBUGGER
 EXTSYM sndwrit,debstop
