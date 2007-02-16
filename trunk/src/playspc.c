@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <ao/ao.h>
 #include "cpu/dspwrap.h"
 #include "cpu/dsp.h"
@@ -31,15 +32,15 @@ struct header_t {
 	char          tag[33];
 	unsigned char marker[3];
 	unsigned char marker2;
-	unsigned char PCReg[2];
+	unsigned char pc[2];
 	unsigned char a, x, y, statflags, stack;
-	unsigned char reserved;
+	unsigned char reserved[2];
 	char          song[32];
 	char          game[32];
 	char          dumper[16];
 	char          comment[32];
 	unsigned char date[4];
-	unsigned char reserved2[7]
+	unsigned char reserved2[7];
 	unsigned char len_secs[4];
 	unsigned char fade_msec[3];
 	char          author[32];
@@ -57,7 +58,8 @@ int main(int argc, char *argv[]) {
     struct header_t header;
     unsigned char DSPRegs[0x100];
     unsigned char junk[0x40];
-    char *emulator;
+    char emulator[8];
+    printf("%u\n", sizeof(header));
     assert (sizeof(header) == 0x100);
 
     InitSPC();
@@ -79,13 +81,13 @@ int main(int argc, char *argv[]) {
 
     switch (header.emulator) {
         case 1:
-            emulator = "ZSNES";
+            strcat(emulator, "ZSNES");
             break;
         case 2:
-            emulator = "SNES9x";
+            strcat(emulator, "SNES9x");
             break;
         default:
-            emulator = "Unknown";
+            strcat(emulator, "Unknown");
             break;
     }
 
