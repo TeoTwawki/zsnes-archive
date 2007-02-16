@@ -57,7 +57,6 @@ int main(int argc, char *argv[]) {
     FILE *fin;
     struct header_t header;
     unsigned char DSPRegs[0x80];
-    unsigned char junk[0x60];
     char *emulator;
 
     assert(sizeof(header) == 0x100);
@@ -68,8 +67,9 @@ int main(int argc, char *argv[]) {
     fread(&header, sizeof(header), 1, fin);
     fread(SPCRAM, sizeof(SPCRAM), 1, fin);
     fread(DSPRegs, sizeof(DSPRegs), 1, fin);
-    fread(junk, sizeof(junk), 1, fin);
+    fseek(fin, 0x40, SEEK_CUR);
     fread(spcextraram, sizeof(spcextraram), 1, fin);
+    fclose(fin);
 
     spcPCRam = SPCRAM+(header.pc[0]+(header.pc[1]<<8));
     spcA = header.a;
