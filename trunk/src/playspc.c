@@ -57,6 +57,9 @@ int main(int argc, char *argv[]) {
     unsigned char junk[0x40];
     char *emulator;
 
+    if (sizeof header != 0x100) 
+        printf("Compiler is stupid!\n");
+
     InitSPC();
 
     fin = fopen(argv[1], "r");
