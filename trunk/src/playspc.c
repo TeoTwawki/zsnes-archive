@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     fread(&header, sizeof(header), 1, fin);
     fread(SPCRAM, sizeof(SPCRAM), 1, fin);
     fread(DSPRegs, sizeof(DSPRegs), 1, fin);
-    fseek(fin, 0x40, SEEK_CUR);
+    fseek(fin, (256-sizeof(spcextraram))-sizeof(DSPRegs), SEEK_CUR);
     fread(spcextraram, sizeof(spcextraram), 1, fin);
     fclose(fin);
 
