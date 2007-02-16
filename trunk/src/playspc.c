@@ -56,8 +56,8 @@ int main(int argc, char *argv[]) {
 
     FILE *fin;
     struct header_t header;
-    unsigned char DSPRegs[0x100];
-    unsigned char junk[0x40];
+    unsigned char DSPRegs[0x80];
+    unsigned char junk[0x60];
     char *emulator;
 
     assert(sizeof(header) == 0x100);
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     timincr1 = SPCRAM[0xfb];
     timincr2 = SPCRAM[0xfc];
 
-    for (i = 0; i < 128; i++)
+    for (i = 0; i < sizeof(DSPRegs); i++)
     {
       dsp_write(i, DSPRegs[i]);
     }
