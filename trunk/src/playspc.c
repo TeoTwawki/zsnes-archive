@@ -102,6 +102,7 @@ int main(int argc, char *argv[]) {
         pushad              \n\
         mov %ebp,[spcPCRam] \n\
         call updatetimer    \n\
+        call catchup        \n\
         mov [spcPCRam],%ebp \n\
         popad               \n\
         .att_syntax"
