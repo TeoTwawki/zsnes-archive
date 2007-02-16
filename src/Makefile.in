@@ -164,7 +164,7 @@ uninstall:
 	rm -f @bindir@/$(notdir @ZSNESEXE@) @mandir@/man1/zsnes.1
 
 clean:
-	rm -f makefile.dep $(Z_OBJS) $(PSR) $(PSR_H) @ZSNESEXE@
+	rm -f makefile.dep $(Z_OBJS) $(PSR) $(PSR_H) @ZSNESEXE@ playspc
 cclean:
 	rm -f $(Z_COBJS) $(PSR) $(PSR_H) @ZSNESEXE@
 tclean:
