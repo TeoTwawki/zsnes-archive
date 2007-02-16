@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
     unsigned char DSPRegs[0x100];
     unsigned char junk[0x40];
     char emulator[8];
-    printf("%u\n", sizeof(header));
-    assert (sizeof(header) == 0x100);
+
+    assert(sizeof(header) == 0x100);
 
     InitSPC();
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
     if (dev) {
         ao_info *di = ao_driver_info(dev->driver_id);
         printf("\nAudio Opened.\nDriver: %s\nChannels: %u\nRate: %u\n\n", di->name, format.channels, format.rate);
-        printf("Dumper: %s\n  Game: %s\n Title: %s\nArtist: %s\n\n", header.dumper, header.game, header.song, header.author);       
+        printf("Dumper: %s\n  Game: %s\n Title: %s\nArtist: %s\n\n", header.dumper, header.game, header.song, header.author);
     } else {
         exit(1);
     }
