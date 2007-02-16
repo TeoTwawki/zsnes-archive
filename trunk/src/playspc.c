@@ -18,7 +18,7 @@ int disablespcclr = 0, SPCSkipXtraROM;
 
 void (*opcjmptab[256])(void);
 
-extern unsigned char SPCRAM[];
+extern unsigned char SPCRAM[0x10000];
 extern unsigned char* spcPCRam;
 extern unsigned char spcextraram[64];
 extern unsigned char timeron, timincr0, timincr1, timincr2;
@@ -50,7 +50,7 @@ struct header_t {
 };
 
 int main(int argc, char *argv[]) {
-    int i;
+    unsigned int i;
 
     struct ao_sample_format format = { 16, 32000, 2, AO_FMT_LITTLE };
 
@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
     InitSPC();
 
     fin = fopen(argv[1], "r");
-    fread(&header,     0x100,   1, fin);
-    fread(SPCRAM,      0x10000, 1, fin);
-    fread(DSPRegs,     0x80,    1, fin);
-    fread(junk,        0x40,    1, fin);
-    fread(spcextraram, 0x40,    1, fin);
+    fread(&header, sizeof(header), 1, fin);
+    fread(SPCRAM, sizeof(SPCRAM), 1, fin);
+    fread(DSPRegs, sizeof(DSPRegs), 1, fin);
+    fread(junk, sizeof(junk), 1, fin);
+    fread(spcextraram, sizeof(spcextraram), 1, fin);
 
     spcPCRam = SPCRAM+(header.pc[0]+(header.pc[1]<<8));
     spcA = header.a;
@@ -97,7 +97,9 @@ int main(int argc, char *argv[]) {
     timincr2 = SPCRAM[0xfc];
 
     for (i = 0; i < 128; i++)
-        dsp_write(i, DSPRegs[i]);
+    {
+      dsp_write(i, DSPRegs[i]);
+    }
 
 
     ao_initialize();
