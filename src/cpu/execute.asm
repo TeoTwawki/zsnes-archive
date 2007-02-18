@@ -817,8 +817,9 @@ NEWSYM INCRFrame, db 0
 NEWSYM NoHDMALine, db 0
 SECTION .text
 
-
+EXTSYM catchup
 NEWSYM cpuover
+call catchup
     dec esi
     cmp byte[HIRQNextExe],0
     je .nohirq
