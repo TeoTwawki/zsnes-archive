@@ -618,7 +618,7 @@ NEWSYM updatetimer
     add dword[spc_scantime],65
     mov eax,[spc_scantime]
     mov [spc_time],eax
-;    ret
+    ret
 
 NEWSYM catchup
     pushad
