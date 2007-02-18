@@ -785,14 +785,16 @@ reg213Fr:
 
 ; Sound Reg #1
 reg2140r:
+%ifdef __BLARGG_SPC__
+%else
     cmp byte[spcon],0
     je .nosound
     inc dword[SPC700read]
     mov al,[reg1read]
     mov byte[spcnumread],0
-pushad
+    pushad
     call catchup
-popad
+    popad
     ret
 .nosound
     ; Find for D0
@@ -824,9 +826,12 @@ popad
     mov al,[xa]
 .n
     ret
+%endif
 
 ; Sound Reg #2
 reg2141r:
+%ifdef __BLARGG_SPC__
+%else
     cmp byte[spcon],0
     je .nosound
     inc dword[SPC700read]
@@ -855,9 +860,12 @@ reg2141r:
     mov al,[xa]
 .n
     ret
+%endif
 
 ; Sound Reg #3
 reg2142r:
+%ifdef __BLARGG_SPC__
+%else
     cmp byte[spcon],0
     je .nosound
     inc dword[SPC700read]
@@ -885,9 +893,12 @@ reg2142r:
     mov al,[xa+1]
 .n
     ret
+%endif
 
 ; Sound Reg #4
 reg2143r:
+%ifdef __BLARGG_SPC__
+%else
     cmp byte[spcon],0
     je .nosound
     inc dword[SPC700read]
@@ -911,6 +922,7 @@ reg2143r:
 .notfound
     mov al,[xa+1]
     ret
+%endif
 
 reg2144r:
     xor al,al
