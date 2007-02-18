@@ -21,10 +21,12 @@ void (*opcjmptab[256])(void);
 extern unsigned char SPCRAM[0x10000];
 extern unsigned char* spcPCRam;
 extern unsigned char spcextraram[64];
+extern int spcCycle,lastCycle;
 extern unsigned char timeron, timincr0, timincr1, timincr2;
 extern unsigned char spcA, spcX, spcY, spcP, spcNZ, spcS;
 extern int DSP_midframe;
 extern void InitSPC();
+extern void catchup();
 
 ao_device *dev;
 
@@ -79,6 +81,9 @@ int main(int argc, char *argv[]) {
     spcNZ = (spcP & 0x82)^2;
     spcS = 0x100+header.stack;
 
+spcCycle = 1;
+lastCycle = 0;
+ 
     switch (header.emulator) {
         case 1:
             emulator = "ZSNES";
@@ -95,7 +100,7 @@ int main(int argc, char *argv[]) {
     timincr0 = SPCRAM[0xfa];
     timincr1 = SPCRAM[0xfb];
     timincr2 = SPCRAM[0xfc];
-
+dsp_init(SPCRAM);
     for (i = 0; i < sizeof(DSPRegs); i++)
     {
       dsp_write(i, DSPRegs[i]);
@@ -103,7 +108,7 @@ int main(int argc, char *argv[]) {
 
 
     ao_initialize();
-    dev = ao_open_live(ao_driver_id("oss"), &format, NULL);
+    dev = ao_open_live(ao_driver_id("alsa09"), &format, NULL);
 
     if (dev) {
         ao_info *di = ao_driver_info(dev->driver_id);
@@ -112,21 +117,21 @@ int main(int argc, char *argv[]) {
     } else {
         exit(1);
     }
-
     while (1) {
         __asm__(
        ".intel_syntax       \n\
         pushad              \n\
         mov %ebp,[spcPCRam] \n\
+        call catchup    \n\
         call updatetimer    \n\
-        call catchup        \n\
         mov [spcPCRam],%ebp \n\
         popad               \n\
         .att_syntax"
             );
         //DSP_midframe = 0;
         dsp_run_wrap();
-        DSP_midframe = 1;
+
+//        DSP_midframe = 1;
         // printf("PC = 0x%04x\n", spcPCRam-SPCRAM);
     }
 }
