@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
 spcCycle = 1;
 lastCycle = 0;
- 
+
     switch (header.emulator) {
         case 1:
             emulator = "ZSNES";
