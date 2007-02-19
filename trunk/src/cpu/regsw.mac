@@ -35,8 +35,28 @@
     mov bl,dl
     mov edi,[tableadc+ebx*4]
     pop ebx
-    call catchup
 %%enspc
+%endmacro
+
+%macro catchupspc 0
+    pushad
+    xor eax,eax
+    mov al, [cycpl]
+    mov bh, 65
+    mov bl, al
+    sub al, dh
+    jb %%backwards
+    mul bh
+    div bl
+    xor ah,ah
+    
+    add eax, [spc_scantime]
+    cmp eax, [spc_time]
+    js %%backwards
+    mov [spc_time], eax	
+    call catchup
+%%backwards
+    popad
 %endmacro
 
 %macro setregw 2

@@ -316,7 +316,7 @@ reexecuteb2:
     mov edi,[tableadc+ebx*4]
     or byte[curexecstate],2
 
-    mov ebp,[spcPCRam]
+;   mov ebp,[spcPCRam]
 
     mov byte[NoSoundReinit],0
     mov byte[csounddisable],0
@@ -330,7 +330,7 @@ reexecuteb2:
 
     ; de-init variables (copy to variables)
 
-    mov [spcPCRam],ebp
+;   mov [spcPCRam],ebp
     mov [Curtableaddr],edi
     mov [xp],dl
     mov [curcyc],dh
@@ -1449,6 +1449,7 @@ call catchup
     inc esi
     jmp execloop.startagain
 .overy
+    call catchup
     pushad
     call dsp_run_wrap
     popad
