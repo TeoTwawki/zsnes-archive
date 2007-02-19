@@ -121,16 +121,13 @@ dsp_init(SPCRAM);
         __asm__(
        ".intel_syntax       \n\
         pushad              \n\
-        mov %ebp,[spcPCRam] \n\
-        call catchup    \n\
+        call catchup        \n\
         call updatetimer    \n\
-        mov [spcPCRam],%ebp \n\
         popad               \n\
         .att_syntax"
             );
         //DSP_midframe = 0;
         dsp_run_wrap();
-
 //        DSP_midframe = 1;
         // printf("PC = 0x%04x\n", spcPCRam-SPCRAM);
     }
