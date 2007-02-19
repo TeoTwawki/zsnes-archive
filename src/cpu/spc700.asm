@@ -623,14 +623,11 @@ NEWSYM updatetimer
 NEWSYM catchup
     push ebp
     mov ebp, [spcPCRam]
-    pushad
-    call dsp_run_wrap
-    popad
 
 .catchup
-    mov eax,[spc_time]
-    cmp eax,[spcCycle]
-    jc .done
+    mov eax,[spcCycle]
+    cmp eax,[spc_time]
+    jns .done
 
     xor ebx,ebx
     mov bl,[ebp]
