@@ -112,8 +112,9 @@ NEWSYM spcextraram, times 64 db 0 ; extra ram, used for tcall
 
 NEWSYM spc_scantime, dd 0
 NEWSYM spc_time, dd 0
+NEWSYM altscanline, db 0
 
-NEWSYM FutureExpandS,  times 256-64 db 0
+NEWSYM FutureExpandS,  times 256-55 db 0
 
 spcsave equ $-SPCRAM
 ; pharos equ hack *sigh*
@@ -615,7 +616,14 @@ NEWSYM updatetimer
     jmp .another
 .noanother
 
-    add dword[spc_scantime],65
+    xor byte[altscanline],1
+    cmp byte[altscanline],1
+    je .notalt
+    add dword[spc_scantime],64
+    jmp .continue
+.notalt
+    add dword[spc_scantime],66
+.continue
     mov eax,[spc_scantime]
     mov [spc_time],eax
     ret
