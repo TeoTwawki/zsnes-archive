@@ -98,8 +98,8 @@ disasmOp mem addr = (str, addr')
              "NOP" -> [baseArg]
              "CSWAP" -> [(baseArg `shiftR` 8) .&. 0xFF, baseArg .&. 0xFF]
              "CREL" -> [baseArg .&. 0xFF,
-                        fromIntegral (addr + 2 + (fromIntegral (fromIntegral (baseArg `shiftR` 8) :: Int8)))]
-             "R1" -> [fromIntegral (addr + 2 + (fromIntegral (fromIntegral baseArg :: Int8)))]
+                        fromIntegral (addr + opBytes op + (fromIntegral (fromIntegral (baseArg `shiftR` 8) :: Int8)))]
+             "R1" -> [fromIntegral (addr + opBytes op + (fromIntegral (fromIntegral baseArg :: Int8)))]
              rule -> error ("unimplemented rule "++rule)
 
     baseArg = realBaseArg `shiftR` opArgShift op
