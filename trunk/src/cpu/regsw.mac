@@ -23,19 +23,7 @@
 ; InitRegW                   Initializes Write Registers
 ;*******************************************************
 
-%macro reenablespc 0
-    cmp dword[cycpbl],1000000h
-    jb %%enspc
-    mov dword[cycpbl],0
-    test byte[curexecstate],02h
-    jnz %%enspc
-    or byte[curexecstate],02h
-    push ebx
-    xor ebx,ebx
-    mov bl,dl
-    mov edi,[tableadc+ebx*4]
-    pop ebx
-%%enspc
+%macro reenablespc 0 
 %endmacro
 
 %macro catchupspc 0
