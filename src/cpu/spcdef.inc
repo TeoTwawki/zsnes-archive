@@ -89,6 +89,7 @@
       add ebp,2
       ret
 .dp0jump
+      spccycles 2
       movsx ebx,byte[ebp+1]
       add ebp,ebx
       add ebp,2
@@ -105,6 +106,7 @@
       add ebp,2
       ret
 .dp0jump
+      spccycles 2
       movsx ebx,byte[ebp+1]
       add ebp,ebx
       add ebp,2
