@@ -1216,6 +1216,7 @@ reg2133w:
 
 ; Sound Register #1
 reg2140w:
+    catchupspc
 %ifndef NO_DEBUGGER
     mov byte[sndwrit],1
 %endif
@@ -1236,6 +1237,7 @@ reg2140w:
 
 ; Sound Register #2
 reg2141w:
+    catchupspc
 %ifndef NO_DEBUGGER
     mov byte[sndwrit],1
 %endif
@@ -1252,6 +1254,7 @@ reg2141w:
 
 ; Sound Register #3
 reg2142w:
+    catchupspc
 %ifndef NO_DEBUGGER
     mov byte[sndwrit],1
 %endif
@@ -1268,6 +1271,7 @@ reg2142w:
 
 ; Sound Register #4
 reg2143w:
+    catchupspc
 %ifndef NO_DEBUGGER
     mov byte[sndwrit],1
 %endif

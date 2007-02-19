@@ -621,6 +621,8 @@ NEWSYM updatetimer
     ret
 
 NEWSYM catchup
+    push ebp
+    mov ebp, [spcPCRam]
     pushad
     call dsp_run_wrap
     popad
@@ -641,6 +643,8 @@ NEWSYM catchup
     jmp .catchup
 
 .done
+    mov [spcPCRam], ebp
+    pop ebp
     ret
 
 

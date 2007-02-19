@@ -23,6 +23,7 @@ EXTSYM SFXEnable,regptr,initsfxregsr,initSA1regs,SA1Enable,initSDD1regs
 EXTSYM SPC7110Enable,initSPC7110regs,RTCEnable,RTCReset,curypos,cycpl
 EXTSYM pdh,vram,romispal,reg1read,spcnumread,spcon,reg2read,reg3read
 EXTSYM reg4read,JoyEOrig,JoyENow,device2,cycphb,joycontren,totlines
+EXTSYM spc_scantime,spc_time
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron
@@ -790,11 +791,10 @@ reg2140r:
     cmp byte[spcon],0
     je .nosound
     inc dword[SPC700read]
+    catchupspc
     mov al,[reg1read]
     mov byte[spcnumread],0
-    pushad
-    call catchup
-    popad
+        
     ret
 .nosound
     ; Find for D0
@@ -835,6 +835,7 @@ reg2141r:
     cmp byte[spcon],0
     je .nosound
     inc dword[SPC700read]
+    catchupspc
     mov al,[reg2read]
     mov byte[spcnumread],0
     ret
@@ -869,6 +870,7 @@ reg2142r:
     cmp byte[spcon],0
     je .nosound
     inc dword[SPC700read]
+    catchupspc
     mov al,[reg3read]
     mov byte[spcnumread],0
     ret
@@ -902,6 +904,7 @@ reg2143r:
     cmp byte[spcon],0
     je .nosound
     inc dword[SPC700read]
+    catchupspc
     mov al,[reg4read]
     mov byte[spcnumread],0
     ret
