@@ -2132,7 +2132,7 @@ void SetupROM()
   }
   else
   {
-    totlines = 263;
+    totlines = 262;
     MsgCount = 120;
   }
 }
