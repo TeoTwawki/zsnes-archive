@@ -618,10 +618,10 @@ NEWSYM updatetimer
 
     xor byte[altscanline],1
     cmp byte[altscanline],1
-    je .altscanline
+    je .noaltscanline
     add dword[spc_scantime],62
     jmp .continue
-.altscanline
+.noaltscanline
     add dword[spc_scantime],66
 .continue
     mov eax,[spc_scantime]
