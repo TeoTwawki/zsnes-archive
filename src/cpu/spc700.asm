@@ -2735,6 +2735,7 @@ NEWSYM Op2E     ; CBNE dp,rel  compare A with (dp) then BNE   ...
     add ebp,2
     ret
 .Jump
+    spccycles 2
     movsx ebx,byte[ebp+1]
     add ebp,ebx
     add ebp,2
@@ -2750,6 +2751,7 @@ NEWSYM OpDE     ; CBNE dp+X,rel   compare A with (dp+X) then BNE ...
     add ebp,2
     ret
 .Jump
+    spccycles 2
     movsx ebx,byte[ebp+1]
     add ebp,ebx
     add ebp,2
@@ -2765,6 +2767,7 @@ NEWSYM Op6E     ; DBNZ   decrement memory (dp) then JNZ ...
     WriteByte
     ret
 .Jump
+    spccycles 2
 NEWSYM Op6Eb
     push ebx
     movsx ebx,byte[ebp+1]
@@ -2780,6 +2783,7 @@ NEWSYM OpFE     ; DBNZ Y,rel   decrement Y then JNZ         ...
     inc ebp
     ret
 .Jump
+    spccycles 2
     movsx ebx,byte[ebp]
     add ebp,ebx
     inc ebp
