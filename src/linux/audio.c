@@ -62,11 +62,11 @@ void SoundWrite_ao()
   if (!pthread_mutex_lock(&audio_mutex))
   {
     samples_waiting += dsp_sample_count;
-    if (samples_waiting > 1280)
+    if (samples_waiting > 600)
     {
       pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
     }
-    pthread_mutex_unlock(&audio_mutex);
+  //  pthread_mutex_unlock(&audio_mutex);
   }
 }
 
@@ -74,12 +74,14 @@ static void *SoundThread_ao(void *useless)
 {
   static unsigned int buffer_loc = 0;
   unsigned int play_amount;
+  char blank[16] = {0};
+
   for (;;)
   {
     pthread_cond_broadcast(&audio_wait); //Send signal
-    pthread_mutex_lock(&audio_mutex);
+//    pthread_mutex_lock(&audio_mutex);
 
-    if (samples_waiting > 256) { play_amount = 256; }
+    if (samples_waiting > 128) { play_amount = 128; }
     else { play_amount =  samples_waiting; }
     samples_waiting -= play_amount;
     pthread_mutex_unlock(&audio_mutex);
