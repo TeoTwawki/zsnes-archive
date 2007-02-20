@@ -613,10 +613,9 @@ NEWSYM updatetimer
 ;    jmp .again
 ;.nowrap
     inc dword[timer2upd]
-    cmp dword[timer2upd],16
+    cmp dword[timer2upd],31
     jne .noanother
     mov dword[timer2upd],0
-    add dword[spc_scantime],1
     jmp .another
 .noanother
     xor byte[altscanline],1
