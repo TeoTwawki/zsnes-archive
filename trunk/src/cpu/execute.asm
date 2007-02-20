@@ -52,6 +52,7 @@ EXTSYM RestoreCVFrame,loadstate,xe,KeyInsrtChap,KeyNextChap,KeyPrevChap
 EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
 EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
 EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame,dsp_run_wrap
+EXTSYM catchup,lastCycle
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger
@@ -817,7 +818,6 @@ NEWSYM INCRFrame, db 0
 NEWSYM NoHDMALine, db 0
 SECTION .text
 
-EXTSYM catchup
 NEWSYM cpuover
 call catchup
     dec esi
@@ -1454,7 +1454,6 @@ call catchup
     pushad
     call dsp_run_wrap
     popad
-EXTSYM spcCycle,lastCycle
 ;    mov dword[lastCycle],0
 ;    mov dword[spcCycle],32
 
@@ -2078,7 +2077,6 @@ NEWSYM execsingle
     and dl,0FBh
 .nowai
     jmp dword near [edi+ebx*4]
-EXTSYM spcCycle,lastCycle
 .overy
     mov dword[lastCycle],0
     mov dword[spcCycle],0
