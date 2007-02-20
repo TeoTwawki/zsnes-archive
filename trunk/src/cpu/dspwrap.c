@@ -135,8 +135,6 @@ void dsp_run_wrap()
     int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 5;
     cycles_remaining = i & 31;
 
-
-
     if (samples > 0)
       dsp_fill(samples);
 /*
