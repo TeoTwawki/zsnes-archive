@@ -613,7 +613,7 @@ NEWSYM updatetimer
 ;    jmp .again
 ;.nowrap
     inc dword[timer2upd]
-    cmp dword[timer2upd],31
+    cmp dword[timer2upd],32
     jne .noanother
     mov dword[timer2upd],0
     jmp .another
