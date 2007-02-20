@@ -529,7 +529,7 @@ NEWSYM InitSPCRegs
 ; This function is called every scanline (262*60 times/sec)
 ; Make it call 0.9825 times (393/400) (skip when divisible by 64)
 ; 2 8khz, 1 64khz
-
+EXTSYM lastCycle
 NEWSYM updatetimer
 .another
     xor byte[timrcall],01h
@@ -545,6 +545,7 @@ NEWSYM updatetimer
     cmp byte[SPCRAM+0FDh],1
     jne .noin0
     reenablespc
+    add dword[spc_scantime],1
     mov dword[cycpbl],0
 .noin0
     test byte[timeron],2
@@ -556,8 +557,8 @@ NEWSYM updatetimer
     mov [timinl1],al
     cmp byte[SPCRAM+0FEh],1
     jne .noin1
+    add dword[spc_scantime],1
     reenablespc
-    mov dword[cycpbl],0
 .noin1
 .notimer
     test byte[timeron],4
@@ -569,6 +570,7 @@ NEWSYM updatetimer
     mov [timinl2],al
     cmp byte[SPCRAM+0FFh],1
     jne .noin2
+    add dword[spc_scantime],1
     reenablespc
     mov dword[cycpbl],0
 .noin2
@@ -580,6 +582,7 @@ NEWSYM updatetimer
     cmp byte[SPCRAM+0FFh],1
     jne .noin2b
     reenablespc
+    add dword[spc_scantime],1
     mov dword[cycpbl],0
 .noin2b
     dec byte[timinl2]
@@ -589,8 +592,8 @@ NEWSYM updatetimer
     mov [timinl2],al
     cmp byte[SPCRAM+0FFh],1
     jne .noin2c
+    add dword[spc_scantime],1
     reenablespc
-    mov dword[cycpbl],0
 .noin2c
     dec byte[timinl2]
     jnz .noin2d
@@ -599,8 +602,8 @@ NEWSYM updatetimer
     mov [timinl2],al
     cmp byte[SPCRAM+0FFh],1
     jne .noin2d
+    add dword[spc_scantime],1
     reenablespc
-    mov dword[cycpbl],0
 .noin2d
 .noin2d2
 ;    inc dword[timer2upd]
@@ -610,16 +613,16 @@ NEWSYM updatetimer
 ;    jmp .again
 ;.nowrap
     inc dword[timer2upd]
-    cmp dword[timer2upd],31
+    cmp dword[timer2upd],16
     jne .noanother
     mov dword[timer2upd],0
+    add dword[spc_scantime],1
     jmp .another
 .noanother
-
     xor byte[altscanline],1
     cmp byte[altscanline],1
     je .noaltscanline
-    add dword[spc_scantime],65
+    add dword[spc_scantime],63
     jmp .continue
 .noaltscanline
     add dword[spc_scantime],65

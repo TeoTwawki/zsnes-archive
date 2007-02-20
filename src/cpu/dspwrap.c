@@ -93,7 +93,7 @@ void InitDSPControl(unsigned char is_pal)
   sample_control.balance = sample_control.hi;
   memset(dsp_samples_buffer, 0, sizeof(dsp_samples_buffer));
   mid_samples = next_samples = dsp_sample_count = lastCycle = cycles_remaining = 0;
-  lastCycle = spcCycle = 32;
+  lastCycle = spcCycle = 0;
 }
 
 void dsp_fill(unsigned int stereo_samples)
