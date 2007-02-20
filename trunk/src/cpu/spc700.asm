@@ -616,15 +616,16 @@ NEWSYM updatetimer
     cmp dword[timer2upd],32
     jne .noanother
     mov dword[timer2upd],0
+;    sub dword[spc_scantime],10
     jmp .another
 .noanother
     xor byte[altscanline],1
     cmp byte[altscanline],1
     je .noaltscanline
-    add dword[spc_scantime],63
+    add dword[spc_scantime],61
     jmp .continue
 .noaltscanline
-    add dword[spc_scantime],65
+    add dword[spc_scantime],66	
 .continue
     mov eax,[spc_scantime]
     mov [spc_time],eax
@@ -717,12 +718,10 @@ NEWSYM SPCRegF3
     ;call dword near [dspWptr+ebx*4]
     mov [DSP_val],al
     mov [DSP_reg],bl
-    mov byte[DSP_midframe],1
     pushad
-    call dsp_run_wrap
     call dsp_write_wrap
+    call dsp_run_wrap
     popad
-    mov byte[DSP_midframe],0
     pop ebx
     mov [SPCRAM+ebx],al
     ret
