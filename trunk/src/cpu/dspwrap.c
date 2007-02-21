@@ -62,8 +62,8 @@ extern unsigned char cycpbl;
 extern unsigned int spcCycle;
 
 short dsp_samples_buffer[1280*5]; //Buffer 5 frames for even PAL
-const unsigned int dsp_buffer_size = sizeof(dsp_samples_buffer)/sizeof(short);
-int dsp_sample_count;
+const size_t dsp_buffer_size = sizeof(dsp_samples_buffer)/sizeof(short);
+size_t dsp_sample_count;
 int lastCycle;
 
 static int mid_samples;
@@ -96,85 +96,55 @@ void InitDSPControl(unsigned char is_pal)
   lastCycle = spcCycle = 32;
 }
 
-void dsp_fill(unsigned int stereo_samples)
+void dsp_samples_push(short *buffer, size_t amount)
 {
-  static unsigned int fill_loc = 0;
-  // printf("outputting samples: %d\n", stereo_samples);
-
-  dsp_sample_count += stereo_samples*2;
-  if (fill_loc+stereo_samples*2 >= dsp_buffer_size)
+  //printf("Filled: %u; More: %u\n", dsp_sample_count, amount);
+  if (amount+dsp_sample_count > dsp_buffer_size)
   {
-    unsigned int current_samples = (dsp_buffer_size-fill_loc)/2;
-    dsp_run(current_samples, dsp_samples_buffer+fill_loc);
-    write_audio(dsp_samples_buffer+fill_loc, current_samples*2);
-    stereo_samples -= current_samples;
-    fill_loc = 0;
+    amount = dsp_buffer_size-dsp_sample_count;
   }
-  if (stereo_samples)
+  if (amount)
   {
-    dsp_run(stereo_samples, dsp_samples_buffer+fill_loc);
-    write_audio(dsp_samples_buffer+fill_loc, stereo_samples*2);
-    fill_loc += stereo_samples*2;
-  }
-
-  if (dsp_sample_count >= 512) //Prevent slowing down from crazy little writing
-  {
-#ifdef __LIBAO__
-    SoundWrite_ao();
-#endif
-    dsp_sample_count = 0;
+    memcpy(dsp_samples_buffer+dsp_sample_count, buffer, amount*sizeof(short));
+    dsp_sample_count += amount;
   }
 }
 
-int DSP_midframe;
+size_t dsp_samples_pull(short *buffer, size_t amount)
+{
+  size_t extra = 0;
+  if (amount > dsp_sample_count)
+  {
+    extra = amount-dsp_sample_count;
+    amount = dsp_sample_count;
+  }
+  if (amount)
+  {
+    memcpy(buffer, dsp_samples_buffer, amount*sizeof(short));
+    dsp_sample_count -= amount;
+    memmove(dsp_samples_buffer, dsp_samples_buffer+amount, dsp_sample_count*sizeof(short));
+  }
+  if (extra)
+  {
+    memset(buffer+amount, 0, extra*sizeof(short));
+  }
+  return(amount);
+}
 
 void dsp_run_wrap()
 {
-  //if (DSP_midframe)
-  //{
-    int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 5;
-    cycles_remaining = i & 31;
+  short buffer[1280*2]; //Big enough for two PAL frames
 
-    if (samples > 0)
-      dsp_fill(samples);
-/*
-    while (samples > next_samples)
-    {
-      samples -= next_samples;
-    }
-    if (samples+mid_samples >= next_samples)
-    {
-      samples = next_samples-mid_samples;
-      mid_samples = next_samples-samples;
-    }
-    if (samples > 0)
-    {
-      //printf("outputting samples: %d\n", samples);
-      dsp_fill(samples);
-      mid_samples += samples;
-    }
-  }
-  else
+  int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 5;
+  cycles_remaining = i & 31;
+
+  if (samples > 0)
   {
-    int samples = next_samples-mid_samples;
-    if (samples > 0)
-    {
-      dsp_fill(samples);
-    }
-    mid_samples = 0;
-    next_samples = ???
-  }
-*/
-  lastCycle = spcCycle;
+    //printf("outputting samples: %d\n", stereo_samples);
 
-#ifndef __MSDOS__
-/*
-  // debug stuff
-  if (!DSP_midframe) {
-      static int lastframe = 0;
-      printf("frame cycles: %d\n", lastCycle-lastframe);
-      lastframe = lastCycle;
+    dsp_run(samples, buffer);
+    //write_audio(buffer, samples*2);
+    dsp_samples_push(buffer, samples*2);
   }
-*/
-#endif
+  lastCycle = spcCycle;
 }

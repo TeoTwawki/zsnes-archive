@@ -31,8 +31,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../asm_call.h"
 #include "../cfg.h"
 #include "cpu/dspwrap.h"
-unsigned int BufferSizeB, BufferSizeW;
-short DSPBuffer[1280];
 
 #ifdef __LIBAO__
 static pthread_t audio_thread;
@@ -59,6 +57,7 @@ static const int freqtab[7] = { 8000, 11025, 22050, 44100, 16000, 32000, 48000 }
 
 void SoundWrite_ao()
 {
+/*
   if (!pthread_mutex_lock(&audio_mutex))
   {
     samples_waiting += dsp_sample_count;
@@ -68,10 +67,12 @@ void SoundWrite_ao()
     }
     pthread_mutex_unlock(&audio_mutex);
   }
+*/
 }
 
 static void *SoundThread_ao(void *useless)
 {
+/*
   static unsigned int buffer_loc = 0;
   unsigned int play_amount;
   char blank[16] = {0};
@@ -99,6 +100,7 @@ static void *SoundThread_ao(void *useless)
       buffer_loc += play_amount;
     }
   }
+*/
   return(0);
 }
 
@@ -154,37 +156,34 @@ static int SoundInit_ao()
 
 void SoundWrite_sdl()
 {
-/*
-  extern unsigned char DSPDisable;
-  extern unsigned T36HZEnabled;
+  size_t pull;
 
-  DSP_buf = DSPBuffer;
-  // Process sound
-  BufferSizeB = 256;
-  BufferSizeW = 512;
-
-  DSP_count = BufferSizeB/2;
-  // take care of the things we left behind last time
   SDL_LockAudio();
-  while (sdl_audio_buffer_fill < sdl_audio_buffer_len)
+  while ((sdl_audio_buffer_tail+512 <= sdl_audio_buffer_len) && (pull = dsp_samples_pull(sdl_audio_buffer+sdl_audio_buffer_tail, 256)*2))
   {
-    short *p = (short*)&sdl_audio_buffer[sdl_audio_buffer_tail];
+    sdl_audio_buffer_tail += pull;
+  }
+  SDL_UnlockAudio();
 
-    if (soundon && !DSPDisable) { dsp_run(); }
+/*
+  extern unsigned int T36HZEnabled;
 
+  SDL_LockAudio();
+  while (dsp_sample_count && (sdl_audio_buffer_fill < sdl_audio_buffer_len))
+  {
+    short *dest = (short *)(sdl_audio_buffer+sdl_audio_buffer_tail);
+    size_t pull = 512;
     if (T36HZEnabled)
     {
-      memset(p, 0, BufferSizeW);
+      memset(dest, 0, pull);
     }
     else
     {
-      short *d = DSPBuffer, *end_d = DSPBuffer+BufferSizeB;
-
-      memcpy(p, d, BufferSizeW);
+      pull = dsp_samples_pull(dest, 256)*2;
     }
 
-    sdl_audio_buffer_fill += BufferSizeW;
-    sdl_audio_buffer_tail += BufferSizeW;
+    sdl_audio_buffer_fill += pull;
+    sdl_audio_buffer_tail += pull;
     if (sdl_audio_buffer_tail >= sdl_audio_buffer_len) { sdl_audio_buffer_tail = 0; }
   }
   SDL_UnlockAudio();
@@ -193,6 +192,23 @@ void SoundWrite_sdl()
 
 static void SoundUpdate_sdl(void *userdata, unsigned char *stream, int len)
 {
+  size_t extra = 0;
+  if (len > sdl_audio_buffer_tail)
+  {
+    extra = len-sdl_audio_buffer_tail;
+    len = sdl_audio_buffer_tail;
+  }
+  if (len)
+  {
+    memcpy(stream, sdl_audio_buffer, len);
+    sdl_audio_buffer_tail -= len;
+    memmove(sdl_audio_buffer, sdl_audio_buffer+len, sdl_audio_buffer_tail);
+  }
+  if (extra)
+  {
+    memset(stream+len, 0, extra);
+  }
+/*
   int left = sdl_audio_buffer_len - sdl_audio_buffer_head;
 
   if (left > 0)
@@ -213,6 +229,7 @@ static void SoundUpdate_sdl(void *userdata, unsigned char *stream, int len)
       sdl_audio_buffer_fill -= len;
     }
   }
+*/
 }
 
 static int SoundInit_sdl()
@@ -274,7 +291,7 @@ int InitSound()
   #ifdef __LIBAO__
   if (strcmp(libAoDriver, "sdl") && !(!strcmp(libAoDriver, "auto") && !strcmp(ao_driver_info(ao_default_driver_id())->name, "null")))
   {
-    return(SoundInit_ao());
+    //return(SoundInit_ao());
   }
   #endif
   return(SoundInit_sdl());
