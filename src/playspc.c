@@ -11,6 +11,7 @@
 #include <ao/ao.h>
 #include "cpu/dspwrap.h"
 #include "cpu/dsp.h"
+#include "asm_call.h"
 
 int romispal = 0, spc700read = 0, cycpbl = 0, cycpblt = 0, curexecstate = 0;
 void *tableadc[0];
@@ -24,7 +25,6 @@ extern unsigned char spcextraram[64];
 extern int spcCycle,lastCycle;
 extern unsigned char timeron, timincr0, timincr1, timincr2;
 extern unsigned char spcA, spcX, spcY, spcP, spcNZ, spcS;
-extern int DSP_midframe;
 extern void InitSPC();
 extern void catchup();
 
@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
     spcNZ = (spcP & 0x82)^2;
     spcS = 0x100+header.stack;
 
-spcCycle = 1;
-lastCycle = 0;
+    //spcCycle = 1;
+    //lastCycle = 0;
 
     switch (header.emulator) {
         case 1:
@@ -100,7 +100,7 @@ lastCycle = 0;
     timincr0 = SPCRAM[0xfa];
     timincr1 = SPCRAM[0xfb];
     timincr2 = SPCRAM[0xfc];
-dsp_init(SPCRAM);
+    dsp_init(SPCRAM);
     for (i = 0; i < sizeof(DSPRegs); i++)
     {
       dsp_write(i, DSPRegs[i]);
@@ -108,7 +108,7 @@ dsp_init(SPCRAM);
 
 
     ao_initialize();
-    dev = ao_open_live(ao_driver_id("alsa09"), &format, NULL);
+    dev = ao_open_live(ao_default_driver_id(), &format, NULL);
 
     if (dev) {
         ao_info *di = ao_driver_info(dev->driver_id);
@@ -117,26 +117,20 @@ dsp_init(SPCRAM);
     } else {
         exit(1);
     }
-    while (1) {
-        __asm__(
-       ".intel_syntax       \n\
-        pushad              \n\
-        call catchup        \n\
-        call updatetimer    \n\
-        popad               \n\
-        .att_syntax"
-            );
-        //DSP_midframe = 0;
-        dsp_run_wrap();
-//        DSP_midframe = 1;
-        // printf("PC = 0x%04x\n", spcPCRam-SPCRAM);
+    for (;;)
+    {
+      asm_call(catchup);
+      asm_call(updatetimer);
+      dsp_run_wrap();
+      if (dsp_sample_count > 128)
+      {
+        extern short dsp_samples_buffer[];
+        if (!ao_play(dev, (char*)dsp_samples_buffer, dsp_sample_count*2))
+        {
+          exit(-1);
+        }
+        dsp_sample_count = 0;
+      }
+      // printf("PC = 0x%04x\n", spcPCRam-SPCRAM);
     }
 }
-
-void SoundWrite_ao() {}
-
-void write_audio(short *sample_buffer, size_t sample_count) {
-    if (!ao_play(dev, (char*)sample_buffer, sample_count*2))
-        exit(1);
-}
-
