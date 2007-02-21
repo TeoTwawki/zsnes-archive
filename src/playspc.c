@@ -207,3 +207,10 @@ int main(int argc, char *argv[])
 
   return(0);
 }
+
+void write_audio(short *sample_buffer, size_t sample_count)
+{
+  //Silence warnings
+  sample_buffer = 0;
+  sample_count = 0;
+}
