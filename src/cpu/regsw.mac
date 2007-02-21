@@ -23,7 +23,7 @@
 ; InitRegW                   Initializes Write Registers
 ;*******************************************************
 
-%macro reenablespc 0 
+%macro reenablespc 0
 %endmacro
 
 %macro catchupspc 0
@@ -37,11 +37,11 @@
     mul bh
     div bl
     xor ah,ah
-    
+
     add eax, [spc_scantime]
     cmp eax, [spc_time]
     js %%backwards
-    mov [spc_time], eax	
+    mov [spc_time], eax
     call catchup
 %%backwards
     popad
