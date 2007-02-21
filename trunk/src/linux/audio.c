@@ -156,12 +156,10 @@ static int SoundInit_ao()
 
 void SoundWrite_sdl()
 {
-  size_t pull;
-
   SDL_LockAudio();
-  while ((sdl_audio_buffer_tail+512 <= sdl_audio_buffer_len) && (pull = dsp_samples_pull(sdl_audio_buffer+sdl_audio_buffer_tail, 256)*2))
+  if (dsp_sample_count) //Lets have less memset()s
   {
-    sdl_audio_buffer_tail += pull;
+    sdl_audio_buffer_tail += dsp_samples_pull((short *)(sdl_audio_buffer+sdl_audio_buffer_tail), (sdl_audio_buffer_len-sdl_audio_buffer_tail)/2)*2;
   }
   SDL_UnlockAudio();
 
