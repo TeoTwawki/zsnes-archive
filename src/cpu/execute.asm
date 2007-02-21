@@ -52,7 +52,7 @@ EXTSYM RestoreCVFrame,loadstate,xe,KeyInsrtChap,KeyNextChap,KeyPrevChap
 EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
 EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
 EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame,dsp_run_wrap
-EXTSYM catchup,lastCycle
+EXTSYM catchup,lastCycle,spc_scantime
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger
@@ -1449,8 +1449,10 @@ call catchup
     inc esi
     jmp execloop.startagain
 .overy
+    add dword[spc_scantime], 33
+    push dword[spc_scantime]
+    pop dword[spcCycle]
     call catchup
-    add dword[spcCycle],32
     pushad
     call dsp_run_wrap
     popad
@@ -1951,9 +1953,9 @@ NEWSYM execsingle
     je .nosound
     call updatetimer
 ;    call catchup
-    pushad
-    call dsp_run_wrap
-    popad
+;    pushad
+;    call dsp_run_wrap
+;    popad
     push ebx
     xor ebx,ebx
     mov bl,dl
@@ -2078,8 +2080,8 @@ NEWSYM execsingle
 .nowai
     jmp dword near [edi+ebx*4]
 .overy
-    mov dword[lastCycle],0
-    mov dword[spcCycle],0
+;    mov dword[lastCycle],0
+;    mov dword[spcCycle],0
 
     mov dh,80
     mov word[curypos],0
