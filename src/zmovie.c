@@ -2365,7 +2365,7 @@ static bool raw_video_open()
 
 static void raw_audio_write(unsigned int samples)
 {
-  fwrite(dsp_samples_buffer, 2, dsp_sample_count, raw_vid.ap);
+  //fwrite(dsp_samples_buffer, 2, dsp_sample_count, raw_vid.ap);
 }
 
 #define PIXEL (vidbuffer[((y+1)*288) + x + 16])

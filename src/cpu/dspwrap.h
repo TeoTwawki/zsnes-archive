@@ -25,11 +25,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 extern int DSP_reg, DSP_val;
 void dsp_read_wrap();
 void dsp_write_wrap();
-
-extern short dsp_samples_buffer[];
-extern const unsigned int dsp_buffer_size;
-extern int dsp_sample_count;
 void dsp_run_wrap();
+size_t dsp_samples_pull(short *buffer, size_t amount);
+
+extern size_t dsp_sample_count;
 
 extern int lastCycle;
 void InitDSPControl(unsigned char is_pal);
