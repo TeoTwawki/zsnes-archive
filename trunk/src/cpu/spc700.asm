@@ -625,7 +625,7 @@ NEWSYM updatetimer
     add dword[spc_scantime],61
     jmp .continue
 .noaltscanline
-    add dword[spc_scantime],66	
+    add dword[spc_scantime],66
 .continue
     mov eax,[spc_scantime]
     mov [spc_time],eax

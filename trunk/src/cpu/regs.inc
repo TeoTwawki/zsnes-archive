@@ -794,7 +794,7 @@ reg2140r:
     catchupspc
     mov al,[reg1read]
     mov byte[spcnumread],0
-        
+
     ret
 .nosound
     ; Find for D0
