@@ -143,7 +143,7 @@ void dsp_run_wrap()
     //printf("outputting samples: %d\n", stereo_samples);
 
     dsp_run(samples, buffer);
-    //write_audio(buffer, samples*2);
+    write_audio(buffer, samples*2);
     dsp_samples_push(buffer, samples*2);
   }
   lastCycle = spcCycle;
