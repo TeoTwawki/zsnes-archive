@@ -28,95 +28,104 @@ extern unsigned char spcA, spcX, spcY, spcP, spcNZ, spcS;
 extern void InitSPC();
 extern void catchup();
 
-ao_device *dev;
-
-struct header_t {
-	char          tag[33];
-	unsigned char marker[3];
-	unsigned char marker2;
-	unsigned char pc[2];
-	unsigned char a, x, y, statflags, stack;
-	unsigned char reserved[2];
-	char          song[32];
-	char          game[32];
-	char          dumper[16];
-	char          comment[32];
-	unsigned char date[4];
-	unsigned char reserved2[7];
-	unsigned char len_secs[4];
-	unsigned char fade_msec[3];
-	char          author[32];
-	unsigned char mute_mask;
-	unsigned char emulator;
-	unsigned char reserved3[46];
+struct header_t
+{
+  char          tag[33];
+  unsigned char marker[3];
+  unsigned char marker2;
+  unsigned char pc[2];
+  unsigned char a, x, y, statflags, stack;
+  unsigned char reserved[2];
+  char          song[32];
+  char          game[32];
+  char          dumper[16];
+  char          comment[32];
+  unsigned char date[4];
+  unsigned char reserved2[7];
+  unsigned char len_secs[4];
+  unsigned char fade_msec[3];
+  char          author[32];
+  unsigned char mute_mask;
+  unsigned char emulator;
+  unsigned char reserved3[46];
 };
 
-int main(int argc, char *argv[]) {
-    unsigned int i;
+static unsigned char DSPRegs[0x80];
 
-    struct ao_sample_format format = { 16, 32000, 2, AO_FMT_LITTLE };
+static void read_spcfile(const char *fname, struct header_t *header)
+{
+  FILE *fp = fopen(fname, "rb");
+  fread(header, sizeof(struct header_t), 1, fp);
+  fread(SPCRAM, sizeof(SPCRAM), 1, fp);
+  fread(DSPRegs, sizeof(DSPRegs), 1, fp);
+  fseek(fp, (256-sizeof(spcextraram))-sizeof(DSPRegs), SEEK_CUR);
+  fread(spcextraram, sizeof(spcextraram), 1, fp);
+  fclose(fp);
+}
 
-    FILE *fin;
-    struct header_t header;
-    unsigned char DSPRegs[0x80];
-    char *emulator;
+static void print_spcinfo(struct header_t *header)
+{
+  char *emulator;
+  switch (header->emulator)
+  {
+    case 1:
+      emulator = "ZSNES";
+      break;
+    case 2:
+      emulator = "Snes9x";
+      break;
+    default:
+      emulator = "Unknown";
+      break;
+  }
+  printf("Emulator: %s\n  Dumper: %s\n    Game: %s\n   Title: %s\n  Artist: %s\n\n", emulator, header->dumper, header->game, header->song, header->author);
+}
 
-    assert(sizeof(header) == 0x100);
+static void init_spc(struct header_t *header)
+{
+  unsigned int i;
 
-    InitSPC();
+  spcPCRam = SPCRAM+(header->pc[0]+(header->pc[1]<<8));
+  spcA = header->a;
+  spcX = header->x;
+  spcY = header->y;
+  spcP = header->statflags;
+  spcNZ = (spcP & 0x82)^2;
+  spcS = 0x100+header->stack;
 
-    fin = fopen(argv[1], "r");
-    fread(&header, sizeof(header), 1, fin);
-    fread(SPCRAM, sizeof(SPCRAM), 1, fin);
-    fread(DSPRegs, sizeof(DSPRegs), 1, fin);
-    fseek(fin, (256-sizeof(spcextraram))-sizeof(DSPRegs), SEEK_CUR);
-    fread(spcextraram, sizeof(spcextraram), 1, fin);
-    fclose(fin);
+  timeron = SPCRAM[0xf1] & 7;
+  timincr0 = SPCRAM[0xfa];
+  timincr1 = SPCRAM[0xfb];
+  timincr2 = SPCRAM[0xfc];
 
-    spcPCRam = SPCRAM+(header.pc[0]+(header.pc[1]<<8));
-    spcA = header.a;
-    spcX = header.x;
-    spcY = header.y;
-    spcP = header.statflags;
-    spcNZ = (spcP & 0x82)^2;
-    spcS = 0x100+header.stack;
+  for (i = 0; i < sizeof(DSPRegs); i++)
+  {
+    dsp_write(i, DSPRegs[i]);
+  }
+}
 
-    //spcCycle = 1;
-    //lastCycle = 0;
+ao_device *ao_init()
+{
+  ao_device *dev;
+  struct ao_sample_format format = { 16, 32000, 2, AO_FMT_LITTLE };
 
-    switch (header.emulator) {
-        case 1:
-            emulator = "ZSNES";
-            break;
-        case 2:
-            emulator = "Snes9x";
-            break;
-        default:
-            emulator = "Unknown";
-            break;
-    }
+  ao_initialize();
+  atexit(ao_shutdown);
+  dev = ao_open_live(ao_default_driver_id(), &format, NULL);
 
-    timeron = SPCRAM[0xf1] & 7;
-    timincr0 = SPCRAM[0xfa];
-    timincr1 = SPCRAM[0xfb];
-    timincr2 = SPCRAM[0xfc];
-    dsp_init(SPCRAM);
-    for (i = 0; i < sizeof(DSPRegs); i++)
-    {
-      dsp_write(i, DSPRegs[i]);
-    }
+  if (dev)
+  {
+    ao_info *di = ao_driver_info(dev->driver_id);
+    printf("\nAudio Opened.\nDriver: %s\nChannels: %u\nRate: %u\n\n", di->name, format.channels, format.rate);
+  }
 
+  return(dev);
+}
 
-    ao_initialize();
-    dev = ao_open_live(ao_default_driver_id(), &format, NULL);
-
-    if (dev) {
-        ao_info *di = ao_driver_info(dev->driver_id);
-        printf("\nAudio Opened.\nDriver: %s\nChannels: %u\nRate: %u\n\n", di->name, format.channels, format.rate);
-        printf("Emulator: %s\n  Dumper: %s\n    Game: %s\n   Title: %s\n  Artist: %s\n\n", emulator, header.dumper, header.game, header.song, header.author);
-    } else {
-        exit(1);
-    }
+void run_spc(ao_device *dev)
+{
+  if (dev)
+  {
     for (;;)
     {
       asm_call(catchup);
@@ -133,4 +142,20 @@ int main(int argc, char *argv[]) {
       }
       // printf("PC = 0x%04x\n", spcPCRam-SPCRAM);
     }
+  }
+}
+
+int main(int argc, char *argv[])
+{
+  struct header_t header;
+
+  assert(sizeof(struct header_t) == 0x100);
+
+  InitSPC();
+  read_spcfile(argv[1], &header);
+  print_spcinfo(&header);
+  init_spc(&header);
+  run_spc(ao_init());
+
+  return(0);
 }
