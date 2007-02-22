@@ -52,7 +52,7 @@ EXTSYM RestoreCVFrame,loadstate,xe,KeyInsrtChap,KeyNextChap,KeyPrevChap
 EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
 EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
 EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame,dsp_run_wrap
-EXTSYM catchup,lastCycle,spc_scantime
+EXTSYM catchup,lastCycle,spc_scantime,spc_time
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger
@@ -1451,7 +1451,7 @@ call catchup
 .overy
     add dword[spc_scantime], 33
     push dword[spc_scantime]
-    pop dword[spcCycle]
+    pop dword[spc_time]
     call catchup
     pushad
     call dsp_run_wrap
