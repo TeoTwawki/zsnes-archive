@@ -1467,11 +1467,13 @@ void savespcdata()
       fwrite(ssdatst, 1, sizeof(ssdatst), fp);
       fwrite(SPCRAM, 1, 65536, fp); //00100h-100FFh - SPCRam
 
-      for (i = 0; i < 128; i++)
-          fputc(dsp_read(i), fp);   //10100h-1017Fh - DSPRam
-      for (i = 0; i < 64; i++)
-          fputc(0, fp);             //10180h-101BFh - Reserved
+      for (i = 0; i < 128; i++) //10100h-1017Fh - DSPRam
+      {
+        fputc(dsp_read(i), fp);
+      }
 
+      memset(ssdatst, 0, 64);
+      fwrite(ssdatst, 64, 1, fp); //10180h-101BFh - Reserved
       fwrite(spcextraram, 1, 64, fp); //101C0h-101FFh - IPL ROM image?
       fclose(fp);
 
