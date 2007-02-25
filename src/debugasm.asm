@@ -24,7 +24,7 @@
 %include "macros.mac"
 
 EXTSYM snesmmap, snesmap2, memtabler8, memtablew8, regaccessbankr8, dmadata
-EXTSYM initaddrl, spcPCRam, UpdateDPage, pdh, numinst, writeon
+EXTSYM initaddrl, UpdateDPage, pdh, numinst, writeon
 EXTSYM xp, xpb, xpc, curcyc, Curtableaddr, splitflags, execsingle, joinflags
 
 ;;; from debugger.c
@@ -160,7 +160,6 @@ NEWSYM breakops
 .skiplower
     mov [initaddrl],esi
     add esi,eax                 ; add program counter to address
-    mov ebp,[spcPCRam]
     mov dl,[xp]                 ; set flags
     mov dh,[curcyc]             ; set cycles
     mov edi,[Curtableaddr]
@@ -195,7 +194,6 @@ NEWSYM breakops
     jne .loopa
 .skipc
     ; copy back data
-    mov [spcPCRam],ebp
     mov [Curtableaddr],edi
     mov [xp],dl
     mov [curcyc],dh
@@ -239,7 +237,6 @@ NEWSYM execnextop
 .skiplower
     mov [initaddrl],esi
     add esi,eax                 ; add program counter to address
-    mov ebp,[spcPCRam]
     mov dl,[xp]                 ; set flags
     mov dh,[curcyc]             ; set cycles
     mov edi,[Curtableaddr]
@@ -249,7 +246,6 @@ NEWSYM execnextop
     call UpdateDPage
     ; execute
     ; copy back data
-    mov [spcPCRam],ebp
     mov [Curtableaddr],edi
     mov [xp],dl
     mov dh,[pdh]
