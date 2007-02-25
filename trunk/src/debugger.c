@@ -458,6 +458,7 @@ void debugloop() {
        debstop3 = 0;
        nodelay(w, TRUE);
        do {
+          // nasty!
           char buf[78];
           // log instruction
           move(0,0);
@@ -466,9 +467,16 @@ void debugloop() {
           mvwinnstr(debugwin, 0, 0, buf, 77);
           buf[77] = 0;
           fprintf(fp, "%s\n", buf);
-          fflush(fp);
 
+          wclear(debugwin);
+          move(0,0);
           asm_call(execnextop);
+          mvwinnstr(debugwin, 0, 0, buf, 77);
+          if ((buf[0] == ' ') && (buf[1] != ' ')) {
+              buf[77] = 0;
+              fprintf(fp, "%s\n", buf);
+          }
+          fflush(fp);
        } while ( (! ((++numinst % 256) && (wgetch(w) == 27)))
                 && (debstop3 != 1) );
        debstop3 = 0;
@@ -555,8 +563,8 @@ void SPCbreakops(unsigned short addr) {
     do {
         asm_call(execnextop);
     } while ((!((++numinst % 256)
-         && (wgetch(w) == 27)))
-         && (spcPCRam != breakarea));
+                && (wgetch(w) == 27)))
+             && (spcPCRam != breakarea));
     nodelay(w, FALSE);
 
     closewindow(w);
