@@ -19,7 +19,6 @@
 
 %include "macros.mac"
 %include "cpu/spccycle.inc"
-%include "cpu/regsw.mac"
 
 EXTSYM KeyRewind,statesaver,UpdateDPage,clocktable,spcCycle
 EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo
@@ -820,6 +819,7 @@ NEWSYM NoHDMALine, db 0
 SECTION .text
 
 NEWSYM cpuover
+call catchup
     dec esi
     cmp byte[HIRQNextExe],0
     je .nohirq
@@ -1020,6 +1020,9 @@ NEWSYM cpuover
     cmp byte[spcon],0
     je .nosound
     call updatetimer
+    pushad
+    call catchup
+    popad
 .nosound
     mov ax,[resolutn]
     inc ax
@@ -1892,9 +1895,15 @@ NEWSYM execsingle
     xor ebx,ebx
     test byte[curexecstate],2
     jz .nosoundb
-
-    catchupspc
-
+    sub dword[cycpbl],26
+    jnc .skipallspc
+    mov bl,[ebp]
+    ; 1260, 10000/12625
+    inc ebp
+    mov eax,[clocktable+ebx*4]
+    spccycles eax
+    call dword near [opcjmptab+ebx*4]
+    xor ebx,ebx
 .skipallspc
 .nosoundb
 
