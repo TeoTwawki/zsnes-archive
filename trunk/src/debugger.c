@@ -40,7 +40,7 @@ extern unsigned char oamram[1024], SPCRAM[65472], DSPMem[256];
 
 extern unsigned char curblank;
 extern unsigned char curcyc;
-extern unsigned char curypos;
+extern unsigned short curypos;
 extern unsigned char CurrentCPU;
 
 extern unsigned char soundon;
@@ -117,7 +117,7 @@ void debugloop();
 void startdisplay();
 void nextopcode();
 void cleardisplay();
-void nextspcopcode();
+//void nextspcopcode();
 void SaveOAMRamLog();
 void debugdump();
 void out65816();
@@ -230,9 +230,10 @@ void debugloop() {
   a:
     if (!(debugds & 2))
         nextopcode();
+    /*
     if (!(debugds & 1))
         nextspcopcode();
-
+    */
   b:
     // redrawing the display is always a good idea
     refresh();
@@ -496,11 +497,14 @@ void debugloop() {
    }
 
   e:
+   
    skipdebugsa1 = 0;
    asm_call(execnextop);
    skipdebugsa1 = 1;
+   /*
    if (soundon && (debugds & 2) && (cycpbl >= 55))
        goto e;
+   */
    goto a;
 
 }
@@ -1111,10 +1115,14 @@ void outspc_addrmode() {
 }
 
 void nextspcopcode() {
+    if (debugds & 1)
+        return;
+    /*
     if (!soundon)
         return;
     if (cycpbl >= 55)
         return;
+    */
 
     // output spc pc & opcode #
     wprintw(debugwin, " %04x/%02x ", spcPCRam - SPCRAM, spcPCRam[0]);
@@ -1429,8 +1437,10 @@ void debugdump() {
     fclose(fp);
   }
 
+  /*
   if ((fp = fopen_dir(ZCfgPath,"DSP.dmp","wb"))) {
 //    fwrite(DSPMem,1,256,fp);
     fclose(fp);
   }
+  */
 }

@@ -631,6 +631,10 @@ NEWSYM updatetimer
     mov [spc_time],eax
     ret
 
+%ifndef NO_DEBUGGER
+EXTSYM debuggeron, nextspcopcode
+%endif
+
 NEWSYM catchup
     push ebp
     mov ebp, [spcPCRam]
@@ -639,6 +643,17 @@ NEWSYM catchup
     mov eax,[spcCycle]
     cmp eax,[spc_time]
     jns .done
+
+%ifndef NO_DEBUGGER
+    mov al,[debuggeron]
+    test al, al
+    jz .nodebug
+    mov [spcPCRam], ebp
+    pushad
+    call nextspcopcode
+    popad
+.nodebug
+%endif
 
     xor ebx,ebx
     mov bl,[ebp]
