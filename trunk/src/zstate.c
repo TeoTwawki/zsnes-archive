@@ -46,6 +46,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "zmovie.h"
 #include "chips/dsp4emu.h"
 #include "input.h"
+#include "cpu/dsp.h"
 
 #define NUMCONV_FR3
 #define NUMCONV_FW3
@@ -1465,8 +1466,13 @@ void savespcdata()
 
       fwrite(ssdatst, 1, sizeof(ssdatst), fp);
       fwrite(SPCRAM, 1, 65536, fp); //00100h-100FFh - SPCRam
-//      fwrite(DSPMem, 1, 192, fp);   //10100h-101FFh - DSPRam
-      fwrite(spcextraram, 1, 64, fp); //Seems DSPRam is split in two, but I don't get what's going on here
+
+      for (i = 0; i < 128; i++)
+          fputc(dsp_read(i), fp);   //10100h-1017Fh - DSPRam
+      for (i = 0; i < 64; i++)
+          fputc(0, fp);             //10180h-101BFh - Reserved
+
+      fwrite(spcextraram, 1, 64, fp); //101C0h-101FFh - IPL ROM image?
       fclose(fp);
 
       ResetState();
