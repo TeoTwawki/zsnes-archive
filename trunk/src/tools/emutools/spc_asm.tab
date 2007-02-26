@@ -242,7 +242,7 @@ SBC     (X),(Y) B9 1 NOP 1
 SBC     *,#*    B8 3 CSWAP 1
 SBC     *,*     A9 3 CSWAP 1
 
-TCALL   *       01 1 T1 1 4 F0
+// TCALL   *       01 1 T1 1 4 F0
 TCALL   $0      01 1 NOP 1
 TCALL   $1      11 1 NOP 1
 TCALL   $2      21 1 NOP 1
