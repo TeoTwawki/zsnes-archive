@@ -452,29 +452,31 @@ void debugloop() {
        fp = fopen_dir(ZStartPath, "debug.log","w");
 
        real_debugwin = debugwin;
-       debugwin = newpad(2, 77);
+       debugwin = newpad(10, 77);
        scrollok(debugwin, TRUE);
 
        debstop3 = 0;
        nodelay(w, TRUE);
        do {
+          int i;
           // nasty!
           char buf[78];
           // log instruction
-          move(0,0);
+          wclear(debugwin); move(0,0);
           out65816();
 
           mvwinnstr(debugwin, 0, 0, buf, 77);
           buf[77] = 0;
           fprintf(fp, "%s\n", buf);
 
-          wclear(debugwin);
-          move(0,0);
+          wclear(debugwin); move(0,0);
           asm_call(execnextop);
-          mvwinnstr(debugwin, 0, 0, buf, 77);
-          if ((buf[0] == ' ') && (buf[1] != ' ')) {
-              buf[77] = 0;
-              fprintf(fp, "%s\n", buf);
+          for (i = 0; i < 9; i++) {
+              mvwinnstr(debugwin, i, 0, buf, 77);
+              if ((buf[0] == ' ') && (buf[1] != ' ')) {
+                  buf[77] = 0;
+                  fprintf(fp, "%s\n", buf);
+              } else break;
           }
           fflush(fp);
        } while ( (! ((++numinst % 256) && (wgetch(w) == 27)))
@@ -1149,7 +1151,7 @@ void nextspcopcode() {
             (spcP  & 0x10) ? '+' : '-',
             (spcP  & 0x08) ? '+' : '-',
             (spcP  & 0x04) ? '+' : '-',
-            (spcP  & 0x02) ? '+' : '-',
+            (!spcNZ) ? '+' : '-',
             (spcP  & 0x01) ? '+' : '-');
 
     wprintw(debugwin, "\n");
