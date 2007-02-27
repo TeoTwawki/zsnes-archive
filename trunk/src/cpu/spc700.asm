@@ -545,7 +545,6 @@ NEWSYM updatetimer
     cmp byte[SPCRAM+0FDh],1
     jne .noin0
     reenablespc
-    add dword[spc_scantime],1
     mov dword[cycpbl],0
 .noin0
     test byte[timeron],2
@@ -622,10 +621,10 @@ NEWSYM updatetimer
     xor byte[altscanline],1
     cmp byte[altscanline],1
     je .noaltscanline
-    add dword[spc_scantime],64;61
+    add dword[spc_scantime],65;61
     jmp .continue
 .noaltscanline
-    add dword[spc_scantime],66
+    add dword[spc_scantime],67
 .continue
     mov eax,[spc_scantime]
     mov [spc_time],eax
