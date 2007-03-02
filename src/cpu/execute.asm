@@ -788,7 +788,7 @@ NEWSYM execloop
    inc esi
    sub dh,[cpucycle+ebx]
    jc .cpuovers
-   ;call dword near [edi+ebx*4]
+   call dword near [edi+ebx*4]
 .cpuovers
 
    jmp cpuover
