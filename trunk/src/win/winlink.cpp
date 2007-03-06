@@ -2319,65 +2319,8 @@ void UpdateVFrame(void)
 
     if (T36HZEnabled == 1)
     {
-      if (MMXSupport == 1)
-      {
-        ASM_BEGIN
-        ASM_COMMAND3(mov edi,buffer_ptr)
-        ASM_COMMAND3(mov ecx,SPCSize)
-        ASM_COMMAND2(shr ecx,2)
-        ASM_COMMAND2(pxor mm0,mm0)
-ASM_COMMAND(_blank_top_fpu:)
-        ASM_COMMAND2(movq [edi],mm0)
-        ASM_COMMAND2(add edi,8)
-        ASM_COMMAND(dec ecx)
-        ASM_COMMAND(jne _blank_top_fpu)
-        ASM_COMMAND(emms)
-        ASM_END
-      }
-      else
-      {
-        ASM_BEGIN
-        ASM_COMMAND3(mov edi,buffer_ptr)
-        ASM_COMMAND3(mov ecx,SPCSize)
-        ASM_COMMAND2(shr ecx,1)
-        ASM_COMMAND2(xor eax,eax)
-ASM_COMMAND(_blank_top:)
-        ASM_COMMAND2(mov [edi],eax)
-        ASM_COMMAND2(add edi,4)
-        ASM_COMMAND(dec ecx)
-        ASM_COMMAND(jne _blank_top)
-        ASM_END
-      }
-    }
-    else
-    {
-      if (MMXSupport == 1)
-      {
-        ASM_BEGIN
-        ASM_COMMAND3(mov esi,DSPBuffer1)
-        ASM_COMMAND3(mov edi,buffer_ptr)
-        ASM_COMMAND3(mov ecx,SPCSize)
-        ASM_COMMAND2(shr ecx,2)
-ASM_COMMAND(_top_mmx:)
-        ASM_COMMAND2(movq mm0,[esi])
-        ASM_COMMAND2(packssdw mm0,[esi+8])
-        ASM_COMMAND2(movq [edi],mm0)
-        ASM_COMMAND2(add esi,16)
-        ASM_COMMAND2(add edi,8)
-        ASM_COMMAND(dec ecx)
-        ASM_COMMAND(jne _top_mmx)
-        ASM_COMMAND(emms)
-        ASM_END
-      }
-      else
-      {
-        for(i=0;i<SPCSize;i++)
-        {
-          Buffer[i]=DSPBuffer1[i];
-          if (DSPBuffer1[i]>32767)Buffer[i]=32767;
-          if (DSPBuffer1[i]<-32767)Buffer[i]=-32767;
-        }
-      }
+
+
     }
 
     if(!UsePrimaryBuffer)
