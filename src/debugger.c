@@ -507,7 +507,7 @@ void debugloop() {
    }
 
   e:
-   
+
    skipdebugsa1 = 0;
    asm_call(execnextop);
    skipdebugsa1 = 1;
