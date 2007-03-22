@@ -3,19 +3,19 @@
 #ifndef SPC_ENDIAN_H
 #define SPC_ENDIAN_H
 
-static inline unsigned get_le16( void const* p )
+INLINE unsigned get_le16( void const* p )
 {
 	return  ((uint8_t const*) p) [1] * 0x100u +
 			((uint8_t const*) p) [0];
 }
 
-static inline int get_le16s( void const* p )
+INLINE int get_le16s( void const* p )
 {
 	return  ((int8_t const*) p) [1] * 0x100 +
 			((uint8_t const*) p) [0];
 }
 
-static inline void set_le16( void* p, unsigned n )
+INLINE void set_le16( void* p, unsigned n )
 {
 	((uint8_t*) p) [1] = (uint8_t) (n >> 8);
 	((uint8_t*) p) [0] = (uint8_t) n;
