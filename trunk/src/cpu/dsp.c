@@ -668,7 +668,7 @@ void dsp_run( long count, dsp_sample_t* out_buf )
 
       uint8_t* const echo_ptr = &RAM [(GLOBALS.esa * 0x100 + m_echo_pos) & 0xFFFF];
 
-		  
+
 		  m_echo_pos += 4;
 		  if ( m_echo_pos >= (GLOBALS.edl & 15) * 0x800 )
 			  m_echo_pos = 0;
