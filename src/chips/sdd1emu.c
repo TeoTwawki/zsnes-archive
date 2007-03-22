@@ -42,7 +42,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 
 #ifndef __GNUC__
-#define INLINE
+#define INLINE static
 #else
 #define INLINE static inline
 #endif
