@@ -35,10 +35,13 @@ extern "C" {
 #include <dinput.h>
 #include <winuser.h>
 #include "resource.h"
+
+extern "C" {
 #include "../cfg.h"
 #include "../input.h"
 #include "../zmovie.h"
 #include "../asm_call.h"
+}
 
 DWORD WindowWidth = 256;
 DWORD WindowHeight = 224;
