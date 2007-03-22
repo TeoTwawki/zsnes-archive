@@ -480,7 +480,6 @@ ${WIN_D}/zsnes.res: ${WIN_D}/zsnes.rc ${WIN_D}/resource.h
 	rc ${WIN_D}/zsnes.rc
 else
 ${WIN_D}/winlink${OE}: ${WIN_D}/winlink.cpp cfg${OE} input${OE} ${WIN_D}/resource.h
-	${CPPC} ${COPT} ${CFLAGS} -masm=intel -o $@ -c ${WIN_D}/winlink.cpp
 ${WIN_D}/zsnes${OE}: ${WIN_D}/zsnes.rc ${WIN_D}/resource.h
 	${WINDRES} --include-dir ${WIN_D} ${WIN_D}/zsnes.rc -o${WIN_D}/zsnes${OE}
 ${OBJFIX}: objfix.c
