@@ -33,6 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 void InitSPC()
 {
+  void InitSPCRegs();
   extern unsigned char SPCRAM[0x10000];
   extern bool romispal;
 
