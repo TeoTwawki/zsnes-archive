@@ -38,63 +38,7 @@ extern "C" {
 #include "../cfg.h"
 #include "../input.h"
 #include "../zmovie.h"
-
-
-/*
-December 17 2004 -Nach
-
-I added some macros for inline assembly to keep compatibility between GCC and MSVC
-
-ASM_BEGIN is to start an assembly section
-ASM_END is to end it
-
-ASM_COMMAND is for any simple command without a , in it example: dec eax
-ASM_COMMAND2 is when a command has a , for example: add ebx, 5
-ASM_COMMAND3 is when the parameter after the , is a variable example: mov eax, my_variable
-
-ASM_CALL is for calling another function inside assembly section
-
-asm_call() can be treated like any C function, use it to call an assembly function
-           from any normal C code.
-*/
-
-#ifdef __GNUC__ //MinGW
-
-//Simple start and end structure, set as volatile so perhaps we can use -O1+ later
-#define ASM_BEGIN asm volatile ( \
-ASM_COMMAND(pushad)
-#define ASM_END ASM_COMMAND(popad) \
-);
-//All commands need quotes and a newline and tab. C vars are _ prefixed
-#define ASM_COMMAND(line) #line"\n\t"
-#define ASM_COMMAND2(line, part2) #line", "#part2"\n\t"
-#define ASM_COMMAND3(line, var) #line", _"#var"\n\t"
-//Just for the prefix
-#define ASM_CALL(func) ASM_COMMAND(call _ ## func)
-//A function call is a simple register backup, call, restore
-#define asm_call(func) ASM_BEGIN \
-ASM_COMMAND(pushad) \
-ASM_CALL(func) \
-ASM_COMMAND(popad) \
-ASM_END
-
-#else //MSVC
-
-#define ASM_BEGIN _asm {
-#define ASM_END };
-
-//MSVC is all straight foward about these
-#define ASM_COMMAND(line) line
-#define ASM_COMMAND2(line, part2) line, part2
-#define ASM_COMMAND3(line, var) ASM_COMMAND2(line, var)
-//Next is not really special either
-#define ASM_CALL(func) ASM_COMMAND(call func)
-//Using this weird style because of MSVCs bad parsing
-#define asm_call(func) { _asm pushad \
-_asm call func \
-_asm popad };
-
-#endif
+#include "../asm_call.h"
 
 DWORD WindowWidth = 256;
 DWORD WindowHeight = 224;
