@@ -1,6 +1,6 @@
 #include "spc_cpu.h"
 
-#include "spc_endian.h"
+#include "spc_endn.h"
 
 /* Copyright (C) 2006 Adam Gashlin (hcs) (conversion to C) */
 /* Copyright (C) 2004-2007 Shay Green. This module is free software; you
@@ -15,7 +15,7 @@ License along with this module; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 // must be last
-#include "spc_source.h"
+#include "spc_src.h"
 
 // Suspicious instruction warnings are given for those never seen used
 

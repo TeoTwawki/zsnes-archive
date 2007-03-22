@@ -30,7 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 
 // must be last
-#include "spc_source.h"
+#include "spc_src.h"
 
 enum { dsp_rate_shift = 5 }; // dsp_clock_rate = spc_clock_rate >> dsp_rate_shift
 
