@@ -7,6 +7,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifndef __GNUC__
+#define INLINE static
+#else
+#define INLINE static inline
+#endif
+
 //// Setup
 
 // Initializes DSP and has it use the 64K RAM provided
@@ -43,7 +49,7 @@ void dsp_run( long pair_count, dsp_sample_t* out );
 //// private
 
 extern uint8_t m_dsp_regs [dsp_register_count];
-static inline int dsp_read( int addr )
+INLINE int dsp_read( int addr )
 {
 	assert( (unsigned) addr < dsp_register_count );
 	return m_dsp_regs [addr];
