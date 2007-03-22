@@ -1,3 +1,5 @@
+#include "dsp.h"
+
 #include "spc_cpu.h"
 
 #include "spc_endn.h"
