@@ -24,14 +24,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "dsp.h"
 
-#include "spc_endian.h"
+#include "spc_endn.h"
 
 #include <stddef.h>
 #include <string.h>
 #include <limits.h>
 
 // must be last
-#include "spc_source.h"
+#include "spc_src.h"
 
 /* Optimization notes
 - There are several caches of values that are of type 'int' to allow faster
