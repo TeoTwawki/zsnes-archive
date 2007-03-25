@@ -2867,7 +2867,7 @@ int GetMouseX(void)
    {
       MouseX = MouseMaxX;
 
-      if (TrapMouseCursor != 1)
+      if (TrapMouseCursor == 1)
       {
          if (abs((int)MouseMoveX) > 10 && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
          {
@@ -2886,7 +2886,7 @@ int GetMouseX(void)
    {
       MouseX = MouseMinX;
 
-      if (TrapMouseCursor != 1)
+      if (TrapMouseCursor == 1)
       {
          if (abs((int)MouseMoveX) > 10 && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
          {
@@ -2911,7 +2911,7 @@ int GetMouseY(void)
    {
       MouseY = MouseMaxY;
 
-      if (TrapMouseCursor != 1)
+      if (TrapMouseCursor == 1)
       {
          if (abs((int)MouseMoveY) > 10 && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
          {
@@ -2930,7 +2930,7 @@ int GetMouseY(void)
    {
       MouseY = MouseMinY;
 
-      if (TrapMouseCursor != 1)
+      if (TrapMouseCursor == 1)
       {
          if (abs((int)MouseMoveY) > 10 && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
          {
