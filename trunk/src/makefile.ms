@@ -93,7 +93,7 @@ ifeq (${ENV},msvc)
   CFLAGONLY=
   CFLAGSORIG=/nologo /c /Ox /GS- /MD /Iwin\vc_head
   CXXFLAGSORIG=/Zc:forScope-
-  MSVCLIBS=zlib.lib libpng.lib wsock32.lib user32.lib gdi32.lib shfolder.lib shell32.lib winmm.lib dinput8.lib dxguid.lib
+  MSVCLIBS=zlib.lib libpng.lib wsock32.lib user32.lib gdi32.lib shfolder.lib shell32.lib winmm.lib dinput8.lib dxguid.lib opengl32.lib glu32.lib
   DRESOBJ=${WIN_D}/zsnes.res
   OS=__WIN32__
 endif
@@ -256,7 +256,7 @@ ifeq (${OS},__WIN32__)
 WINOBJ=${DRESOBJ}\
 	${CONFLOC} ${WIN_D}/winintrf${OE} ${WIN_D}/winlink${OE} \
 	${WIN_D}/lib${OE} ${WIN_D}/safelib${OE} ${MMLIB_D}/mm${OE} \
-	${MMLIB_D}/windows${OE}
+	${MMLIB_D}/windows${OE} ${WIN_D}/gl_draw${OE}
 
 WINVIDOBJ=${VID_D}/sw_draw${OE} ${VID_D}/copyvwin${OE} ${VID_D}/ntsc${OE}\
 	${VID_D}/hq2x16${OE} ${VID_D}/hq2x32${OE}\
