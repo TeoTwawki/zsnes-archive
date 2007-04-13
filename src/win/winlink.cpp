@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define DIRECTINPUT_VERSION 0x0800
 #define DIRECTSOUND_VERSION 0x0800
+#define __STDC_CONSTANT_MACROS
 
 extern "C"
 {
@@ -31,6 +32,7 @@ extern "C"
 #include <mmsystem.h>
 #include <time.h>
 }
+#include <stdint.h>
 #include <math.h>
 #include <dsound.h>
 #include <dinput.h>
@@ -1934,6 +1936,7 @@ void UnlockSurface()
   }
 }
 
+//The big extern
 extern "C"
 {
   void WinUpdateDevices();
@@ -2013,8 +2016,8 @@ extern "C"
       update_ticks_pc = UPDATE_TICKS_GAME * freq / 1000.0;
     }
 
-    QueryPerformanceCounter((LARGE_INTEGER *) &start);
-    QueryPerformanceCounter((LARGE_INTEGER *) &start2);
+    QueryPerformanceCounter((LARGE_INTEGER *)&start);
+    QueryPerformanceCounter((LARGE_INTEGER *)&start2);
 
     T36HZEnabled = 0;
     T60HZEnabled = 1;
@@ -2049,8 +2052,8 @@ extern "C"
     update_ticks_pc2 = UPDATE_TICKS_UDP * freq / 1000.0;
     update_ticks_pc = UPDATE_TICKS_GUI * freq / 1000.0;
 
-    QueryPerformanceCounter((LARGE_INTEGER *) &start);
-    QueryPerformanceCounter((LARGE_INTEGER *) &start2);
+    QueryPerformanceCounter((LARGE_INTEGER *)&start);
+    QueryPerformanceCounter((LARGE_INTEGER *)&start2);
 
     T60HZEnabled = 0;
     T36HZEnabled = 1;
@@ -2133,14 +2136,21 @@ extern "C"
     if (hqFilter != 0)
     {
       if ((GUIHQ2X[cvidmode] != 0) && (hqFilterlevel == 2))
+      {
         HQMode = 2;
+      }
       if ((GUIHQ3X[cvidmode] != 0) && (hqFilterlevel == 3))
+      {
         HQMode = 3;
+      }
       if ((GUIHQ4X[cvidmode] != 0) && (hqFilterlevel == 4))
+      {
         HQMode = 4;
+      }
     }
 
-    if ((CurMode != cvidmode) || (prevHQMode != HQMode) || (prevNTSCMode != NTSCFilter) || (changeRes))
+    if ((CurMode != cvidmode) || (prevHQMode != HQMode) || (prevNTSCMode != NTSCFilter) ||
+        (changeRes))
     {
       CurMode = cvidmode;
       prevHQMode = HQMode;
@@ -2252,9 +2262,13 @@ extern "C"
       if (DMode == 1)
       {
         if ((DSMode == 1) || (FullScreen == 0))
+        {
           SurfaceX = 512;
+        }
         else
+        {
           SurfaceX = 640;
+        }
 
         SurfaceY = 480;
 
@@ -2267,9 +2281,13 @@ extern "C"
       else
       {
         if ((SMode == 0) && (FullScreen == 1))
+        {
           SurfaceX = 320;
+        }
         else
+        {
           SurfaceX = 256;
+        }
         SurfaceY = 240;
       }
 
@@ -2294,12 +2312,18 @@ extern "C"
       BlitArea.right = SurfaceX;
 
       if ((SurfaceX == 602) || (SurfaceX == 640) || (SurfaceX == 320))
+      {
         BlitArea.bottom = SurfaceY;
+      }
       else if (!NTSCFilter)
+      {
         BlitArea.bottom = (SurfaceY / 240) * resolutn;
+      }
 
       if (PrevRes == 0)
+      {
         PrevRes = resolutn;
+      }
     }
 
     if (((PrevStereoSound != StereoSound) || (PrevSoundQuality != SoundQuality)) && FirstSound != 1)
@@ -2340,8 +2364,8 @@ extern "C"
                          GetWindowLong(hMainWindow, GWL_EXSTYLE));
 
       GetClientRect(hMainWindow, &rcWindow);
-      ClientToScreen(hMainWindow, (LPPOINT) & rcWindow);
-      ClientToScreen(hMainWindow, (LPPOINT) & rcWindow + 1);
+      ClientToScreen(hMainWindow, (LPPOINT)&rcWindow);
+      ClientToScreen(hMainWindow, (LPPOINT)&rcWindow + 1);
 
       if (FullScreen == 1)
       {
@@ -2376,14 +2400,18 @@ extern "C"
       }
 
       if (CheckTVRatioReq())
+      {
         KeepTVRatio();
+      }
     }
     else
     {
       atexit(ExitFunction);
 
-      if (!QueryPerformanceFrequency((LARGE_INTEGER *) &freq))
+      if (!QueryPerformanceFrequency((LARGE_INTEGER *)&freq))
+      {
         return;
+      }
 
       if (!RegisterWinClass())
       {
@@ -2407,7 +2435,8 @@ extern "C"
         X = MainWindowX; Y = MainWindowY;
       }
 
-      hMainWindow = CreateWindow("ZSNES", WinName, WS_VISIBLE | WS_POPUP, X, Y,  //WS_OVERLAPPED "ZSNES"
+      hMainWindow = CreateWindow("ZSNES", WinName, WS_VISIBLE | WS_POPUP, X, Y,
+                                 //WS_OVERLAPPED "ZSNES"
                                  WindowWidth, WindowHeight, NULL, NULL, hInst, NULL);
 
       if (!hMainWindow)
@@ -2439,11 +2468,17 @@ extern "C"
     {
       FirstVid = 0;
       if (KitchenSync)
+      {
         Refresh = totlines == 263 ? 120 : 100;
+      }
       else if (KitchenSyncPAL && totlines == 314)
+      {
         Refresh = 100;
+      }
       else if (ForceRefreshRate)
+      {
         Refresh = SetRefreshRate;
+      }
       InitDirectDraw();
       clearwin();
       Clear2xSaIBuffer();
@@ -2454,7 +2489,9 @@ extern "C"
       ReleaseDirectDraw();
       InitDirectDraw();
       if (CheckTVRatioReq())
+      {
         KeepTVRatio();
+      }
       clearwin();
       Clear2xSaIBuffer();
       clear_display();
@@ -2478,7 +2515,7 @@ extern "C"
       Sleep(1);
     }
 
-    QueryPerformanceCounter((LARGE_INTEGER *) &end2);
+    QueryPerformanceCounter((LARGE_INTEGER *)&end2);
 
     while ((end2 - start2) >= update_ticks_pc2)
     {
@@ -2487,7 +2524,7 @@ extern "C"
 
     if (T60HZEnabled == 1)
     {
-      QueryPerformanceCounter((LARGE_INTEGER *) &end);
+      QueryPerformanceCounter((LARGE_INTEGER *)&end);
 
       while ((end - start) >= update_ticks_pc)
       {
@@ -2498,7 +2535,7 @@ extern "C"
 
     if (T36HZEnabled == 1)
     {
-      QueryPerformanceCounter((LARGE_INTEGER *) &end);
+      QueryPerformanceCounter((LARGE_INTEGER *)&end);
 
       while ((end - start) >= update_ticks_pc)
       {
@@ -2569,7 +2606,7 @@ extern "C"
       return;
     }
 
-    SurfBufD = (DWORD) & SurfBuf[0];
+    SurfBufD = (DWORD)&SurfBuf[0];
 
     if (AltSurface == 0)
     {
@@ -2621,21 +2658,31 @@ extern "C"
         {
           if (DD_BackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx) ==
               DDERR_SURFACELOST)
+          {
             DD_Primary->Restore();
+          }
 
           if (DD_Primary->Flip(NULL, DDFLIP_WAIT) == DDERR_SURFACELOST)
+          {
             DD_Primary->Restore();
+          }
 
           if (DD_BackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx) ==
               DDERR_SURFACELOST)
+          {
             DD_Primary->Restore();
+          }
 
           if (DD_Primary->Flip(NULL, DDFLIP_WAIT) == DDERR_SURFACELOST)
+          {
             DD_Primary->Restore();
+          }
 
           if (DD_BackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx) ==
               DDERR_SURFACELOST)
+          {
             DD_Primary->Restore();
+          }
         }
       }
       else
@@ -2649,8 +2696,11 @@ extern "C"
               DDrawError();
             }
           }
-          if (DD_Primary->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx) == DDERR_SURFACELOST)
+          if (DD_Primary->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx) ==
+              DDERR_SURFACELOST)
+          {
             DD_Primary->Restore();
+          }
         }
       }
     }
@@ -2660,9 +2710,9 @@ extern "C"
   void DrawWin256x224x32();
   void DrawWin320x240x16();
 
-  volatile __int64 copymaskRB = 0x001FF800001FF800LL;
-  volatile __int64 copymaskG = 0x0000FC000000FC00LL;
-  volatile __int64 copymagic = 0x0008010000080100LL;
+  volatile uint64_t copymaskRB = UINT64_C(0x001FF800001FF800);
+  volatile uint64_t copymaskG = UINT64_C(0x0000FC000000FC00);
+  volatile uint64_t copymagic = UINT64_C(0x0008010000080100);
 
   void drawscreenwin(void)
   {
@@ -2701,22 +2751,34 @@ extern "C"
     if (hqFilter != 0)
     {
       if ((GUIHQ2X[cvidmode] != 0) && (hqFilterlevel == 2))
+      {
         HQMode = 2;
+      }
       if ((GUIHQ3X[cvidmode] != 0) && (hqFilterlevel == 3))
+      {
         HQMode = 3;
+      }
       if ((GUIHQ4X[cvidmode] != 0) && (hqFilterlevel == 4))
+      {
         HQMode = 4;
+      }
     }
 
     if (PrevRes != resolutn)
     {
       if ((SurfaceX == 640) || (SurfaceX == 320))
+      {
         BlitArea.bottom = SurfaceY;
+      }
       else if (!NTSCFilter)
+      {
         BlitArea.bottom = (SurfaceY / 240) * resolutn;
+      }
 
       if ((FullScreen == 0) && (SMode == 0) && (DSMode == 0) && !NTSCFilter)
+      {
         WindowHeight = (WindowHeight / 224) * resolutn;
+      }
 
       initwinvideo();
       PrevRes = resolutn;
@@ -2743,8 +2805,8 @@ extern "C"
       initwinvideo();
     }
 
-    SurfBufD = (DWORD) & SurfBuf[0];
-    SURFDW = (DWORD *) &SurfBuf[0];
+    SurfBufD = (DWORD)&SurfBuf[0];
+    SURFDW = (DWORD *)&SurfBuf[0];
 
     if (!(KitchenSync || (KitchenSyncPAL && totlines == 314)) && Refresh != 0 && !ForceRefreshRate)
     {
@@ -2776,7 +2838,8 @@ extern "C"
       clear_display();
     }
 
-    if (!KitchenSync && KitchenSyncPAL && totlines == 263 && Refresh != SetRefreshRate && ForceRefreshRate)
+    if (!KitchenSync && KitchenSyncPAL && totlines == 263 && Refresh != SetRefreshRate &&
+        ForceRefreshRate)
     {
       Refresh = SetRefreshRate;
       ReleaseDirectDraw();
@@ -2816,9 +2879,10 @@ extern "C"
                        }
                        break;*/
           case 24:
-            MessageBox(NULL,
-                       "Sorry.  ZSNESw does not work in windowed 24 bit color modes. \nClick 'OK' to switch to a full screen mode.",
-                       "DDRAW Error", MB_ICONERROR);
+            MessageBox(
+            NULL,
+            "Sorry.  ZSNESw does not work in windowed 24 bit color modes. \nClick 'OK' to switch to a full screen mode.",
+            "DDRAW Error", MB_ICONERROR);
             cvidmode = 3;
             initwinvideo();
             Sleep(1000);
@@ -2826,7 +2890,8 @@ extern "C"
             break;
           default:
             UnlockSurface();
-            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error", MB_ICONERROR);
+            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error",
+                       MB_ICONERROR);
             cvidmode = 2;
             initwinvideo();
             Sleep(1000);
@@ -2847,7 +2912,7 @@ extern "C"
           case 32:
             for (j = 0; j < 8; j++)
             {
-              SURFDW = (DWORD *) &SurfBuf[j * pitch];
+              SURFDW = (DWORD *)&SurfBuf[j * pitch];
               color32 = 0x7F000000;
 
               for (i = 0; i < 320; i++)
@@ -2856,7 +2921,7 @@ extern "C"
               }
             }
 
-            for (j = 8; (int) j < (resolutn - 1) + 8; j++)
+            for (j = 8; (int)j < (resolutn - 1) + 8; j++)
             {
               color32 = 0x7F000000;
               for (i = 0; i < 32; i++)
@@ -2866,10 +2931,9 @@ extern "C"
 
               for (i = 32; i < (256 + 32); i++)
               {
-                color32 = (((*(WORD *) (ScreenPtr)) & 0xF800) << 8) +
-                          (((*(WORD *) (ScreenPtr)) & 0x07E0) << 5) +
-                          (((*(WORD *) (ScreenPtr)) & 0x001F) << 3) +
-                          0xFF000000;
+                color32 = (((*(WORD *)(ScreenPtr)) & 0xF800) << 8) +
+                          (((*(WORD *)(ScreenPtr)) & 0x07E0) << 5) +
+                          (((*(WORD *)(ScreenPtr)) & 0x001F) << 3) + 0xFF000000;
                 //                  SURFDW[i]=color32;
                 ScreenPtr += 2;
               }
@@ -2881,12 +2945,12 @@ extern "C"
               }
 
               ScreenPtr = ScreenPtr + 576 - 512;
-              SURFDW = (DWORD *) &SurfBuf[(j) * pitch];
+              SURFDW = (DWORD *)&SurfBuf[(j)*pitch];
             }
 
             for (j = ((resolutn - 1) + 8); j < 240; j++)
             {
-              SURFDW = (DWORD *) &SurfBuf[j * pitch];
+              SURFDW = (DWORD *)&SurfBuf[j * pitch];
 
               color32 = 0x7F000000;
               for (i = 0; i < 320; i++)
@@ -2897,7 +2961,8 @@ extern "C"
             break;
           default:
             UnlockSurface();
-            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error", MB_ICONERROR);
+            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error",
+                       MB_ICONERROR);
             cvidmode = 2;
             initwinvideo();
             Sleep(1000);
@@ -2920,7 +2985,8 @@ extern "C"
             break;
           default:
             UnlockSurface();
-            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error", MB_ICONERROR);
+            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error",
+                       MB_ICONERROR);
             cvidmode = 2;
             initwinvideo();
             Sleep(1000);
@@ -2942,7 +3008,8 @@ extern "C"
             break;
           default:
             UnlockSurface();
-            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error", MB_ICONERROR);
+            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error",
+                       MB_ICONERROR);
             cvidmode = 2;
             initwinvideo();
             Sleep(1000);
@@ -2963,7 +3030,8 @@ extern "C"
             break;
           default:
             UnlockSurface();
-            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error", MB_ICONERROR);
+            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error",
+                       MB_ICONERROR);
             cvidmode = 2;
             initwinvideo();
             Sleep(1000);
@@ -3008,7 +3076,8 @@ extern "C"
         default:
           {
             UnlockSurface();
-            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error", MB_ICONERROR);
+            MessageBox(NULL, "Mode only available in 16 and 32 bit color", "DDRAW Error",
+                       MB_ICONERROR);
             cvidmode = 2;
             initwinvideo();
             Sleep(1000);
@@ -3025,14 +3094,14 @@ extern "C"
   void WinUpdateDevices()
   {
     int i, j;
-    unsigned char * keys;
+    unsigned char *keys;
     unsigned char keys2[256];
 
     for (i = 0; i < 256; i++)
     {
       keys2[i] = 0;
     }
-    keys = (unsigned char *) &pressed;
+    keys = (unsigned char*)&pressed;
 
     if (KeyboardInput && InputEn == 1)
     {
@@ -3055,9 +3124,13 @@ extern "C"
     for (i = 0; i < 256; i++)
     {
       if (keys2[i] == 0)
+      {
         keys[i] = 0;
+      }
       if (keys2[i] != 0 && keys[i] == 0)
+      {
         keys[i] = 1;
+      }
     }
 
     keys[0] = 0;
@@ -3076,93 +3149,125 @@ extern "C"
         if (JoystickInput[i]->GetDeviceState(sizeof(DIJOYSTATE), &js[i]) == DIERR_INPUTLOST)
         {
           if (JoystickInput[i])
+          {
             JoystickInput[i]->Acquire();
+          }
           if (FAILED(JoystickInput[i]->GetDeviceState(sizeof(DIJOYSTATE), &js[i])))
+          {
             return;
+          }
         }
 
         if (!X1Disable[i])
         {
           if (js[i].lX > 0)
+          {
             keys[0x100 + i * 32 + 0] = 1;
+          }
         }
 
         if (!X2Disable[i])
         {
           if (js[i].lX < 0)
+          {
             keys[0x100 + i * 32 + 1] = 1;
+          }
         }
 
         if (!Y1Disable[i])
         {
           if (js[i].lY > 0)
+          {
             keys[0x100 + i * 32 + 2] = 1;
+          }
         }
 
         if (!Y2Disable[i])
         {
           if (js[i].lY < 0)
+          {
             keys[0x100 + i * 32 + 3] = 1;
+          }
         }
 
         if (!Z1Disable[i])
         {
           if (js[i].lZ > 0)
+          {
             keys[0x100 + i * 32 + 4] = 1;
+          }
         }
 
         if (!Z2Disable[i])
         {
           if (js[i].lZ < 0)
+          {
             keys[0x100 + i * 32 + 5] = 1;
+          }
         }
 
         if (!RY1Disable[i])
         {
           if (js[i].lRy > 0)
+          {
             keys[0x100 + i * 32 + 6] = 1;
+          }
         }
 
         if (!RY2Disable[i])
         {
           if (js[i].lRy < 0)
+          {
             keys[0x100 + i * 32 + 7] = 1;
+          }
         }
 
         if (!RZ1Disable[i])
         {
           if (js[i].lRz > 0)
+          {
             keys[0x100 + i * 32 + 8] = 1;
+          }
         }
 
         if (!RZ2Disable[i])
         {
           if (js[i].lRz < 0)
+          {
             keys[0x100 + i * 32 + 9] = 1;
+          }
         }
 
         if (!S01Disable[i])
         {
           if (js[i].rglSlider[0] > 0)
+          {
             keys[0x100 + i * 32 + 10] = 1;
+          }
         }
 
         if (!S02Disable[i])
         {
           if (js[i].rglSlider[0] < 0)
+          {
             keys[0x100 + i * 32 + 11] = 1;
+          }
         }
 
         if (!S11Disable[i])
         {
           if (js[i].rglSlider[1] > 0)
+          {
             keys[0x100 + i * 32 + 12] = 1;
+          }
         }
 
         if (!S12Disable[i])
         {
           if (js[i].rglSlider[1] < 0)
+          {
             keys[0x100 + i * 32 + 13] = 1;
+          }
         }
 
         if (!POVDisable[i])
@@ -3204,9 +3309,15 @@ extern "C"
         }
 
         if (NumBTN[i])
+        {
           for (j = 0; (unsigned long) j < NumBTN[i]; j++)
+          {
             if (js[i].rgbButtons[j])
+            {
               keys[0x100 + i * 32 + 16 + j] = 1;
+            }
+          }
+        }
       }
       else
       {
@@ -3231,19 +3342,18 @@ extern "C"
 
       if (TrapMouseCursor == 1)
       {
-        if (abs((int) MouseMoveX) > (10 / MouseSensitivity) &&
-            T36HZEnabled == 1 &&
-            FullScreen == 0 &&
+        if (abs((int)MouseMoveX) > (10 / MouseSensitivity) && T36HZEnabled == 1 && FullScreen == 0 &&
             MouseButtonPressed == 0)
         {
           MouseInput->Unacquire();
-          SetCursorPos(X + WindowWidth + 32, (int) (Y + (MouseY * WindowHeight / 224)));
+          SetCursorPos(X + WindowWidth + 32, (int)(Y + (MouseY * WindowHeight / 224)));
         }
       }
-      else if (FullScreen == 0 && device1 == 0 && device2 == 0 && MouseButtonPressed == 0 && GUIOn2 == 1)
+      else if (FullScreen == 0 && device1 == 0 && device2 == 0 && MouseButtonPressed == 0 &&
+               GUIOn2 == 1)
       {
         MouseInput->Unacquire();
-        SetCursorPos(X + WindowWidth + 1, (int) (Y + (MouseY * WindowHeight / 224)));
+        SetCursorPos(X + WindowWidth + 1, (int)(Y + (MouseY * WindowHeight / 224)));
       }
     }
 
@@ -3253,22 +3363,21 @@ extern "C"
 
       if (TrapMouseCursor == 1)
       {
-        if (abs((int) MouseMoveX) > (10 / MouseSensitivity) &&
-            T36HZEnabled == 1 &&
-            FullScreen == 0 &&
+        if (abs((int)MouseMoveX) > (10 / MouseSensitivity) && T36HZEnabled == 1 && FullScreen == 0 &&
             MouseButtonPressed == 0)
         {
           MouseInput->Unacquire();
-          SetCursorPos(X - 32, (int) (Y + (MouseY * WindowHeight / 224)));
+          SetCursorPos(X - 32, (int)(Y + (MouseY * WindowHeight / 224)));
         }
       }
-      else if (FullScreen == 0 && device1 == 0 && device2 == 0 && MouseButtonPressed == 0 && GUIOn2 == 1)
+      else if (FullScreen == 0 && device1 == 0 && device2 == 0 && MouseButtonPressed == 0 &&
+               GUIOn2 == 1)
       {
         MouseInput->Unacquire();
-        SetCursorPos(X - 1, (int) (Y + (MouseY * WindowHeight / 224)));
+        SetCursorPos(X - 1, (int)(Y + (MouseY * WindowHeight / 224)));
       }
     }
-    return((int) MouseX);
+    return((int)MouseX);
   }
 
   int GetMouseY(void)
@@ -3281,19 +3390,18 @@ extern "C"
 
       if (TrapMouseCursor == 1)
       {
-        if (abs((int) MouseMoveY) > (10 / MouseSensitivity) &&
-            T36HZEnabled == 1 &&
-            FullScreen == 0 &&
+        if (abs((int)MouseMoveY) > (10 / MouseSensitivity) && T36HZEnabled == 1 && FullScreen == 0 &&
             MouseButtonPressed == 0)
         {
           MouseInput->Unacquire();
-          SetCursorPos((int) (X + (MouseX * WindowWidth / 256)), Y + WindowHeight + 32);
+          SetCursorPos((int)(X + (MouseX * WindowWidth / 256)), Y + WindowHeight + 32);
         }
       }
-      else if (FullScreen == 0 && device1 == 0 && device2 == 0 && MouseButtonPressed == 0 && GUIOn2 == 1)
+      else if (FullScreen == 0 && device1 == 0 && device2 == 0 && MouseButtonPressed == 0 &&
+               GUIOn2 == 1)
       {
         MouseInput->Unacquire();
-        SetCursorPos((int) (X + (MouseX * WindowWidth / 256)), Y + WindowHeight + 1);
+        SetCursorPos((int)(X + (MouseX * WindowWidth / 256)), Y + WindowHeight + 1);
       }
     }
 
@@ -3303,33 +3411,32 @@ extern "C"
 
       if (TrapMouseCursor == 1)
       {
-        if (abs((int) MouseMoveY) > (10 / MouseSensitivity) &&
-            T36HZEnabled == 1 &&
-            FullScreen == 0 &&
+        if (abs((int)MouseMoveY) > (10 / MouseSensitivity) && T36HZEnabled == 1 && FullScreen == 0 &&
             MouseButtonPressed == 0)
         {
           MouseInput->Unacquire();
-          SetCursorPos((int) (X + (MouseX * WindowWidth / 256)), Y - 32);
+          SetCursorPos((int)(X + (MouseX * WindowWidth / 256)), Y - 32);
         }
       }
-      else if (FullScreen == 0 && device1 == 0 && device2 == 0 && MouseButtonPressed == 0 && GUIOn2 == 1)
+      else if (FullScreen == 0 && device1 == 0 && device2 == 0 && MouseButtonPressed == 0 &&
+               GUIOn2 == 1)
       {
         MouseInput->Unacquire();
-        SetCursorPos((int) (X + (MouseX * WindowWidth / 256)), Y - 1);
+        SetCursorPos((int)(X + (MouseX * WindowWidth / 256)), Y - 1);
       }
     }
 
-    return((int) MouseY);
+    return((int)MouseY);
   }
 
   int GetMouseMoveX(void)
   {
-    return((int) MouseMoveX / MouseSensitivity);
+    return((int)MouseMoveX / MouseSensitivity);
   }
 
   int GetMouseMoveY(void)
   {
-    return((int) MouseMoveY / MouseSensitivity);
+    return((int)MouseMoveY / MouseSensitivity);
   }
 
   int GetMouseButton(void)
@@ -3347,8 +3454,8 @@ extern "C"
       while (MouseButton != 0 && T36HZEnabled && FullScreen == 0)
       {
         Moving = 1;
-        X += (int) MouseMoveX;
-        Y += (int) MouseMoveY;
+        X += (int)MouseMoveX;
+        Y += (int)MouseMoveY;
 
         InputRead();
         initwinvideo();
@@ -3359,37 +3466,37 @@ extern "C"
       Moving = 0;
       initwinvideo();
     }
-    return((int) MouseButton);
+    return((int)MouseButton);
   }
 
   void SetMouseMinX(int MinX)
   {
-    MouseMinX = (float) MinX;
+    MouseMinX = (float)MinX;
   }
 
   void SetMouseMaxX(int MaxX)
   {
-    MouseMaxX = (float) MaxX;
+    MouseMaxX = (float)MaxX;
   }
 
   void SetMouseMinY(int MinY)
   {
-    MouseMinY = (float) MinY;
+    MouseMinY = (float)MinY;
   }
 
   void SetMouseMaxY(int MaxY)
   {
-    MouseMaxY = (float) MaxY;
+    MouseMaxY = (float)MaxY;
   }
 
   void SetMouseX(int X)
   {
-    MouseX = (float) X;
+    MouseX = (float)X;
   }
 
   void SetMouseY(int Y)
   {
-    MouseY = (float) Y;
+    MouseY = (float)Y;
   }
 
   void FrameSemaphore()
@@ -3397,12 +3504,14 @@ extern "C"
     if (T60HZEnabled)
     {
       double delay;
-      QueryPerformanceCounter((LARGE_INTEGER *) &end);
+      QueryPerformanceCounter((LARGE_INTEGER *)&end);
 
       delay = ((update_ticks_pc - (end - start)) * 1000.0 / freq) - 3.0;
 
       if (delay > 0.0)
+      {
         WaitForSingleObject(hLock, (unsigned int) delay);
+      }
     }
   }
 
@@ -3419,7 +3528,7 @@ extern "C"
     MouseX = 0;
     MouseY = 0;
   }
-
+  
   extern "C"
   {
     char *CBBuffer;
@@ -3428,7 +3537,7 @@ extern "C"
     {
       if (OpenClipboard(0))
       {
-        char *p = (char *) GetClipboardData(CF_TEXT);
+        char *p = (char *)GetClipboardData(CF_TEXT);
         if (p)
         {
           strncpy(CBBuffer, p, CBLength);
@@ -3538,8 +3647,8 @@ extern "C"
     if (CurrentBuildNum != PrevBuildNum)
     {
       MessageBox(NULL,
-                 "This build of ZSNES is a WORK IN PROGRESS. This means that it is known to contain bugs and certain features\nmay or may not be working correctly. This build is not any representation of final work and is provided AS IS\nfor people to try bleeding edge code.\n\nPlease see http://zsnes.game-host.org/~pagefault/ for a list of current issues.",
-                 "Disclaimer", MB_OK);
+      "This build of ZSNES is a WORK IN PROGRESS. This means that it is known to contain bugs and certain features\nmay or may not be working correctly. This build is not any representation of final work and is provided AS IS\nfor people to try bleeding edge code.\n\nPlease see http://zsnes.game-host.org/~pagefault/ for a list of current issues.",
+      "Disclaimer", MB_OK);
       PrevBuildNum = CurrentBuildNum;
     }
   }
