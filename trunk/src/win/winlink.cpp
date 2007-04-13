@@ -368,26 +368,14 @@ extern "C"
 
 BOOL InputAcquire(void)
 {
-  if (JoystickInput[0])
+  for (unsigned int i = 0; i < 5; i++)
   {
-    JoystickInput[0]->Acquire();
+    if (JoystickInput[i])
+    {
+      JoystickInput[i]->Acquire();
+    }
   }
-  if (JoystickInput[1])
-  {
-    JoystickInput[1]->Acquire();
-  }
-  if (JoystickInput[2])
-  {
-    JoystickInput[2]->Acquire();
-  }
-  if (JoystickInput[3])
-  {
-    JoystickInput[3]->Acquire();
-  }
-  if (JoystickInput[4])
-  {
-    JoystickInput[4]->Acquire();
-  }
+
   if (device1 && device2 && !GUIOn2)
   {
     MultiMouseInit();
@@ -410,26 +398,15 @@ BOOL InputDeAcquire(void)
   {
     KeyboardInput->Unacquire();
   }
-  if (JoystickInput[0])
+
+  for (unsigned int i = 0; i < 5; i++)
   {
-    JoystickInput[0]->Unacquire();
+    if (JoystickInput[i])
+    {
+      JoystickInput[i]->Unacquire();
+    }
   }
-  if (JoystickInput[1])
-  {
-    JoystickInput[1]->Unacquire();
-  }
-  if (JoystickInput[2])
-  {
-    JoystickInput[2]->Unacquire();
-  }
-  if (JoystickInput[3])
-  {
-    JoystickInput[3]->Unacquire();
-  }
-  if (JoystickInput[4])
-  {
-    JoystickInput[4]->Unacquire();
-  }
+
   if (device1 && device2 && !GUIOn2)
   {
     MultiMouseShutdown();
@@ -1538,116 +1515,74 @@ void TestJoy()
         }
       }
 
-      if (!X1Disable[i])
+      if (!X1Disable[i] && (js[i].lX > 0))
       {
-        if (js[i].lX > 0)
-        {
-          X1Disable[i] = 1;
-        }
+        X1Disable[i] = 1;
       }
 
-      if (!X2Disable[i])
+      if (!X2Disable[i] && (js[i].lX < 0))
       {
-        if (js[i].lX < 0)
-        {
-          X2Disable[i] = 1;
-        }
+        X2Disable[i] = 1;
       }
 
-      if (!Y1Disable[i])
+      if (!Y1Disable[i] && (js[i].lY > 0))
       {
-        if (js[i].lY > 0)
-        {
-          Y1Disable[i] = 1;
-        }
+        Y1Disable[i] = 1;
       }
 
-      if (!Y2Disable[i])
+      if (!Y2Disable[i] && (js[i].lY < 0))
       {
-        if (js[i].lY < 0)
-        {
-          Y2Disable[i] = 1;
-        }
+        Y2Disable[i] = 1;
       }
 
-      if (!Z1Disable[i])
+      if (!Z1Disable[i] && (js[i].lZ > 0))
       {
-        if (js[i].lZ > 0)
-        {
-          Z1Disable[i] = 1;
-        }
+        Z1Disable[i] = 1;
       }
 
-      if (!Z2Disable[i])
+      if (!Z2Disable[i] && (js[i].lZ < 0))
       {
-        if (js[i].lZ < 0)
-        {
-          Z2Disable[i] = 1;
-        }
+        Z2Disable[i] = 1;
       }
 
-      if (!RY1Disable[i])
+      if (!RY1Disable[i] && (js[i].lRy > 0))
       {
-        if (js[i].lRy > 0)
-        {
-          RY1Disable[i] = 1;
-        }
+        RY1Disable[i] = 1;
       }
 
-      if (!RY2Disable[i])
+      if (!RY2Disable[i] && (js[i].lRy < 0))
       {
-        if (js[i].lRy < 0)
-        {
-          RY2Disable[i] = 1;
-        }
+        RY2Disable[i] = 1;
       }
 
-      if (!RZ1Disable[i])
+      if (!RZ1Disable[i] && (js[i].lRz > 0))
       {
-        if (js[i].lRz > 0)
-        {
-          RZ1Disable[i] = 1;
-        }
+        RZ1Disable[i] = 1;
       }
 
-      if (!RZ2Disable[i])
+      if (!RZ2Disable[i] &&(js[i].lRz < 0))
       {
-        if (js[i].lRz < 0)
-        {
-          RZ2Disable[i] = 1;
-        }
+        RZ2Disable[i] = 1;
       }
 
-      if (!S01Disable[i])
+      if (!S01Disable[i] && (js[i].rglSlider[0] > 0))
       {
-        if (js[i].rglSlider[0] > 0)
-        {
-          S01Disable[i] = 1;
-        }
+        S01Disable[i] = 1;
       }
 
-      if (!S02Disable[i])
+      if (!S02Disable[i] && (js[i].rglSlider[0] < 0))
       {
-        if (js[i].rglSlider[0] < 0)
-        {
-          S02Disable[i] = 1;
-        }
+        S02Disable[i] = 1;
       }
 
-      if (!S11Disable[i])
+      if (!S11Disable[i] && (js[i].rglSlider[1] > 0))
       {
-        if (js[i].rglSlider[1] > 0)
-        {
-          S11Disable[i] = 1;
-        }
+        S11Disable[i] = 1;
       }
 
-      if (!S12Disable[i])
+      if (!S12Disable[i] && (js[i].rglSlider[1] < 0))
       {
-        if (js[i].rglSlider[1] < 0)
-        {
-          S12Disable[i] = 1;
-        }
+        S12Disable[i] = 1;
       }
     }
   }
@@ -1686,9 +1621,7 @@ int InitDirectDraw()
 {
   DDSURFACEDESC2 ddsd2;
   DDPIXELFORMAT format;
-  //MK: unused 2003/08/31
-  //HRESULT hr;
-  //char message1[256];
+
   unsigned int color32, ScreenPtr2;
   int i, j, k, r, g, b, Y, u, v;
 
@@ -1799,10 +1732,9 @@ int InitDirectDraw()
     {
       if (lpDD->SetDisplayMode(WindowWidth, WindowHeight, 16, 0, 0) != DD_OK)
       {
-        MessageBox(
-        NULL,
-        "IDirectDraw7::SetDisplayMode failed.\nMake sure your video card supports this mode.",
-        "DirectDraw Error", MB_ICONERROR);
+        MessageBox(NULL,
+                   "IDirectDraw7::SetDisplayMode failed.\nMake sure your video card supports this mode.",
+                   "DirectDraw Error", MB_ICONERROR);
         return FALSE;
       }
       else
@@ -1899,10 +1831,9 @@ int InitDirectDraw()
 
   if (BitDepth == 24)
   {
-    MessageBox(
-    NULL,
-    "ZSNESw does not support 24bit color.\nPlease change your resolution to either 16bit or 32bit color",
-    "Error", MB_OK);
+    MessageBox(NULL,
+               "ZSNESw does not support 24bit color.\nPlease change your resolution to either 16bit or 32bit color",
+               "Error", MB_OK);
     exit(0);
   }
 
@@ -1940,10 +1871,9 @@ int InitDirectDraw()
 
     if (lpDD->CreateSurface(&ddsd2, &DD_CFB16, NULL) != DD_OK)
     {
-      MessageBox(
-      NULL,
-      "IDirectDraw7::CreateSurface failed. You should update your video card drivers. Alternatively, you could use a 16-bit desktop or use a non-D mode.",
-      "DirectDraw Error", MB_ICONERROR);
+      MessageBox(NULL,
+                 "IDirectDraw7::CreateSurface failed. You should update your video card drivers. Alternatively, you could use a 16-bit desktop or use a non-D mode.",
+                 "DirectDraw Error", MB_ICONERROR);
       return FALSE;
     }
 
@@ -2212,7 +2142,7 @@ extern "C"
     }
   }
 
-  extern "C" char GUIKEEP43[];
+  extern char GUIKEEP43[];
 
   bool CheckTVRatioReq()
   {
@@ -2564,7 +2494,7 @@ extern "C"
       InitSound();
       TestJoy();
 
-      //      if (debugger) InitDebugger(); // Start debugger such that it is at this point
+      //if (debugger) InitDebugger(); // Start debugger such that it is at this point
     }
 
     if (FirstVid == 1)
@@ -2648,12 +2578,9 @@ extern "C"
     }
   }
 
-  extern "C"
-  {
-    volatile int SPCSize;
-    volatile int buffer_ptr;
-    extern unsigned char MMXSupport;
-  }
+  volatile int SPCSize;
+  volatile int buffer_ptr;
+  extern unsigned char MMXSupport;
 
   void UpdateVFrame(void)
   {
@@ -2731,19 +2658,16 @@ extern "C"
     UnlockSurface();
   }
 
-  extern "C"
+  void initDirectDraw()
   {
-    void initDirectDraw()
+    InitDirectDraw();
+    if (CheckTVRatioReq())
     {
-      InitDirectDraw();
-      if (CheckTVRatioReq())
-      {
-        KeepTVRatio();
-      }
-      clearwin();
-      Clear2xSaIBuffer();
-      clear_display();
+      KeepTVRatio();
     }
+    clearwin();
+    Clear2xSaIBuffer();
+    clear_display();
   }
 
   void clear_display()
@@ -2822,13 +2746,13 @@ extern "C"
     DWORD i, j, color32;
     DWORD *SURFDW;
 
-    NGNoTransp = 0;              // Set this value to 1 within the appropriate
-    // video mode if you want to add a custom
-    // transparency routine or hardware
-    // transparency.  This only works if
-    // the value of newengen is equal to 1.
-    // (see ProcessTransparencies in newgfx16.asm
-    //  for ZSNES' current transparency code)
+    NGNoTransp = 0; // Set this value to 1 within the appropriate
+                    // video mode if you want to add a custom
+                    // transparency routine or hardware
+                    // transparency.  This only works if
+                    // the value of newengen is equal to 1.
+                    // (see ProcessTransparencies in newgfx16.asm
+                    //  for ZSNES' current transparency code)
 
     UpdateVFrame();
     if (curblank != 0)
@@ -2968,24 +2892,25 @@ extern "C"
               DrawWin256x224x32();
               break;
             }
-            /*           SURFDW=(DWORD *) &SurfBuf[(resolutn-1)*pitch];
-                       color32=0x7F000000;
-                       for(i=0;i<256;i++)
-                       {
-                         SURFDW[i]=color32;
-                       }
-                       SURFDW=(DWORD *) &SurfBuf[resolutn*pitch];
-                       color32=0x7F000000;
-                       for(i=0;i<256;i++)
-                       {
-                         SURFDW[i]=color32;
-                       }
-                       break;*/
+            /*
+            SURFDW=(DWORD *) &SurfBuf[(resolutn-1)*pitch];
+            color32=0x7F000000;
+            for(i=0;i<256;i++)
+            {
+              SURFDW[i]=color32;
+            }
+            SURFDW=(DWORD *) &SurfBuf[resolutn*pitch];
+            color32=0x7F000000;
+            for(i=0;i<256;i++)
+            {
+              SURFDW[i]=color32;
+            }
+            break;
+          */
           case 24:
-            MessageBox(
-            NULL,
-            "Sorry.  ZSNESw does not work in windowed 24 bit color modes. \nClick 'OK' to switch to a full screen mode.",
-            "DDRAW Error", MB_ICONERROR);
+            MessageBox(NULL,
+                       "Sorry.  ZSNESw does not work in windowed 24 bit color modes. \nClick 'OK' to switch to a full screen mode.",
+                       "DDRAW Error", MB_ICONERROR);
             cvidmode = 3;
             initwinvideo();
             Sleep(1000);
@@ -3037,7 +2962,7 @@ extern "C"
                 color32 = (((*(WORD *)(ScreenPtr)) & 0xF800) << 8) +
                           (((*(WORD *)(ScreenPtr)) & 0x07E0) << 5) +
                           (((*(WORD *)(ScreenPtr)) & 0x001F) << 3) + 0xFF000000;
-                //                  SURFDW[i]=color32;
+                //SURFDW[i]=color32;
                 ScreenPtr += 2;
               }
 
@@ -3432,8 +3357,6 @@ extern "C"
     }
   }
 
-  extern "C" unsigned char MouseSensitivity;
-
   int GetMouseX(void)
   {
     InputRead();
@@ -3631,46 +3554,43 @@ extern "C"
     MouseX = 0;
     MouseY = 0;
   }
-  
-  extern "C"
-  {
-    char *CBBuffer;
-    unsigned int CBLength;
-    void PasteClipBoard()
-    {
-      if (OpenClipboard(0))
-      {
-        char *p = (char *)GetClipboardData(CF_TEXT);
-        if (p)
-        {
-          strncpy(CBBuffer, p, CBLength);
-          CBBuffer[CBLength - 1] = 0;
 
-          for (p = CBBuffer; *p; p++)
+  char *CBBuffer;
+  unsigned int CBLength;
+  void PasteClipBoard()
+  {
+    if (OpenClipboard(0))
+    {
+      char *p = (char *)GetClipboardData(CF_TEXT);
+      if (p)
+      {
+        strncpy(CBBuffer, p, CBLength);
+        CBBuffer[CBLength - 1] = 0;
+
+        for (p = CBBuffer; *p; p++)
+        {
+          if (isspace(*p))
           {
-            if (isspace(*p))
-            {
-              *p = ' ';
-            }
-          }
-          for (p--; p >= CBBuffer; p--)
-          {
-            if (isspace(*p))
-            {
-              *p = 0;
-            }
-            else
-            {
-              break;
-            }
+            *p = ' ';
           }
         }
-        CloseClipboard();
+        for (p--; p >= CBBuffer; p--)
+        {
+          if (isspace(*p))
+          {
+            *p = 0;
+          }
+          else
+          {
+            break;
+          }
+        }
       }
+      CloseClipboard();
     }
   }
 
-  extern "C" signed int NumberOfOpcodes;
+  extern int NumberOfOpcodes;
 
   void WriteLine()
   {
@@ -3729,7 +3649,7 @@ extern "C"
     return((SysPowerStat.BatteryLifePercent == 255) ? -1 : SysPowerStat.BatteryLifePercent);
   }
 
-  extern "C" unsigned int delayvalue;
+  extern unsigned int delayvalue;
 
   // Delay function for GUI
   void DoSleep()
@@ -3740,8 +3660,6 @@ extern "C"
     Sleep(delayvalue);
   }
 
-  extern "C" unsigned int PrevBuildNum;
-
   void DisplayWIPDisclaimer()
   {
     unsigned int version_hash();
@@ -3750,8 +3668,8 @@ extern "C"
     if (CurrentBuildNum != PrevBuildNum)
     {
       MessageBox(NULL,
-      "This build of ZSNES is a WORK IN PROGRESS. This means that it is known to contain bugs and certain features\nmay or may not be working correctly. This build is not any representation of final work and is provided AS IS\nfor people to try bleeding edge code.\n\nPlease see http://zsnes.game-host.org/~pagefault/ for a list of current issues.",
-      "Disclaimer", MB_OK);
+                 "This build of ZSNES is a WORK IN PROGRESS. This means that it is known to contain bugs and certain features\nmay or may not be working correctly. This build is not any representation of final work and is provided AS IS\nfor people to try bleeding edge code.\n\nPlease see http://zsnes.game-host.org/~pagefault/ for a list of current issues.",
+                 "Disclaimer", MB_OK);
       PrevBuildNum = CurrentBuildNum;
     }
   }
