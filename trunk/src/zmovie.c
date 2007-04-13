@@ -50,6 +50,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
+#include <stdint.h>
 #include "gblvars.h"
 #include "asm_call.h"
 #include "md.h"
@@ -68,12 +69,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define NUMCONV_FW4
 #include "numconv.h"
 
-
-#ifdef __GNUC__
-typedef unsigned long long uint64;
-#else //MSVC
-typedef unsigned __int64 uint64;
-#endif
 
 extern unsigned int versionNumber, CRC32, cur_zst_size, MsgCount, MessageOn;
 extern unsigned int JoyAOrig, JoyBOrig, JoyCOrig, JoyDOrig, JoyEOrig;
@@ -2170,9 +2165,9 @@ struct
 
   size_t aud_dsize_pos;
 
-  uint64 sample_hi;
-  uint64 sample_lo;
-  uint64 sample_balance;
+  uint64_t sample_hi;
+  uint64_t sample_lo;
+  uint64_t sample_balance;
 } raw_vid;
 
 static void raw_embed_logo(bool audio)
