@@ -149,12 +149,12 @@ void gl_clearwin(void);
 
 static void adjustMouseXScale(void)
 {
-  MouseXScale = (MouseMaxX - MouseMinX) / ((float) WindowWidth);
+  MouseXScale = (MouseMaxX - MouseMinX) / ((float)WindowWidth);
 }
 
 static void adjustMouseYScale(void)
 {
-  MouseYScale = (MouseMaxY - MouseMinY) / ((float) WindowHeight);
+  MouseYScale = (MouseMaxY - MouseMinY) / ((float)WindowHeight);
 }
 
 void SetHQx(unsigned int ResX, unsigned int ResY)
@@ -216,11 +216,17 @@ int Main_Proc(void)
           break;
         }
         if (event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT)
+        {
           shiftptr = 1;
+        }
         if (event.key.keysym.mod & KMOD_NUM)
+        {
           numlockptr = 1;
+        }
         else
+        {
           numlockptr = 0;
+        }
 
         key = sdl_keysym_to_pc_scancode(event.key.keysym.sym);
         if (key < 448)
@@ -232,7 +238,9 @@ int Main_Proc(void)
 
       case SDL_KEYUP:
         if (event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT)
+        {
           shiftptr = 0;
+        }
         key = sdl_keysym_to_pc_scancode(event.key.keysym.sym);
         if (key < 448)
         {
@@ -248,18 +256,26 @@ int Main_Proc(void)
         }
         else
         {
-          MouseX = ((int) ((float) event.motion.x) * MouseXScale);
-          MouseY = ((int) ((float) event.motion.y) * MouseYScale);
+          MouseX = ((int)((float)event.motion.x) * MouseXScale);
+          MouseY = ((int)((float)event.motion.y) * MouseYScale);
         }
 
         if (MouseX < MouseMinX)
+        {
           MouseX = MouseMinX;
+        }
         if (MouseX > MouseMaxX)
+        {
           MouseX = MouseMaxX;
+        }
         if (MouseY < MouseMinY)
+        {
           MouseY = MouseMinY;
+        }
         if (MouseY > MouseMaxY)
+        {
           MouseY = MouseMaxY;
+        }
         break;
 
       case SDL_MOUSEBUTTONDOWN:
@@ -306,7 +322,9 @@ int Main_Proc(void)
         // POV hats act as direction pad
         offset = HatOffset[event.jhat.which];
         if (offset >= (256 + 128 + 64))
+        {
           break;
+        }
         switch (event.jhat.value)
         {
           case SDL_HAT_CENTERED:
@@ -367,7 +385,9 @@ int Main_Proc(void)
         offset = BallOffset[event.jball.which];
         offset += event.jball.ball;
         if (offset >= (256 + 128 + 64))
+        {
           break;
+        }
         if (event.jball.xrel < -100)
         {
           pressed[offset] = 0;
@@ -394,7 +414,9 @@ int Main_Proc(void)
         offset = AxisOffset[event.jaxis.which];
         offset += event.jaxis.axis * 2;
         if (offset >= (256 + 128 + 64))
+        {
           break;
+        }
         //printf("DEBUG axis offset: %d\n", offset);
         if (event.jaxis.value < -(joy_sensitivity))
         {
@@ -418,7 +440,9 @@ int Main_Proc(void)
         offset += event.jbutton.button;
         //printf("DEBUG button offset: %d\n", offset);
         if (offset >= (256 + 128 + 64))
+        {
           break;
+        }
         pressed[offset] = 1;
         break;
 
@@ -427,7 +451,9 @@ int Main_Proc(void)
         offset += event.jbutton.button;
         //printf("DEBUG button offset: %d\n", offset);
         if (offset >= (256 + 128 + 64))
+        {
           break;
+        }
         pressed[offset] = 0;
         break;
       case SDL_QUIT:
@@ -439,7 +465,8 @@ int Main_Proc(void)
         if (!GUIRESIZE[cvidmode])
         {
           SetGLAttributes();
-          surface = SDL_SetVideoMode(WindowWidth, WindowHeight, BitDepth, surface->flags & ~SDL_RESIZABLE);
+          surface = SDL_SetVideoMode(WindowWidth, WindowHeight, BitDepth,
+                                     surface->flags & ~SDL_RESIZABLE);
           adjustMouseXScale();
           adjustMouseYScale();
           break;
@@ -460,13 +487,13 @@ int Main_Proc(void)
         {
           if (224 * WindowWidth > 256 * WindowHeight && WindowHeight)
           {
-            glOrtho(-((float) 224 * WindowWidth) / ((float) 256 * WindowHeight),
-                    ((float) 224 * WindowWidth) / ((float) 256 * WindowHeight), -1, 1, -1, 1);
+            glOrtho(-((float)224 * WindowWidth) / ((float)256 * WindowHeight),
+                    ((float)224 * WindowWidth) / ((float)256 * WindowHeight), -1, 1, -1, 1);
           }
           else if (224 * WindowWidth < 256 * WindowHeight && WindowWidth)
           {
-            glOrtho(-1, 1, -((float) 256 * WindowHeight) / ((float) 224 * WindowWidth),
-                    ((float) 256 * WindowHeight) / ((float) 224 * WindowWidth), -1, 1);
+            glOrtho(-1, 1, -((float)256 * WindowHeight) / ((float)224 * WindowWidth),
+                    ((float)256 * WindowHeight) / ((float)224 * WindowWidth), -1, 1);
           }
           else
           {
@@ -478,13 +505,13 @@ int Main_Proc(void)
         {
           if (3 * WindowWidth > 4 * WindowHeight && WindowHeight)
           {
-            glOrtho(-((float) 3 * WindowWidth) / ((float) 4 * WindowHeight),
-                    ((float) 3 * WindowWidth) / ((float) 4 * WindowHeight), -1, 1, -1, 1);
+            glOrtho(-((float)3 * WindowWidth) / ((float)4 * WindowHeight),
+                    ((float)3 * WindowWidth) / ((float)4 * WindowHeight), -1, 1, -1, 1);
           }
           else if (3 * WindowWidth < 4 * WindowHeight && WindowWidth)
           {
-            glOrtho(-1, 1, -((float) 4 * WindowHeight) / ((float) 3 * WindowWidth),
-                    ((float) 4 * WindowHeight) / ((float) 3 * WindowWidth), -1, 1);
+            glOrtho(-1, 1, -((float)4 * WindowHeight) / ((float)3 * WindowWidth),
+                    ((float)4 * WindowHeight) / ((float)3 * WindowWidth), -1, 1);
           }
           else
           {
@@ -713,13 +740,9 @@ void ProcessKeyBuf(int scancode)
   int accept = 0;
   int vkeyval = 0;
 
-  if (((scancode >= 'A') && (scancode <= 'Z')) ||
-      ((scancode >= 'a') && (scancode <= 'z')) ||
-      (scancode == SDLK_ESCAPE) ||
-      (scancode == SDLK_SPACE) ||
-      (scancode == SDLK_BACKSPACE) ||
-      (scancode == SDLK_RETURN) ||
-      (scancode == SDLK_TAB))
+  if (((scancode >= 'A') && (scancode <= 'Z')) || ((scancode >= 'a') && (scancode <= 'z')) ||
+      (scancode == SDLK_ESCAPE) || (scancode == SDLK_SPACE) || (scancode == SDLK_BACKSPACE) ||
+      (scancode == SDLK_RETURN) || (scancode == SDLK_TAB))
   {
     accept = 1;
     vkeyval = scancode;
@@ -786,7 +809,6 @@ void ProcessKeyBuf(int scancode)
           vkeyval = 256 + 79; accept = 1; break;
       }
     }    // end no-numlock
-
   }      // end testing of keypad
   if (!shiftptr)
   {
@@ -875,7 +897,9 @@ void ProcessKeyBuf(int scancode)
     KeyBuffer[CurKeyPos] = vkeyval;
     CurKeyPos++;
     if (CurKeyPos == 16)
+    {
       CurKeyPos = 0;
+    }
   }
 }
 
@@ -916,7 +940,8 @@ BOOL InitJoystickInput(void)
     num_hats = SDL_JoystickNumHats(JoystickInput[i]);
     num_balls = SDL_JoystickNumBalls(JoystickInput[i]);
     printf("Device %i %s\n", i, SDL_JoystickName(i));
-    printf("  %i axis, %i buttons, %i hats, %i balls\n", num_axes, num_buttons, num_hats, num_balls);
+    printf("  %i axis, %i buttons, %i hats, %i balls\n", num_axes, num_buttons, num_hats,
+           num_balls);
 
     if (next_offset >= 448)
     {
@@ -986,7 +1011,7 @@ int startgame()
     status = gl_start(WindowWidth, WindowHeight, BitDepth, FullScreen);
   }
   else
-  #endif
+    #endif
   {
     status = sw_start(WindowWidth, WindowHeight, BitDepth, FullScreen);
   }
@@ -1084,11 +1109,8 @@ void initwinvideo(void)
 
   init_hqNx();
 
-  if ((CurMode != cvidmode) ||
-      (prevNTSCMode != NTSCFilter) ||
-      (changeRes) ||
-      (prevKeep4_3Ratio != Keep4_3Ratio) ||
-      (prevsync != vsyncon))
+  if ((CurMode != cvidmode) || (prevNTSCMode != NTSCFilter) || (changeRes) ||
+      (prevKeep4_3Ratio != Keep4_3Ratio) || (prevsync != vsyncon))
   {
     CurMode = cvidmode;
     newmode = 1;
@@ -1103,7 +1125,9 @@ void initwinvideo(void)
 #ifdef __OPENGL__
     UseOpenGL = 0;
     if (CheckOGLMode())
+    {
       UseOpenGL = 1;
+    }
 
     if ((cvidmode == 20) || (cvidmode == 21) || (cvidmode == 22))
     {
@@ -1112,7 +1136,9 @@ void initwinvideo(void)
     }
 #else
     if (CheckOGLMode())
-      cvidmode = 2; // set it to the default 512x448 W
+    {
+      cvidmode = 2;
+    } // set it to the default 512x448 W
 #endif
 
     switch (cvidmode)
@@ -1199,9 +1225,13 @@ void initwinvideo(void)
   {
     /* Exit zsnes if SDL could not be initialized */
     if (sdl_state == vid_null)
+    {
       exit(0);
+    }
     else
+    {
       return;
+    }
   }
 
   if (newmode == 1)
@@ -1221,13 +1251,13 @@ void initwinvideo(void)
       {
         if (224 * WindowWidth > 256 * WindowHeight && WindowHeight)
         {
-          glOrtho(-((float) 224 * WindowWidth) / ((float) 256 * WindowHeight),
-                  ((float) 224 * WindowWidth) / ((float) 256 * WindowHeight), -1, 1, -1, 1);
+          glOrtho(-((float)224 * WindowWidth) / ((float)256 * WindowHeight),
+                  ((float)224 * WindowWidth) / ((float)256 * WindowHeight), -1, 1, -1, 1);
         }
         else if (224 * WindowWidth < 256 * WindowHeight && WindowWidth)
         {
-          glOrtho(-1, 1, -((float) 256 * WindowHeight) / ((float) 224 * WindowWidth),
-                  ((float) 256 * WindowHeight) / ((float) 224 * WindowWidth), -1, 1);
+          glOrtho(-1, 1, -((float)256 * WindowHeight) / ((float)224 * WindowWidth),
+                  ((float)256 * WindowHeight) / ((float)224 * WindowWidth), -1, 1);
         }
         else
         {
@@ -1239,13 +1269,13 @@ void initwinvideo(void)
       {
         if (3 * WindowWidth > 4 * WindowHeight && WindowHeight)
         {
-          glOrtho(-((float) 3 * WindowWidth) / ((float) 4 * WindowHeight),
-                  ((float) 3 * WindowWidth) / ((float) 4 * WindowHeight), -1, 1, -1, 1);
+          glOrtho(-((float)3 * WindowWidth) / ((float)4 * WindowHeight),
+                  ((float)3 * WindowWidth) / ((float)4 * WindowHeight), -1, 1, -1, 1);
         }
         else if (3 * WindowWidth < 4 * WindowHeight && WindowWidth)
         {
-          glOrtho(-1, 1, -((float) 4 * WindowHeight) / ((float) 3 * WindowWidth),
-                  ((float) 4 * WindowHeight) / ((float) 3 * WindowWidth), -1, 1);
+          glOrtho(-1, 1, -((float)4 * WindowHeight) / ((float)3 * WindowWidth),
+                  ((float)4 * WindowHeight) / ((float)3 * WindowWidth), -1, 1);
         }
         else
         {
@@ -1322,7 +1352,7 @@ void sem_sleep(void)
   end = update_ticks_pc - (sem_GetTicks() - start) - .2f;
   if (end > 0.f)
   {
-    SDL_SemWaitTimeout(sem_frames, (int) end);
+    SDL_SemWaitTimeout(sem_frames, (int)end);
   }
 }
 
@@ -1404,7 +1434,7 @@ void clearwin()
     gl_clearwin();
   }
   else
-  #endif
+#endif
   {
     sw_clearwin();
   }
@@ -1432,7 +1462,7 @@ void drawscreenwin(void)
     gl_drawwin();
   }
   else
-  #endif
+    #endif
   {
     sw_drawwin();
   }
@@ -1464,11 +1494,11 @@ void UnloadSDL()
 
 int GetMouseX(void)
 {
-  return ((int) MouseX);
+  return ((int)MouseX);
 }
 int GetMouseY(void)
 {
-  return ((int) MouseY);
+  return ((int)MouseY);
 }
 
 int GetMouseMoveX(void)
@@ -1485,7 +1515,7 @@ int GetMouseMoveY(void)
 }
 int GetMouseButton(void)
 {
-  return ((int) MouseButton);
+  return ((int)MouseButton);
 }
 
 void SetMouseMinX(int MinX)
@@ -1520,7 +1550,7 @@ void SetMouseY(int Y)
 /* evul, maybe should use something other than constructor method */
 void __attribute__((stdcall, constructor)) sem_StartTicks()
 {
-                                             gettimeofday(&sem_start, NULL);
+  gettimeofday(&sem_start, NULL);
 }
 
 float sem_GetTicks()
@@ -1529,8 +1559,8 @@ float sem_GetTicks()
   float ticks;
 
   gettimeofday(&now, NULL);
-  ticks = ((float) (now.tv_sec - sem_start.tv_sec)) * 1000.f +
-          ((float) (now.tv_usec - sem_start.tv_usec)) * .001f;
+  ticks = ((float)(now.tv_sec - sem_start.tv_sec)) * 1000.f +
+          ((float)(now.tv_usec - sem_start.tv_usec)) * .001f;
   return(ticks);
 }
 
