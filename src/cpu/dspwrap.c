@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "dspwrap.h"
 #include "dsp.h"
@@ -73,9 +74,9 @@ static int next_samples;
 
 struct sample_control_t
 {
-  unsigned long long hi;
-  unsigned long long lo;
-  unsigned long long balance;
+  uint64_t hi;
+  uint64_t lo;
+  uint64_t balance;
 };
 static struct sample_control_t sample_control;
 
