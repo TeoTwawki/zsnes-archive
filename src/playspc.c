@@ -22,7 +22,7 @@ int romispal = 0, spc700read, cycpbl, cycpblt, curexecstate;
 void *tableadc[0];
 int disablespcclr, SPCSkipXtraROM;
 
-void (*opcjmptab[256])(void);
+void (*opcjmptab[256])();
 
 extern unsigned char SPCRAM[0x10000];
 extern unsigned char* spcPCRam;
