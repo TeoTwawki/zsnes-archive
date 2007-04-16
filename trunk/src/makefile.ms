@@ -256,7 +256,7 @@ ifeq (${OS},__WIN32__)
 WINOBJ=${DRESOBJ}\
 	${CONFLOC} ${WIN_D}/winintrf${OE} ${WIN_D}/winlink${OE} \
 	${WIN_D}/lib${OE} ${WIN_D}/safelib${OE} ${MMLIB_D}/mm${OE} \
-	${MMLIB_D}/windows${OE} ${WIN_D\dd_draw${OE} ${WIN_D}/gl_draw${OE}
+	${MMLIB_D}/windows${OE} ${WIN_D\dx_ddraw${OE} ${WIN_D}/gl_draw${OE}
 
 WINVIDOBJ=${VID_D}/sw_draw${OE} ${VID_D}/copyvwin${OE} ${VID_D}/ntsc${OE}\
 	${VID_D}/hq2x16${OE} ${VID_D}/hq2x32${OE}\
