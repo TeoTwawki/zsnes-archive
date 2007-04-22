@@ -25,7 +25,7 @@ EXTSYM MessageOn,MsgCount,Msgptr,bgcmsung,bgmode
 EXTSYM cgmod,frameskip,frskipper
 EXTSYM maxbr,modeused,newengen
 EXTSYM pal16b,pal16bxcl,pressed,prevbright,prevpal
-EXTSYM scaddsngb,scaddtngb,scaddtngbx,scfbl,scrndis,t1cc
+EXTSYM scfbl,scrndis,t1cc
 EXTSYM vidbright,vidbuffer,vidbufferofsa,vidmemch2
 EXTSYM GUIRClick,MousePRClick,ngmsdraw,fulladdtab
 EXTSYM KeyFastFrwrd,SRAMSave5Sec
@@ -150,11 +150,8 @@ NEWSYM cachevideo
     mov dword[bgcmsung],0
     mov dword[modeused],0
     mov dword[modeused+4],0
-    mov dword[scaddsngb],0
-    mov dword[scaddtngb],0
     mov dword[ngmsdraw],0
     mov dword[ngextbg],0
-    mov dword[scaddtngbx],0FFFFFFFFh
     mov byte[hiresstuff],0
     mov byte[Mode7HiRes],0
 
