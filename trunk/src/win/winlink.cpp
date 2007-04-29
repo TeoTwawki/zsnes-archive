@@ -123,7 +123,8 @@ float MouseY;
 float MouseMoveX;
 float MouseMoveY;
 BYTE MouseButtonPressed;
-
+BYTE DD_DRAW = 0;
+BYTE OPENGL = 0;
 BYTE IsActivated = 1;
 
 WORD PrevRes = 0;
@@ -2606,8 +2607,8 @@ extern "C"
           }
       }
     }
-    UnlockSurface();
-    gl_drawwin();
+    if (DD_DRAW) UnlockSurface();
+    if (OPENGL) gl_drawwin();
   }
 
   void SwitchFullScreen();
