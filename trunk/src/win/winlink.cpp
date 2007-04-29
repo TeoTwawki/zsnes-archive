@@ -1747,8 +1747,8 @@ extern "C"
       DSMode = GUIDSMODE[cvidmode];
       NTSCMode = GUINTVID[cvidmode];
 
-	  if (cvidmode > 42) OPENGL = 1;
-	  else (D_DRAW = 1);
+	  if (cvidmode > 42) { OPENGL = 1; D_DRAW = 0; }
+	  else { D_DRAW = 1; OPENGL = 0; }
 
 	  switch (cvidmode)
       {
@@ -2610,8 +2610,8 @@ extern "C"
           }
       }
     }
-    if (D_DRAW) UnlockSurface();
-    if (OPENGL) gl_drawwin();
+    UnlockSurface();
+	if (OPENGL) gl_drawwin();
   }
 
   void SwitchFullScreen();
