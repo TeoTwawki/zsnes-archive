@@ -2389,21 +2389,6 @@ extern "C"
               DrawWin256x224x32();
               break;
             }
-            /*
-            SURFDW=(DWORD *) &SurfBuf[(resolutn-1)*pitch];
-            color32=0x7F000000;
-            for(i=0;i<256;i++)
-            {
-              SURFDW[i]=color32;
-            }
-            SURFDW=(DWORD *) &SurfBuf[resolutn*pitch];
-            color32=0x7F000000;
-            for(i=0;i<256;i++)
-            {
-              SURFDW[i]=color32;
-            }
-            break;
-          */
           case 24:
             MessageBox(NULL,
                        "Sorry.  ZSNESw does not work in windowed 24 bit color modes. \nClick 'OK' to switch to a full screen mode.",
