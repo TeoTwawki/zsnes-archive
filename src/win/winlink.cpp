@@ -123,8 +123,8 @@ float MouseY;
 float MouseMoveX;
 float MouseMoveY;
 BYTE MouseButtonPressed;
-BYTE DD_DRAW = 0;
-BYTE OPENGL = 0;
+BYTE D_DRAW = 0;
+BYTE OPENGL = 0;	
 BYTE IsActivated = 1;
 
 WORD PrevRes = 0;
@@ -1747,7 +1747,10 @@ extern "C"
       DSMode = GUIDSMODE[cvidmode];
       NTSCMode = GUINTVID[cvidmode];
 
-      switch (cvidmode)
+	  if (cvidmode > 42) OPENGL = 1;
+	  else (D_DRAW = 1);
+
+	  switch (cvidmode)
       {
         case 0:
           WindowWidth = 256;
@@ -1828,7 +1831,7 @@ extern "C"
           WindowWidth = CustomResX;
           WindowHeight = CustomResY;
           break;
-        case 43:
+		case 43:
           WindowWidth = 512;
           WindowHeight = 448;
           //     gl_start(100, 100, 16, 0);
@@ -2607,7 +2610,7 @@ extern "C"
           }
       }
     }
-    if (DD_DRAW) UnlockSurface();
+    if (D_DRAW) UnlockSurface();
     if (OPENGL) gl_drawwin();
   }
 
