@@ -126,6 +126,7 @@ BYTE MouseButtonPressed;
 BYTE D_DRAW = 0;
 BYTE OPENGL = 0;	
 BYTE IsActivated = 1;
+BYTE PrevRes=0;
 
 extern "C"
 {
@@ -1690,16 +1691,17 @@ extern "C"
 
   extern char GUIKEEP43[];
 
-  bool CheckTVRatioReq()
+  char CheckTVRatioReq()
   {
     return(GUIKEEP43[cvidmode] && Keep4_3Ratio);
   }
 
+  WINDOWPLACEMENT wndpl;
+  RECT rc1;
+  DWORD newmode = 0;
+
   void initwinvideo()
   {
-    WINDOWPLACEMENT wndpl;
-    RECT rc1;
-    DWORD newmode = 0;
     DWORD HQMode = 0;
 
     if (FirstActivate && NTSCFilter)
