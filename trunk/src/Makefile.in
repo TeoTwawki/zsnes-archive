@@ -19,7 +19,6 @@
 
 CHIP_D=chips
 CPU_D=cpu
-CPU_SPC_D=cpu/spc
 EFF_D=effects
 GUI_D=gui
 JMA_D=jma
@@ -45,9 +44,8 @@ CHIP_CO=$(CHIP_D)/c4emu.o $(CHIP_D)/dsp1emu.o $(CHIP_D)/dsp3emu.o\
 
 CPU_AO=$(CPU_D)/dma.o $(CPU_D)/execute.o $(CPU_D)/irq.o $(CPU_D)/memory.o\
 	$(CPU_D)/spc700.o $(CPU_D)/stable.o $(CPU_D)/table.o $(CPU_D)/tablec.o
-CPU_CO=$(CPU_D)/dsp.o $(CPU_D)/executec.o $(CPU_D)/memtable.o \
-	$(CPU_D)/dspwrap.o $(CPU_D)/spc.o  $(CPU_D)/spc_cpu.o
-
+CPU_CO=$(CPU_D)/dsp.o $(CPU_D)/dspwrap.o $(CPU_D)/executec.o $(CPU_D)/memtable.o\
+	$(CPU_D)/spc.o $(CPU_D)/spc_cpu.o
 
 DEBUG_AO=@DEBUGGER_A@
 DEBUG_CO=@DEBUGGER_C@
@@ -93,8 +91,6 @@ Z_OBJS=$(Z_AOBJS) $(Z_COBJS)
 .PHONY: default main tools all install clean cclean tclean distclean
 .SUFFIXES: .asm .c .cpp .psr
 
-%: %.cpp
-	@CXX@ @CXXFLAGS@ -o $@ $<
 %.o: %.asm
 	@NASMPATH@ @NFLAGS@ -o $@ $<
 %.o: %.c
