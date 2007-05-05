@@ -18,10 +18,8 @@
 ;Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 %include "macros.mac"
-%include "cpu/spccycle.inc"
 %include "cpu/regsw.mac"
 
-EXTSYM KeyRewind,statesaver,UpdateDPage,clocktable,spcCycle
 EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo
 EXTSYM vidbufferofsa,device2,RawDumpInProgress,KeySaveState,KeyLoadState
 EXTSYM KeyQuickExit,KeyQuickLoad,KeyQuickRst,GUIDoReset,GUIReset,KeyOnStA
@@ -53,7 +51,8 @@ EXTSYM RestoreCVFrame,loadstate,xe,KeyInsrtChap,KeyNextChap,KeyPrevChap
 EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
 EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
 EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame,dsp_run_wrap
-EXTSYM catchup,lastCycle,spc_scantime,spc_time
+EXTSYM KeyRewind,statesaver,UpdateDPage,clocktable
+EXTSYM catchup
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger
@@ -318,7 +317,6 @@ reexecuteb2:
     mov edi,[tableadc+ebx*4]
     or byte[curexecstate],2
 
-;   mov ebp,[spcPCRam]
 
     mov byte[NoSoundReinit],0
     mov byte[csounddisable],0
@@ -332,7 +330,6 @@ reexecuteb2:
 
     ; de-init variables (copy to variables)
 
-;   mov [spcPCRam],ebp
     mov [Curtableaddr],edi
     mov [xp],dl
     mov [curcyc],dh
@@ -1459,9 +1456,6 @@ NEWSYM cpuover
     pushad
     call dsp_run_wrap
     popad
-;    mov dword[lastCycle],0
-;    mov dword[spcCycle],32
-
     mov dh,80
 %ifdef __MSDOS__
     cmp byte[smallscreenon],1
@@ -2077,9 +2071,6 @@ NEWSYM execsingle
 .nowai
     jmp dword near [edi+ebx*4]
 .overy
-;    mov dword[lastCycle],0
-;    mov dword[spcCycle],0
-
     mov dh,80
     mov word[curypos],0
     xor byte[ppustatus],80h
