@@ -373,7 +373,7 @@ ${CHIP_D}/st11proc${OE}: ${CHIP_D}/st11proc.asm macros.mac
 
 ${CPU_D}/dma${OE}: ${CPU_D}/dma.asm macros.mac
 ${CPU_D}/dsp${OE}: ${CPU_D}/dsp.c ${CPU_D}/dsp.h
-${CPU_D}/execute${OE}: ${CPU_D}/execute.asm macros.mac ${CPU_D}/spccycle.inc
+${CPU_D}/execute${OE}: ${CPU_D}/execute.asm macros.mac
 ${CPU_D}/executec${OE}: ${CPU_D}/executec.c gblvars.h
 ${CPU_D}/irq${OE}: ${CPU_D}/irq.asm macros.mac
 ${CPU_D}/memory${OE}: ${CPU_D}/memory.asm macros.mac
