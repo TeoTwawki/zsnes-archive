@@ -379,8 +379,6 @@ ${CPU_D}/irq${OE}: ${CPU_D}/irq.asm macros.mac
 ${CPU_D}/memory${OE}: ${CPU_D}/memory.asm macros.mac
 ${CPU_D}/memtable${OE}: ${CPU_D}/memtable.c gblvars.h ${CPU_D}/memtable.h
 ${CPU_D}/dspwrap${OE}: ${CPU_D}/dspwrap.c asm_call.h ${CPU_D}/dsp.h ${CPU_D}/dspwrap.h
-${CPU_D}/spc700${OE}: ${CPU_D}/spc700.asm macros.mac ${CPU_D}/regsw.mac \
-	${CPU_D}/spcaddr.inc ${CPU_D}/spccycle.inc ${CPU_D}/spcdef.inc
 ${CPU_D}/stable${OE}: ${CPU_D}/stable.asm macros.mac ${CPU_D}/s65816d.inc \
 	${CPU_D}/saddress.inc ${CPU_D}/saddrni.inc ${CPU_D}/se65816.inc
 ${CPU_D}/table${OE}: ${CPU_D}/table.asm macros.mac ${CPU_D}/65816d.inc \
