@@ -28,12 +28,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "dsp.h"
 #include "../asm_call.h"
 
+//#include "../zspc-0.9.0/zspc.h"
 //C++ style code in C
 #define true 1
 #define false 0
 
 void InitSPC()
 {
+/*
   void InitSPCRegs();
   extern unsigned char SPCRAM[0x10000];
   extern bool romispal;
@@ -42,26 +44,27 @@ void InitSPC()
   dsp_init(SPCRAM);
   dsp_reset();
   InitDSPControl(romispal);
+*/
 }
 
 int DSP_reg, DSP_val;
 
 void dsp_read_wrap()
 {
-  DSP_val = dsp_read(DSP_reg);
+  //DSP_val = dsp_read(DSP_reg);
 }
 
 void dsp_write_wrap()
 {
-  dsp_write(DSP_reg, DSP_val);
+  //dsp_write(DSP_reg, DSP_val);
 }
 
 #ifdef __LIBAO__
 void SoundWrite_ao();
 #endif
 void write_audio(short *sample_buffer, size_t sample_count);
-extern unsigned char cycpbl;
-extern unsigned int spcCycle;
+//extern unsigned char cycpbl;
+//extern unsigned int spcCycle;
 
 short dsp_samples_buffer[1280*5]; //Buffer 5 frames for even PAL
 const size_t dsp_buffer_size = sizeof(dsp_samples_buffer)/sizeof(short);
@@ -95,7 +98,7 @@ void InitDSPControl(unsigned char is_pal)
   sample_control.balance = sample_control.hi;
   memset(dsp_samples_buffer, 0, sizeof(dsp_samples_buffer));
   mid_samples = next_samples = dsp_sample_count = lastCycle = cycles_remaining = 0;
-  lastCycle = spcCycle = 32;
+  //lastCycle = spcCycle = 32;
 }
 
 void dsp_samples_push(short *buffer, size_t amount)
@@ -135,6 +138,7 @@ size_t dsp_samples_pull(short *buffer, size_t amount)
 
 void dsp_run_wrap()
 {
+/*
   short buffer[1280*2]; //Big enough for two PAL frames
 
   int i = cycles_remaining+spcCycle-lastCycle, samples = i >> 5;
@@ -149,4 +153,5 @@ void dsp_run_wrap()
     dsp_samples_push(buffer, samples*2);
   }
   lastCycle = spcCycle;
+*/
 }

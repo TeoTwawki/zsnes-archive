@@ -48,11 +48,11 @@ void dsp_run( long pair_count, dsp_sample_t* out );
 
 //// private
 
-extern uint8_t m_dsp_regs [dsp_register_count];
+//extern uint8_t m_dsp_regs [dsp_register_count];
 INLINE int dsp_read( int addr )
 {
 	assert( (unsigned) addr < dsp_register_count );
-	return m_dsp_regs [addr];
+	//return m_dsp_regs [addr];
 }
 
 #endif

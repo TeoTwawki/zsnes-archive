@@ -35,7 +35,7 @@ EXTSYM Get_Key,INTEnab,JoyCRead,NMIEnab,NumCheats,CurrentExecSA1,ReadInputDevice
 EXTSYM StartDrawNewGfx,VIRQLoc,cachevideo,cfield,cheatdata,curblank,curnmi
 EXTSYM curypos,cycpl,doirqnext,drawline,exechdma,hdmadelay,intrset,newengen
 EXTSYM oamaddr,oamaddrs,resolutn,showvideo,starthdma,switchtonmi,switchtovirq
-EXTSYM totlines,updatetimer,SA1Swap,SA1DoIRQ,JoyAOrig,JoyANow,JoyBOrig,JoyBNow
+EXTSYM totlines,SA1Swap,SA1DoIRQ,JoyAOrig,JoyANow,JoyBOrig,JoyBNow
 EXTSYM JoyCOrig,JoyCNow,JoyDOrig,JoyDNow,JoyEOrig,JoyENow,SA1Message
 EXTSYM MultiTapStat,SA1Control,SA1Enable,SA1IRQEnable,SPC700read
 EXTSYM SPC700write,SA1IRQExec,ForceNewGfxOff,LethEnData
@@ -1016,10 +1016,10 @@ NEWSYM cpuover
     jae near .overy
     cmp byte[spcon],0
     je .nosound
-    call updatetimer
-    pushad
-    call catchup
-    popad
+    ;call updatetimer
+    ;pushad
+    ;call catchup
+    ;popad
 .nosound
     mov ax,[resolutn]
     inc ax
@@ -1449,13 +1449,13 @@ NEWSYM cpuover
     inc esi
     jmp execloop.startagain
 .overy
-    add dword[spc_scantime], 33
-    push dword[spc_scantime]
-    pop dword[spc_time]
-    call catchup
-    pushad
-    call dsp_run_wrap
-    popad
+;    add dword[spc_scantime], 33
+;    push dword[spc_scantime]
+;    pop dword[spc_time]
+;    call catchup
+;    pushad
+;    call dsp_run_wrap
+;    popad
     mov dh,80
 %ifdef __MSDOS__
     cmp byte[smallscreenon],1
@@ -1890,7 +1890,7 @@ NEWSYM execsingle
     test byte[curexecstate],2
     jz .nosoundb
 
-    catchupspc
+;    catchupspc
 
 .skipallspc
 .nosoundb
@@ -1942,7 +1942,7 @@ NEWSYM execsingle
 
     cmp byte[spcon],0
     je .nosound
-    call updatetimer
+    ;call updatetimer
 ;    call catchup
 ;    pushad
 ;    call dsp_run_wrap

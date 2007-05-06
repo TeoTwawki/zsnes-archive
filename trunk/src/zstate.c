@@ -79,7 +79,7 @@ static void copy_snes_data(uint8_t **buffer, void (*copy_func)(uint8_t **, void 
   copy_func(buffer, &intrset, 1);
   copy_func(buffer, &cycpl, 1);
   copy_func(buffer, &cycphb, 1);
-  copy_func(buffer, &spcon, 1);
+  //copy_func(buffer, &spcon, 1);
   copy_func(buffer, &stackand, 2);
   copy_func(buffer, &stackor, 2);
   copy_func(buffer, &xat, 2);
@@ -97,16 +97,16 @@ static void copy_snes_data(uint8_t **buffer, void (*copy_func)(uint8_t **, void 
   copy_func(buffer, &Curtableaddr, 4);
   copy_func(buffer, &curnmi, 1);
   //SPC Timers
-  copy_func(buffer, &cycpbl, 4);
-  copy_func(buffer, &cycpblt, 4);
+  //copy_func(buffer, &cycpbl, 4);
+  //copy_func(buffer, &cycpblt, 4);
   //SNES PPU Register status
-  copy_func(buffer, &sndrot, 3019);
+  //copy_func(buffer, &sndrot, 3019);
 }
 
 static void copy_spc_data(uint8_t **buffer, void (*copy_func)(uint8_t **, void *, size_t))
 {
   //SPC stuff, DSP stuff
-  copy_func(buffer, SPCRAM, PHspcsave);
+  //copy_func(buffer, SPCRAM, PHspcsave);
 //  copy_func(buffer, &BRRBuffer, PHdspsave);
 //  copy_func(buffer, &DSPMem, sizeof(DSPMem));
 }
@@ -122,10 +122,10 @@ static void copy_extra_data(uint8_t **buffer, void (*copy_func)(uint8_t **, void
   copy_func(buffer, &nmistatus, 4);
   copy_func(buffer, &joycontren, 4);
   copy_func(buffer, &NextLineCache, 1);
-  copy_func(buffer, &spc700read, 10*4);
-  copy_func(buffer, &timer2upd, 4);
+  //copy_func(buffer, &spc700read, 10*4);
+  //copy_func(buffer, &timer2upd, 4);
   copy_func(buffer, &xa, 14*4);
-  copy_func(buffer, &spcnumread, 1);
+  //copy_func(buffer, &spcnumread, 1);
   copy_func(buffer, &opcd, 6*4);
   copy_func(buffer, &HIRQCycNext, 4);
   copy_func(buffer, &HIRQNextExe, 1);
@@ -153,7 +153,7 @@ static void copy_state_data(uint8_t *buffer, void (*copy_func)(uint8_t **, void 
 
   if (spcon)
   {
-    copy_spc_data(&buffer, copy_func);
+    //copy_spc_data(&buffer, copy_func);
     /*
     if (buffer) //Rewind stuff
     {
@@ -545,12 +545,12 @@ extern uintptr_t spcBuffera;
 extern uintptr_t Voice0BufPtr, Voice1BufPtr, Voice2BufPtr, Voice3BufPtr;
 extern uintptr_t Voice4BufPtr, Voice5BufPtr, Voice6BufPtr, Voice7BufPtr;
 */
-extern uintptr_t spcPCRam, spcRamDP;
+//extern uintptr_t spcPCRam, spcRamDP;
 
 void PrepareSaveState()
 {
-  spcPCRam -= (uintptr_t)SPCRAM;
-  spcRamDP -= (uintptr_t)SPCRAM;
+  //spcPCRam -= (uintptr_t)SPCRAM;
+  //spcRamDP -= (uintptr_t)SPCRAM;
 
 /*  Voice0BufPtr -= spcBuffera;
   Voice1BufPtr -= spcBuffera;
@@ -616,8 +616,8 @@ void RestoreSA1()
 
 void ResetState()
 {
-  spcPCRam += (uintptr_t)SPCRAM;
-  spcRamDP += (uintptr_t)SPCRAM;
+  //spcPCRam += (uintptr_t)SPCRAM;
+  //spcRamDP += (uintptr_t)SPCRAM;
 
 /*  ResState(Voice0BufPtr);
   ResState(Voice1BufPtr);
@@ -1037,7 +1037,7 @@ bool zst_load(FILE *fp, size_t Compressed)
   {
     prevoamptr = 0xFF;
     ioportval = 0xFF;
-    spcnumread = 0;
+    //spcnumread = 0;
   }
 
   if (MovieProcessing != MOVIE_RECORD)
@@ -1065,7 +1065,7 @@ bool zst_compressed_loader(FILE *fp)
 void zst_sram_load(FILE *fp)
 {
   fseek(fp, sizeof(zst_header_cur)-1 + PH65816regsize + 199635, SEEK_CUR);
-  if (spcon) { fseek(fp, PHspcsave /*+ PHdspsave + sizeof(DSPMem)*/, SEEK_CUR); }
+  //if (spcon) { fseek(fp, PHspcsave /*+ PHdspsave + sizeof(DSPMem)*/, SEEK_CUR); }
   if (C4Enable) { fseek(fp, 8192, SEEK_CUR); }
   if (SFXEnable) { fseek(fp, PHnum2writesfxreg + 131072, SEEK_CUR); }
   if (SA1Enable)
@@ -1104,7 +1104,7 @@ void zst_sram_load_compressed(FILE *fp)
         if (uncompress(buffer, &data_size, compressed_buffer, compressed_size) == Z_OK)
         {
           uint8_t *data = buffer + PH65816regsize + 199635;
-          if (spcon)  { data += PHspcsave /*+ PHdspsave + sizeof(DSPMem)*/; }
+          //if (spcon)  { data += PHspcsave /*+ PHdspsave + sizeof(DSPMem)*/; }
           if (C4Enable) { data += 8192; }
           if (SFXEnable)  { data += PHnum2writesfxreg + 131072; }
           if (SA1Enable)
@@ -1373,8 +1373,8 @@ Cleaned up by Nach
 10100h-101FFh - DSPRam (256 bytes)
 */
 
-extern uint8_t spcextraram[64];
-extern uint8_t spcP, spcA, spcX, spcY, spcS, spcNZ;
+//extern uint8_t spcextraram[64];
+//extern uint8_t spcP, spcA, spcX, spcY, spcS, spcNZ;
 extern uint32_t infoloc;
 
 char spcsaved[16];
@@ -1408,6 +1408,7 @@ void savespcdata()
       struct tm *lt = localtime(&t);
 
       //Assemble N/Z flags into P
+/*
       spcP &= 0xFD;
       if (!spcNZ)
       {
@@ -1418,16 +1419,17 @@ void savespcdata()
       {
         spcP |= 0x80;
       }
+*/
 
       strcpy((char *)ssdatst, "SNES-SPC700 Sound File Data v0.30"); //00000h - File Header : SNES-SPC700 Sound File Data v0.00
       ssdatst[0x21] = ssdatst[0x22] = ssdatst[0x23] = 0x1a; //00021h - 0x1a,0x1a,0x1a
       ssdatst[0x24] = 10;   //00024h - 10
-      *((uint16_t *)(ssdatst+0x25)) = spcPCRam-(uint32_t)SPCRAM; //00025h - PC Register value (1 Word)
-      ssdatst[0x27] = spcA; //00027h - A Register Value (1 byte)
-      ssdatst[0x28] = spcX; //00028h - X Register Value (1 byte)
-      ssdatst[0x29] = spcY; //00029h - Y Register Value (1 byte)
-      ssdatst[0x2A] = spcP; //0002Ah - Status Flags Value (1 byte)
-      ssdatst[0x2B] = spcS; //0002Bh - Stack Register Value (1 byte)
+      //*((uint16_t *)(ssdatst+0x25)) = spcPCRam-(uint32_t)SPCRAM; //00025h - PC Register value (1 Word)
+      //ssdatst[0x27] = spcA; //00027h - A Register Value (1 byte)
+      //ssdatst[0x28] = spcX; //00028h - X Register Value (1 byte)
+      //ssdatst[0x29] = spcY; //00029h - Y Register Value (1 byte)
+      //ssdatst[0x2A] = spcP; //0002Ah - Status Flags Value (1 byte)
+      //ssdatst[0x2B] = spcS; //0002Bh - Stack Register Value (1 byte)
 
       ssdatst[0x2C] = 0; //0002Ch - Reserved
       ssdatst[0x2D] = 0; //0002Dh - Reserved
@@ -1466,7 +1468,7 @@ void savespcdata()
       memset(ssdatst+0xD2, 0, 46); //000D2h-000FFh - Reserved
 
       fwrite(ssdatst, 1, sizeof(ssdatst), fp);
-      fwrite(SPCRAM, 1, 65536, fp); //00100h-100FFh - SPCRam
+      //fwrite(SPCRAM, 1, 65536, fp); //00100h-100FFh - SPCRam
 
       for (i = 0; i < 128; i++) //10100h-1017Fh - DSPRam
       {
@@ -1475,7 +1477,7 @@ void savespcdata()
 
       memset(ssdatst, 0, 64);
       fwrite(ssdatst, 64, 1, fp); //10180h-101BFh - Reserved
-      fwrite(spcextraram, 1, 64, fp); //101C0h-101FFh - IPL ROM image?
+      //fwrite(spcextraram, 1, 64, fp); //101C0h-101FFh - IPL ROM image?
       fclose(fp);
 
       ResetState();

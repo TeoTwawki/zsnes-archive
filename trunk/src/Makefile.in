@@ -28,6 +28,7 @@ PORT_D=linux
 TOOL_D=tools
 VID_D=video
 ZIP_D=zip
+#SPC_D=zspc-0.9.0
 
 PSR=parsegen
 PSR_H=cfg.h md.h input.h
@@ -43,9 +44,9 @@ CHIP_CO=$(CHIP_D)/c4emu.o $(CHIP_D)/dsp1emu.o $(CHIP_D)/dsp3emu.o\
 	$(CHIP_D)/seta10.o $(CHIP_D)/seta11.o
 
 CPU_AO=$(CPU_D)/dma.o $(CPU_D)/execute.o $(CPU_D)/irq.o $(CPU_D)/memory.o\
-	$(CPU_D)/spc700.o $(CPU_D)/stable.o $(CPU_D)/table.o $(CPU_D)/tablec.o
-CPU_CO=$(CPU_D)/dsp.o $(CPU_D)/dspwrap.o $(CPU_D)/executec.o $(CPU_D)/memtable.o\
-	$(CPU_D)/spc.o $(CPU_D)/spc_cpu.o
+	$(CPU_D)/stable.o $(CPU_D)/table.o $(CPU_D)/tablec.o
+CPU_CO=$(CPU_D)/dspwrap.o $(CPU_D)/executec.o $(CPU_D)/memtable.o
+#	$(SPC_D)/SPC_DSP.o $(SPC_D)/zspc.o
 
 DEBUG_AO=@DEBUGGER_A@
 DEBUG_CO=@DEBUGGER_C@
@@ -106,9 +107,6 @@ main: makefile.dep $(Z_OBJS)
 	@ZC@ -o @ZSNESEXE@ $(Z_OBJS) @ZCFLAGS@ @LDFLAGS@
 	rm -f version.o
 
-playspc: playspc.o $(CPU_D)/dsp.o $(CPU_D)/dspwrap.o $(CPU_D)/spc700.o
-	@CC@ -lao -o $@ $^
-
 $(PSR): parsegen.cpp
 	@CXX@ @CXXFLAGS@ -o $@ $< -lz
 
@@ -160,7 +158,7 @@ uninstall:
 	rm -f @bindir@/$(notdir @ZSNESEXE@) @mandir@/man1/zsnes.1
 
 clean:
-	rm -f makefile.dep $(Z_OBJS) $(PSR) $(PSR_H) @ZSNESEXE@ playspc
+	rm -f makefile.dep $(Z_OBJS) $(PSR) $(PSR_H) @ZSNESEXE@
 cclean:
 	rm -f $(Z_COBJS) $(PSR) $(PSR_H) @ZSNESEXE@
 tclean:

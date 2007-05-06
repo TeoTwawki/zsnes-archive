@@ -480,21 +480,21 @@ NEWSYM GUIDoReset
     call init65816
     pushad
     call procexecloop
-    call dsp_reset
+    ;call dsp_reset
     popad
 
-    xor eax,eax
-    mov edx,SPCRAM
-    mov ax,0FFC0h
-    add edx,eax
-    mov [spcPCRam],edx
-    mov dword[spcS],1EFh
-    mov dword[spcRamDP],SPCRAM
-    mov byte[spcA],0
-    mov byte[spcX],0
-    mov byte[spcY],0
-    mov byte[spcP],0
-    mov byte[spcNZ],0
+    ;xor eax,eax
+    ;mov edx,SPCRAM
+    ;mov ax,0FFC0h
+    ;add edx,eax
+    ;mov [spcPCRam],edx
+    ;mov dword[spcS],1EFh
+    ;mov dword[spcRamDP],SPCRAM
+    ;mov byte[spcA],0
+    ;mov byte[spcX],0
+    ;mov byte[spcY],0
+    ;mov byte[spcP],0
+    ;mov byte[spcNZ],0
 ;    mov byte[Voice0Status],0
 ;    mov byte[Voice1Status],0
 ;    mov byte[Voice2Status],0
