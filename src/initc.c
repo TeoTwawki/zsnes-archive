@@ -1410,7 +1410,7 @@ extern uint8_t pal16b[1024];
 extern uint8_t pal16bcl[1024];
 extern uint8_t pal16bclha[1024];
 extern uint8_t pal16bxcl[256];
-extern uint8_t SPCRAM[65472];
+//extern uint8_t SPCRAM[65472];
 
 extern uint8_t *vidbuffer;
 extern uint8_t *vram;
@@ -1418,6 +1418,7 @@ extern uint8_t *vcache2b;
 extern uint8_t *vcache4b;
 extern uint8_t *vcache8b;
 
+#if 0
 void clearSPCRAM()
 {
   /*
@@ -1440,11 +1441,12 @@ void clearSPCRAM()
     memset(SPCRAM+i+0x20, 0xFF, 0x20);
   }
 }
+#endif
 
 void clearmem2()
 {
   memset(sram, 0xFF, 65536);
-  clearSPCRAM();
+  //clearSPCRAM();
 }
 
 void clearmem()
@@ -1823,7 +1825,7 @@ uint32_t showinfogui()
 }
 
 extern uint32_t nmiprevaddrl, nmiprevaddrh, nmirept, nmiprevline, nmistatus;
-extern uint8_t spcnumread, yesoutofmemory;
+extern uint8_t yesoutofmemory;
 extern uint8_t NextLineCache, sramsavedis, sndrot, regsbackup[3019];
 /*
 extern uint32_t Voice0Freq, Voice1Freq, Voice2Freq, Voice3Freq;
@@ -2588,7 +2590,7 @@ void powercycle(bool sramload, bool romload)
   nmirept = 0;
   nmiprevline = 224;
   nmistatus = 0;
-  spcnumread = 0;
+  //spcnumread = 0;
   NextLineCache = 0;
   curexecstate = 1;
 
@@ -2626,7 +2628,7 @@ void powercycle(bool sramload, bool romload)
 }
 
 extern uint8_t osm2dis, ReturnFromSPCStall, SPCStallSetting, prevoamptr;
-extern uint8_t reg1read, reg2read, reg3read, reg4read, NMIEnab, INTEnab;
+extern uint8_t NMIEnab, INTEnab;
 extern uint8_t doirqnext, vidbright, forceblnk, timeron, spcP, JoyAPos, JoyBPos;
 extern uint8_t coladdr, coladdg, coladdb;
 extern uint8_t SDD1BankA,SDD1BankB, SDD1BankC, SDD1BankD;
@@ -2634,7 +2636,7 @@ extern uint8_t intrset, curcyc, cycpl, GUIReset;
 extern uint32_t numspcvblleft, SPC700read, SPC700write, spc700idle;
 extern uint32_t xa, xdb, xpb, xs, xd, xx, xy, scrndis;
 extern uint16_t VIRQLoc, resolutn, xpc;
-extern uint8_t spcextraram[64], SPCROM[64];
+//extern uint8_t spcextraram[64], SPCROM[64];
 extern uint32_t tableD[256];
 uint8_t SPCSkipXtraROM, bgfixer2 = 0, disableeffects = 0;
 //This is saved in states
@@ -2748,12 +2750,12 @@ void init65816()
 
     for(i = 0;i<0x40;i++)
     {
-      spcextraram[i] = 0xFF;
-      SPCRAM[0xFFC0+i] = SPCROM[i];
+      //spcextraram[i] = 0xFF;
+      //SPCRAM[0xFFC0+i] = SPCROM[i];
     }
 
     // Clear SPC Memory
-    clearSPCRAM();
+    //clearSPCRAM();
     clearvidsound();
 
     prevoamptr = 0xFF;
@@ -2775,25 +2777,25 @@ void init65816()
 
 
     // What the hell is this?
-    SPCRAM[0xF4] = 0;
-    SPCRAM[0xF5] = 0;
-    SPCRAM[0xF6] = 0;
-    SPCRAM[0xF7] = 0;
+    //SPCRAM[0xF4] = 0;
+    //SPCRAM[0xF5] = 0;
+    //SPCRAM[0xF6] = 0;
+    //SPCRAM[0xF7] = 0;
 
-    reg1read = 0;
-    reg2read = 0;
-    reg3read = 0;
-    reg4read = 0;
+    //reg1read = 0;
+    //reg2read = 0;
+    //reg3read = 0;
+    //reg4read = 0;
     cycpbl = 0;
-    spcnumread = 0;
+    //spcnumread = 0;
     NMIEnab = 1;
     VIRQLoc = 0;
     doirqnext = 0;
     resolutn = 224;
     vidbright = 0;
     forceblnk = 0;
-    spcP = 0;
-    timeron = 0;
+    //spcP = 0;
+    //timeron = 0;
     JoyAPos = 0;
     JoyBPos = 0;
     coladdr = 0;

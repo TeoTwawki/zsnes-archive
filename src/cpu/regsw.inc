@@ -21,7 +21,7 @@
 
 EXTSYM initsfxregsw,reg420Bw,reg420Cw,regptw,initSA1regsw,SDD1Reset
 EXTSYM SPC7110Reset,RTCReset2,NextLineCache,vidmemch2,vidmemch4
-EXTSYM vidmemch8,vrama,nmirept,SPCRAM,HIRQCycNext,HIRQNextExe,tableadc
+EXTSYM vidmemch8,vrama,nmirept,HIRQCycNext,HIRQNextExe,tableadc
 EXTSYM cycpb268,cycpb358,cycpbl,cycpblt,opexec268,opexec268cph,opexec358
 EXTSYM opexec358cph
 
@@ -1224,9 +1224,9 @@ reg2140w:
     jne .n
     mov byte[nmirept],0
 .n
-    mov [SPCRAM+0F4h],al
-    inc dword[SPC700write]
-    reenablespc
+    ;mov [SPCRAM+0F4h],al
+    ;inc dword[SPC700write]
+    ;reenablespc
     ret
 ;    cmp dword[cycpbl],0FFFFh
 ;    ja .spcreset
@@ -1241,9 +1241,9 @@ reg2141w:
 %ifndef NO_DEBUGGER
     mov byte[sndwrit],1
 %endif
-    mov [SPCRAM+0F5h],al
-    inc dword[SPC700write]
-    reenablespc
+    ;mov [SPCRAM+0F5h],al
+    ;inc dword[SPC700write]
+    ;reenablespc
     ret
 ;    cmp dword[cycpbl],0FFFFh
 ;    ja .spcreset
@@ -1258,9 +1258,9 @@ reg2142w:
 %ifndef NO_DEBUGGER
     mov byte[sndwrit],1
 %endif
-    mov [SPCRAM+0F6h],al
-    inc dword[SPC700write]
-    reenablespc
+    ;mov [SPCRAM+0F6h],al
+    ;inc dword[SPC700write]
+    ;reenablespc
     ret
 ;    cmp dword[cycpbl],0FFFFh
 ;    ja .spcreset
@@ -1275,9 +1275,9 @@ reg2143w:
 %ifndef NO_DEBUGGER
     mov byte[sndwrit],1
 %endif
-    mov [SPCRAM+0F7h],al
-    inc dword[SPC700write]
-    reenablespc
+    ;mov [SPCRAM+0F7h],al
+    ;inc dword[SPC700write]
+    ;reenablespc
     ret
 ;    cmp dword[cycpbl],0FFFFh
 ;    ja .spcreset

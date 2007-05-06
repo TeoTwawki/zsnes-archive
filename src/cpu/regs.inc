@@ -21,9 +21,7 @@
 
 EXTSYM SFXEnable,regptr,initsfxregsr,initSA1regs,SA1Enable,initSDD1regs
 EXTSYM SPC7110Enable,initSPC7110regs,RTCEnable,RTCReset,curypos,cycpl
-EXTSYM pdh,vram,romispal,reg1read,spcnumread,spcon,reg2read,reg3read
-EXTSYM reg4read,JoyEOrig,JoyENow,device2,cycphb,joycontren,totlines
-EXTSYM spc_scantime,spc_time
+EXTSYM pdh,vram,romispal,JoyEOrig,JoyENow,device2,cycphb,joycontren,totlines
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron
@@ -787,144 +785,21 @@ reg213Fr:
 ; Sound Reg #1
 reg2140r:
 %ifdef __BLARGG_SPC__
-%else
-    cmp byte[spcon],0
-    je .nosound
-    inc dword[SPC700read]
-    catchupspc
-    mov al,[reg1read]
-    mov byte[spcnumread],0
-
-    ret
-.nosound
-    ; Find for D0
-    mov ebx,esi
-    cmp word[ebx],0FB10h
-    jne .noret
-    mov word[ebx],0EAEAh
-.noret
-    mov al,5
-.tryagain
-    cmp byte[ebx],0D0h
-    je .foundit
-    inc ebx
-    dec al
-    jnz .tryagain
-    jmp .notfound
-.foundit
-    mov byte[ebx],0EAh
-    mov byte[ebx+1],0EAh
-.notfound
-    inc byte[sndrot2]
-    cmp byte[sndrot2],3
-    jne .a
-    mov byte[sndrot2],0
-.a
-    xor al,al
-    test byte[sndrot2],01h
-    jz .n
-    mov al,[xa]
-.n
-    ret
 %endif
 
 ; Sound Reg #2
 reg2141r:
 %ifdef __BLARGG_SPC__
-%else
-    cmp byte[spcon],0
-    je .nosound
-    inc dword[SPC700read]
-    catchupspc
-    mov al,[reg2read]
-    mov byte[spcnumread],0
-    ret
-.nosound
-    ; Find for D0
-    mov ebx,esi
-    mov al,3
-.tryagain
-    cmp byte[ebx],0D0h
-    je .foundit
-    inc ebx
-    dec al
-    jnz .tryagain
-    jmp .notfound
-.foundit
-    mov byte[ebx],0EAh
-    mov byte[ebx+1],0EAh
-.notfound
-    xor byte[sndrot],01h
-    mov al,[xa+1]
-    test byte[sndrot],01h
-    jz .n
-    mov al,[xa]
-.n
-    ret
 %endif
 
 ; Sound Reg #3
 reg2142r:
 %ifdef __BLARGG_SPC__
-%else
-    cmp byte[spcon],0
-    je .nosound
-    inc dword[SPC700read]
-    catchupspc
-    mov al,[reg3read]
-    mov byte[spcnumread],0
-    ret
-.nosound
-    ; Find for D0
-    mov ebx,esi
-    mov al,3
-.tryagain
-    cmp byte[ebx],0D0h
-    je .foundit
-    inc ebx
-    dec al
-    jnz .tryagain
-    jmp .notfound
-.foundit
-    mov byte[ebx],0EAh
-    mov byte[ebx+1],0EAh
-.notfound
-    mov al,[xa]
-    test byte[sndrot],01h
-    jz .n
-    mov al,[xa+1]
-.n
-    ret
 %endif
 
 ; Sound Reg #4
 reg2143r:
 %ifdef __BLARGG_SPC__
-%else
-    cmp byte[spcon],0
-    je .nosound
-    inc dword[SPC700read]
-    catchupspc
-    mov al,[reg4read]
-    mov byte[spcnumread],0
-    ret
-.nosound
-    ; Find for D0
-    mov ebx,esi
-    mov al,3
-.tryagain
-    cmp byte[ebx],0D0h
-    je .foundit
-    inc ebx
-    dec al
-    jnz .tryagain
-    jmp .notfound
-.foundit
-    mov byte[ebx],0EAh
-    mov byte[ebx+1],0EAh
-.notfound
-    mov al,[xa+1]
-    ret
 %endif
 
 reg2144r:

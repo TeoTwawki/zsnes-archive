@@ -329,6 +329,7 @@ else
   JMA_FILES=""
   ZC="$CC"
   ZCFLAGS="$CFLAGS"
+  CXXFLAGS+=" -fno-exceptions"
 fi
 
 dnl - Check for header files

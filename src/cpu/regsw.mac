@@ -38,11 +38,11 @@
     div bl
     xor ah,ah
 
-    add eax, [spc_scantime]
-    cmp eax, [spc_time]
+    ;add eax, [spc_scantime]
+    ;cmp eax, [spc_time]
     js %%backwards
-    mov [spc_time], eax
-    call catchup
+    ;mov [spc_time], eax
+    ;call catchup
 %%backwards
     popad
 %endmacro

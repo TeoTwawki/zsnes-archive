@@ -47,6 +47,7 @@ VID_D=video
 NTSC_D=video/snes_ntsc
 WIN_D=win
 ZIP_D=zip
+#SPC_D=zspc-0.9.0
 
 DELETECOMMAND=rm -f
 DELPRE=rm -f
@@ -177,6 +178,7 @@ LINK=${CPPC}
 ifeq (${JMA},no)
   CFLAGSORIG+= -DNO_JMA
   ASMFLAGSORIG+= -DNO_JMA
+  CXXFLAGSORIG+= -fno-exceptions
   ifeq (${OS},__MSDOS__)
     LINK=${CC}
   endif
@@ -203,7 +205,8 @@ CHIPSOBJ=${CHIP_D}/dsp1emu${OE} ${CHIP_D}/fxemu2${OE} ${CHIP_D}/sfxproc${OE}\
 CPUOBJ=${CPU_D}/dma${OE} ${CPU_D}/execute${OE} ${CPU_D}/executec${OE}\
 	${CPU_D}/irq${OE} ${CPU_D}/memory${OE} ${CPU_D}/memtable${OE}\
 	${CPU_D}/stable${OE} ${CPU_D}/table${OE}\
-	${CPU_D}/tablec${OE} ${CPU_D}/dsp${OE} ${CPU_D}/dspwrap${OE}
+	${CPU_D}/tablec${OE} ${CPU_D}/dspwrap${OE}
+	#$(SPC_D)/SPC_DSP${OE} $(SPC_D)/zspc${OE}
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
 
@@ -372,7 +375,6 @@ ${CHIP_D}/st10proc${OE}: ${CHIP_D}/st10proc.asm macros.mac
 ${CHIP_D}/st11proc${OE}: ${CHIP_D}/st11proc.asm macros.mac
 
 ${CPU_D}/dma${OE}: ${CPU_D}/dma.asm macros.mac
-${CPU_D}/dsp${OE}: ${CPU_D}/dsp.c ${CPU_D}/dsp.h
 ${CPU_D}/execute${OE}: ${CPU_D}/execute.asm macros.mac
 ${CPU_D}/executec${OE}: ${CPU_D}/executec.c gblvars.h
 ${CPU_D}/irq${OE}: ${CPU_D}/irq.asm macros.mac
@@ -386,8 +388,7 @@ ${CPU_D}/table${OE}: ${CPU_D}/table.asm macros.mac ${CPU_D}/65816d.inc \
 	${CPU_D}/regs.inc ${CPU_D}/regs.mac ${CPU_D}/regsw.inc \
 	${CPU_D}/regsw.mac
 ${CPU_D}/tablec${OE}: ${CPU_D}/tablec.asm macros.mac ${CPU_D}/65816dc.inc \
-	${CPU_D}/address.inc ${CPU_D}/addrni.inc ${CPU_D}/e65816c.inc \
-	${CPU_D}/spccycle.inc
+	${CPU_D}/address.inc ${CPU_D}/addrni.inc ${CPU_D}/e65816c.inc
 
 ${DOS_D}/dosintrf${OE}: ${DOS_D}/dosintrf.asm macros.mac
 ${DOS_D}/gppro${OE}: ${DOS_D}/gppro.asm macros.mac

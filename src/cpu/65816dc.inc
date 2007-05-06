@@ -26,8 +26,6 @@ EXTSYM flagnz,flago,flagc,cpucycle,cycpbl,cycpblt,opcjmptab,doirqnext,dmadata
 ;*******************************************************
 EXTSYM clocktable,spcCycle
 
-%include "cpu/spccycle.inc"
-
 %macro endloop 0
     xor ebx,ebx
     mov bl,[esi]

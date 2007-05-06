@@ -2663,14 +2663,14 @@ static void OldMoviePlay(FILE *fp)
 
   if (RecData[2] == 1)
   {
-    timer2upd = bytes_to_uint32(RecData+3);
+    //timer2upd = bytes_to_uint32(RecData+3);
     curexecstate = bytes_to_uint32(RecData+7);
     nmiprevaddrl = 0;
     nmiprevaddrh = 0;
     nmirept = 0;
     nmiprevline = 224;
     nmistatus = 0;
-    spcnumread = 0;
+    //spcnumread = 0;
     NextLineCache = 0;
   }
 
