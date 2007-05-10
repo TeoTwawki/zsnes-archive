@@ -52,7 +52,7 @@ VID_D=video
 NTSC_D=video/snes_ntsc
 WIN_D=win
 ZIP_D=zip
-#SPC_D=zspc-0.9.0
+SPC_D=cpu/zspc
 
 DELETECOMMAND=rm -f
 DELPRE=rm -f
@@ -209,8 +209,8 @@ CHIPSOBJ=${CHIP_D}/dsp1emu${OE} ${CHIP_D}/fxemu2${OE} ${CHIP_D}/sfxproc${OE}\
 CPUOBJ=${CPU_D}/dma${OE} ${CPU_D}/execute${OE} ${CPU_D}/executec${OE}\
 	${CPU_D}/irq${OE} ${CPU_D}/memory${OE} ${CPU_D}/memtable${OE}\
 	${CPU_D}/stable${OE} ${CPU_D}/table${OE}\
-	${CPU_D}/tablec${OE} ${CPU_D}/dspwrap${OE}
-	#$(SPC_D)/SPC_DSP${OE} $(SPC_D)/zspc${OE}
+	${CPU_D}/tablec${OE} ${CPU_D}/dspwrap${OE}\
+	$(SPC_D)/zdsp${OE} $(SPC_D)/zspc${OE}
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
 
