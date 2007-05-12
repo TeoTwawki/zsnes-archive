@@ -149,6 +149,9 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 datarootdir=@datarootdir@
 
+playspc: playspc.c $(SPC_D)/zdsp.o $(SPC_D)/zspc.o
+	@CC@ @CFLAGS@ -o $@ playspc.c $(SPC_D)/zdsp.o $(SPC_D)/zspc.o -lao
+
 install:
 	@INSTALL@ -d -m 0755 $(DESTDIR)/@bindir@
 	@INSTALL@ -m 0755 @ZSNESEXE@ $(DESTDIR)/@bindir@
