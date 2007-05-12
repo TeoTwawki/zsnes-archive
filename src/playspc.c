@@ -42,6 +42,7 @@ static void read_spcfile(const char *fname, struct header_t *header)
     size_t size = fread(spcdata, 1, sizeof(spcdata), fp);
     memcpy(header, spcdata, sizeof(struct header_t));
     zspc_load_spc(spcdata, size);
+    zspc_clear_echo();
     fclose(fp);
   }
 }
