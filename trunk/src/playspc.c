@@ -113,7 +113,7 @@ void run_spc(ao_device *dev, struct header_t *header)
       if (all_silence(samples_buffer, samples_count))
       {
         silence_count++;
-        if (silence_count == 2048) //~2 seconds of silence
+        if (silence_count == 20) //~2 seconds of silence
         {
           play_secs = 0;
         }
