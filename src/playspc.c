@@ -48,7 +48,7 @@ static void ds_initialize()
   DSBUFFERDESC dsbdesc;
 
   ds_error(DirectSoundCreate8(0, &lpds, 0));
-  ds_error(lpds->SetCooperativeLevel(GetDesktopWindow(), DSSCL_NORMAL));
+  ds_error(lpds->SetCooperativeLevel(GetDesktopWindow(), DSSCL_EXCLUSIVE));
 
   memset(&wfx, 0, sizeof(wfx));
   wfx.wFormatTag = WAVE_FORMAT_PCM;
@@ -157,7 +157,8 @@ static bool ds_play(adev_t, char *samples_buffer, size_t samples_count)
 
     data += samples_outputted;
     samples_remaining -= samples_outputted;
-	break;
+    if (samples_outputted < samples_remaining) { Sleep(500); }
+    else { break; }
   }
   return(true);
 }
@@ -227,8 +228,9 @@ struct header_t
   uint8_t reserved3[46];
 };
 
-static void read_spcfile(const char *fname, struct header_t *header)
+static bool read_spcfile(const char *fname, struct header_t *header)
 {
+  bool success = false;
   FILE *fp = fopen(fname, "rb");
   if (fp)
   {
@@ -238,7 +240,13 @@ static void read_spcfile(const char *fname, struct header_t *header)
     zspc_load_spc(spcdata, size);
     zspc_clear_echo();
     fclose(fp);
+    success = true;
   }
+  else
+  {
+    printf("Failed to open %s.\n", fname);
+  }
+  return(success);
 }
 
 static void print_spcinfo(struct header_t *header)
@@ -290,7 +298,7 @@ void run_spc(adev_t dev, struct header_t *header)
       if (all_silence(samples_buffer, samples_count))
       {
         silence_count++;
-        if (silence_count == 20) //~2 seconds of silence
+        if (silence_count == 40) //~2.5 seconds of silence
         {
           play_secs = 0;
         }
@@ -320,9 +328,11 @@ int main(int argc, char *argv[])
   while (--argc)
   {
     zspc_init();
-    read_spcfile(*(++argv), &header);
-    print_spcinfo(&header);
-    run_spc(ao_init(), &header);
+    if (read_spcfile(*(++argv), &header))
+    {
+      print_spcinfo(&header);
+      run_spc(ao_init(), &header);
+    }
   }
 
   return(0);
