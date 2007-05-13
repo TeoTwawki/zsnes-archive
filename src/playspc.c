@@ -113,13 +113,13 @@ static int ds_write_buffer(unsigned char *data, int len)
   if (SUCCEEDED(res))
   {
     // Write to pointers without reordering.
-    memcpy(lpvPtr1,data,dwBytes1);
-    if (lpvPtr2) { memcpy(lpvPtr2,data+dwBytes1,dwBytes2); }
+    memcpy(lpvPtr1, data, dwBytes1);
+    if (lpvPtr2) { memcpy(lpvPtr2, data+dwBytes1, dwBytes2); }
     ds_write_offset += dwBytes1+dwBytes2;
-    if (ds_write_offset>=ds_buffer_size) { ds_write_offset = dwBytes2; }
+    if (ds_write_offset >= ds_buffer_size) { ds_write_offset = dwBytes2; }
 
    // Release the data back to DirectSound.
-    res = ds_error(hdsbuf->Unlock(lpvPtr1,dwBytes1,lpvPtr2,dwBytes2));
+    res = ds_error(hdsbuf->Unlock(lpvPtr1, dwBytes1, lpvPtr2, dwBytes2));
     if (SUCCEEDED(res))
     {
       // Success.
@@ -148,7 +148,7 @@ static bool ds_play(adev_t, char *samples_buffer, size_t samples_count)
     int space, len = samples_remaining;
 
     // make sure we have enough space to write data
-    ds_error(hdsbuf->GetCurrentPosition(&play_offset,NULL));
+    ds_error(hdsbuf->GetCurrentPosition(&play_offset, 0));
     space = ds_buffer_size-(ds_write_offset-play_offset);
     if (space > ds_buffer_size) { space -= ds_buffer_size; } // ds_write_offset < play_offset
     if (space < len) { len = space; }
