@@ -48,7 +48,7 @@ static void ds_initialize()
   DSBUFFERDESC dsbdesc;
 
   ds_error(DirectSoundCreate8(0, &lpds, 0));
-  ds_error(lpds->SetCooperativeLevel(GetDesktopWindow(), DSSCL_EXCLUSIVE));
+  ds_error(lpds->SetCooperativeLevel(GetDesktopWindow(), DSSCL_NORMAL));
 
   memset(&wfx, 0, sizeof(wfx));
   wfx.wFormatTag = WAVE_FORMAT_PCM;
