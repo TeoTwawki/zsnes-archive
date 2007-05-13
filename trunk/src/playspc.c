@@ -157,6 +157,7 @@ static bool ds_play(adev_t, char *samples_buffer, size_t samples_count)
 
     data += samples_outputted;
     samples_remaining -= samples_outputted;
+	break;
   }
   return(true);
 }
