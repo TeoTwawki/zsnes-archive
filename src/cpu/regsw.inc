@@ -1216,75 +1216,47 @@ reg2133w:
 
 ; Sound Register #1
 reg2140w:
-    catchupspc
-%ifndef NO_DEBUGGER
-    mov byte[sndwrit],1
-%endif
-    cmp byte[nmistatus],2
-    jne .n
-    mov byte[nmirept],0
-.n
-    ;mov [SPCRAM+0F4h],al
-    ;inc dword[SPC700write]
-    ;reenablespc
-    ret
-;    cmp dword[cycpbl],0FFFFh
-;    ja .spcreset
-;    ret
-;.spcreset
-;    mov dword[cycpbl],100
-;    ret
+mov byte[zspc_port],0
+mov [zspc_data],al
+mov bx,[curypos]
+mov [zspc_time],bx
+pushad
+call zspc_write_port
+popad
+ret
 
 ; Sound Register #2
 reg2141w:
-    catchupspc
-%ifndef NO_DEBUGGER
-    mov byte[sndwrit],1
-%endif
-    ;mov [SPCRAM+0F5h],al
-    ;inc dword[SPC700write]
-    ;reenablespc
-    ret
-;    cmp dword[cycpbl],0FFFFh
-;    ja .spcreset
-;    ret
-;.spcreset
-;    mov dword[cycpbl],100
-;    ret
+mov byte[zspc_port],1
+mov [zspc_data],al
+mov bx,[curypos]
+mov [zspc_time],bx
+pushad
+call zspc_write_port
+popad
+ret
 
 ; Sound Register #3
 reg2142w:
-    catchupspc
-%ifndef NO_DEBUGGER
-    mov byte[sndwrit],1
-%endif
-    ;mov [SPCRAM+0F6h],al
-    ;inc dword[SPC700write]
-    ;reenablespc
-    ret
-;    cmp dword[cycpbl],0FFFFh
-;    ja .spcreset
-;    ret
-;.spcreset
-;    mov dword[cycpbl],100
-;    ret
+mov byte[zspc_port],2
+mov [zspc_data],al
+mov bx,[curypos]
+mov [zspc_time],bx
+pushad
+call zspc_write_port
+popad
+ret
 
 ; Sound Register #4
 reg2143w:
-    catchupspc
-%ifndef NO_DEBUGGER
-    mov byte[sndwrit],1
-%endif
-    ;mov [SPCRAM+0F7h],al
-    ;inc dword[SPC700write]
-    ;reenablespc
-    ret
-;    cmp dword[cycpbl],0FFFFh
-;    ja .spcreset
-;    ret
-;.spcreset
-;    mov dword[cycpbl],100
-;    ret
+mov byte[zspc_port],3
+mov [zspc_data],al
+mov bx,[curypos]
+mov [zspc_time],bx
+pushad
+call zspc_write_port
+popad
+ret
 
 ; Read/write WRAM register
 reg2180w:
