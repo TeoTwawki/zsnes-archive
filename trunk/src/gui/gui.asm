@@ -42,11 +42,12 @@
 
 %include "macros.mac"
 
+;EXTSYM dsp_reset
 EXTSYM curblank,vidpastecopyscr,frameskip,newengen,cvidmode,antienab
-EXTSYM soundon,StereoSound,SoundQuality,MusicRelVol,endprog,dsp_reset
+EXTSYM soundon,StereoSound,SoundQuality,MusicRelVol,endprog
 EXTSYM continueprog,spcBuffera,cbitmode,t1cc
 EXTSYM romloadskip,romdata,init65816,current_zst
-EXTSYM procexecloop,SPCRAM,spcPCRam,spcS,spcRamDP,spcA,spcX,spcY,spcP,spcNZ
+EXTSYM procexecloop
 EXTSYM statesaver,loadstate2
 EXTSYM vidbuffer,ASCII2Font,hirestiledat,showallext,scanlines
 EXTSYM sprlefttot,spritetablea,KeyRTRCycle
