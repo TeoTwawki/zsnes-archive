@@ -255,5 +255,13 @@ NEWSYM bg2change, resb 256
 NEWSYM bg3change, resb 256
 NEWSYM bg4change, resb 256
 NEWSYM bgwinchange, resb 256
-
 NEWSYM PrevPicture, resb 64*56*2
+section .data
+NEWSYM spcPCRam, db 0
+NEWSYM spcP, db 0
+NEWSYM spcS, db 0
+NEWSYM spcY, db 0
+NEWSYM spcA, db 0
+NEWSYM spcX, db 0
+NEWSYM spcNZ, db 0
+NEWSYM SPCRAM, db 0

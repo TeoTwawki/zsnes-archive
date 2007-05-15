@@ -2044,7 +2044,81 @@ extern "C"
   void GUI36hzcall();
   void Game60hzcall();
 
-  void CheckTimers()
+static int ds_buffer_size = 0;               //size in bytes of the direct sound buffer
+static int ds_write_offset = 0;              //offset of the write cursor in the direct sound buffer
+static int ds_min_free_space = 0;            //if the free space is below this value get_space() will return 0
+
+  static int ds_write_buffer(unsigned char *data, int len)
+{
+  HRESULT res;
+  LPVOID lpvPtr1; 
+  DWORD dwBytes1; 
+  LPVOID lpvPtr2; 
+  DWORD dwBytes2; 
+
+  // Lock the buffer
+  res = lpSoundBuffer->Lock(ds_write_offset, len, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0);
+  // If the buffer was lost, restore and retry lock.
+  if (res == DSERR_BUFFERLOST)
+  {
+    lpSoundBuffer->Restore();
+    res = lpSoundBuffer->Lock(ds_write_offset, len, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0);
+  }
+
+  if (SUCCEEDED(res))
+  {
+    // Write to pointers without reordering.
+    memcpy(lpvPtr1, data, dwBytes1);
+    if (lpvPtr2) { memcpy(lpvPtr2, data+dwBytes1, dwBytes2); }
+    ds_write_offset += dwBytes1+dwBytes2;
+    if (ds_write_offset >= ds_buffer_size) { ds_write_offset = dwBytes2; }
+
+   // Release the data back to DirectSound.
+    res = lpSoundBuffer->Unlock(lpvPtr1, dwBytes1, lpvPtr2, dwBytes2);
+    if (SUCCEEDED(res))
+    {
+      // Success.
+      DWORD status;
+      lpSoundBuffer->GetStatus(&status);
+      if (!(status & DSBSTATUS_PLAYING))
+      {
+        lpSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
+      }
+      return(dwBytes1+dwBytes2);
+    }
+  }
+  // Lock, Unlock, or Restore failed.
+  return(0);
+}
+
+static bool ds_play(char *samples_buffer, size_t samples_count)
+{
+  unsigned char *data = (unsigned char *)samples_buffer;
+  int samples_outputted, samples_remaining;
+
+  samples_remaining = samples_count;
+  for (;;)
+  {
+    DWORD play_offset;
+    int space, len = samples_remaining;
+
+    // make sure we have enough space to write data
+	lpSoundBuffer->GetCurrentPosition(&play_offset, 0);
+    space = ds_buffer_size-(ds_write_offset-play_offset);
+    if (space > ds_buffer_size) { space -= ds_buffer_size; } // ds_write_offset < play_offset
+    if (space < len) { len = space; }
+
+    samples_outputted = ds_write_buffer((unsigned char *)data, len);
+
+    data += samples_outputted;
+    samples_remaining -= samples_outputted;
+    if (samples_outputted < samples_remaining) { Sleep(500); }
+    else { break; }
+  }
+  return(true);
+}
+
+void CheckTimers()
   {
     // Lame fix for GUI using 100% CPU
     if (GUIOn || GUIOn2 || EMUPause)
