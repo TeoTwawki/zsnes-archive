@@ -2579,12 +2579,12 @@ bool loadfileGUI()
 extern uint32_t CheatOn, NumCheats;
 extern uint8_t CheatWinMode, CheatSearchStatus;
 void GUIQuickLoadUpdate();
-void InitSPC();
+void zspc_init();
 
 void powercycle(bool sramload, bool romload)
 {
   clearmem2();
-
+  zspc_init();
   nmiprevaddrl = 0;
   nmiprevaddrh = 0;
   nmirept = 0;
