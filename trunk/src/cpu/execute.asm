@@ -26,7 +26,8 @@ EXTSYM KeyQuickExit,KeyQuickLoad,KeyQuickRst,GUIDoReset,GUIReset,KeyOnStA
 EXTSYM KeyOnStB,C4Enable,KeyQuickClock,KeyQuickSaveSPC,TimerEnable
 EXTSYM splitflags,joinflags,KeyQuickSnapShot,csounddisable,videotroub
 EXTSYM InitPreGame,Curtableaddr,curcyc,debugdisble,dmadata,guioff,memtabler8
-EXTSYM SetupPreGame,memtablew8,regaccessbankr8,showmenu,snesmap2,snesmmap
+EXTSYM zspc_end_frame
+ EXTSYM SetupPreGame,memtablew8,regaccessbankr8,showmenu,snesmap2,snesmmap
 EXTSYM DeInitPostGame,spcPCRam,xp,xpb,xpc,tablead,tableadc,SA1UpdateDPage
 EXTSYM Makemode7Table,nextmenupopup,MovieProcessing,SFXEnable,wramdata,cycpbl
 EXTSYM cycpblt,irqon,spcon,multchange,romispal,scrndis,sprlefttot,sprleftpr
@@ -1455,6 +1456,7 @@ NEWSYM cpuover
 ;    pushad
 ;    call dsp_run_wrap
 ;    popad
+call zspc_end_frame
     mov dh,80
 %ifdef __MSDOS__
     cmp byte[smallscreenon],1
