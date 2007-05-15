@@ -181,7 +181,6 @@ adev_t ds_init()
 #define ao_play ds_play
 
 #else
-#if 0
 #include <ao/ao.h>
 
 typedef ao_device *adev_t;
@@ -203,11 +202,12 @@ adev_t ao_init()
 
   return(dev);
 }
-#endif
 
+/*
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/soundcard.h>
+#include <sys/ioctl.h>
 
 typedef int adev_t;
 
@@ -265,6 +265,7 @@ static bool ao_play(adev_t device, char *samples_buffer, size_t samples_count)
 {
   write(device, samples_buffer, samples_count);
 }
+*/
 
 #endif //End of OS specific code
 
