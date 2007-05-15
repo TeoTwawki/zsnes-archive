@@ -10,7 +10,7 @@
 ;
 ;This program is distributed in the hope that it will be useful,
 ;but WITHOUT ANY WARRANTY; without even the implied warranty of
-;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;MERCHANTABILITY or FITNESS FOR` A PARTICULAR PURPOSE.  See the
 ;GNU General Public License for more details.
 ;
 ;You should have received a copy of the GNU General Public License
@@ -770,6 +770,8 @@ reg213Er:
     mov al,01h
     ret
 
+
+EXTSYM zspc_read_port,zspc_data,zspc_time,zspc_port,zspc_write_port
 ; PPU Status Flag & Version number (NTSC/PAL/EXTRN Latch flag)
 reg213Fr:
 ;    mov byte[debstop3],1
@@ -781,26 +783,51 @@ reg213Fr:
     mov byte[latchyr],0
     or al,[extlatch]
     ret
-
+    
+    
 ; Sound Reg #1
 reg2140r:
-%ifdef __BLARGG_SPC__
-%endif
+mov byte[zspc_port],0
+mov bx,[curypos]
+mov [zspc_time],bx
+pushad
+call zspc_read_port
+popad
+mov [zspc_data],al
+ret
 
 ; Sound Reg #2
 reg2141r:
-%ifdef __BLARGG_SPC__
-%endif
+mov byte[zspc_port],1
+mov bx,[curypos]
+mov [zspc_time],bx
+pushad
+call zspc_read_port
+popad
+mov [zspc_data],al
+ret
 
 ; Sound Reg #3
 reg2142r:
-%ifdef __BLARGG_SPC__
-%endif
+mov byte[zspc_port],2
+mov bx,[curypos]
+mov [zspc_time],bx
+pushad
+call zspc_read_port
+popad
+mov [zspc_data],al
+ret
 
 ; Sound Reg #4
 reg2143r:
-%ifdef __BLARGG_SPC__
-%endif
+mov byte[zspc_port],3
+mov bx,[curypos]
+mov [zspc_time],bx
+pushad
+call zspc_read_port
+popad
+mov [zspc_data],al
+ret
 
 reg2144r:
     xor al,al
