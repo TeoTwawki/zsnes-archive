@@ -181,6 +181,7 @@ adev_t ds_init()
 #define ao_play ds_play
 
 #else
+#if 0
 #include <ao/ao.h>
 
 typedef ao_device *adev_t;
@@ -201,6 +202,68 @@ adev_t ao_init()
   }
 
   return(dev);
+}
+#endif
+
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/soundcard.h>
+
+typedef int adev_t;
+
+static adev_t dev;
+
+static void ao_initialize()
+{
+  char *devname = "/dev/dsp";
+  if ((dev = open(devname, O_WRONLY, O_NONBLOCK)) > 0)
+  {
+    int cooked = 1;
+    int rate = 32000;
+    int channels = 2;
+    int format = AFMT_S16_LE;
+
+#if SOUND_VERSION >= 0x040000
+    if (ioctl(dev, SNDCTL_DSP_COOKEDMODE, &cooked) == -1)
+    {
+      perror("Cooked");
+    }
+#endif
+
+    if (ioctl(dev, SNDCTL_DSP_CHANNELS, &channels) == -1)
+    {
+      perror ("Channels");
+    }
+
+    if (ioctl(dev, SNDCTL_DSP_SETFMT, &format) == -1)
+    {
+      perror ("Format");
+    }
+
+    if (ioctl(dev, SNDCTL_DSP_SPEED, &rate) == -1)
+    {
+      perror ("Rate");
+    }
+  }
+  else
+  {
+    perror(devname);
+  }
+}
+
+static void ao_shutdown()
+{
+  close(dev);
+}
+
+static adev_t ao_init()
+{
+  return((dev > 0) ? dev : 0);
+}
+
+static bool ao_play(adev_t device, char *samples_buffer, size_t samples_count)
+{
+  write(device, samples_buffer, samples_count);
 }
 
 #endif //End of OS specific code
