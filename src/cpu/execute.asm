@@ -1456,6 +1456,9 @@ NEWSYM cpuover
 ;    pushad
 ;    call dsp_run_wrap
 ;    popad
+EXTSYM zspc_time
+mov bx,[curypos]
+mov [zspc_time],bx
 call zspc_end_frame
     mov dh,80
 %ifdef __MSDOS__
