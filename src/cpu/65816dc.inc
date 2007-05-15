@@ -24,7 +24,6 @@ EXTSYM flagnz,flago,flagc,cpucycle,cycpbl,cycpblt,opcjmptab,doirqnext,dmadata
 ;*******************************************************
 ; Flag Setting Macros
 ;*******************************************************
-EXTSYM clocktable,spcCycle
 
 %macro endloop 0
     xor ebx,ebx
