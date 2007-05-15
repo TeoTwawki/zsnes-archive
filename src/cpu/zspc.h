@@ -1,6 +1,10 @@
 #ifndef ZSPC_H
 #define ZSPC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "cpu/spc.h"
 
 //// Setup
@@ -34,5 +38,9 @@ void zspc_write_port( void );
 // Runs SPC to zspc_time and starts a new time frame at 0
 void zspc_end_frame( spc_time_t end_time );
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif ZSPC_H
