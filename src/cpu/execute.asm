@@ -51,8 +51,7 @@ EXTSYM RestoreCVFrame,loadstate,xe,KeyInsrtChap,KeyNextChap,KeyPrevChap
 EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
 EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
 EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame,dsp_run_wrap
-EXTSYM KeyRewind,statesaver,UpdateDPage,clocktable
-EXTSYM catchup
+EXTSYM KeyRewind,statesaver,UpdateDPage
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger

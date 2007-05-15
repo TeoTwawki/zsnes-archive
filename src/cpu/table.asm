@@ -40,7 +40,6 @@ EXTSYM tableA,tableB,tableC,tableD,tableE,tableF,tableG,tableH
 EXTSYM DPageR8,DPageW8,DPageR16,DPageW16
 EXTSYM SDD1Enable
 EXTSYM JoyAOrig,JoyANow,JoyBOrig,JoyBNow,JoyCOrig,JoyCNow,JoyDOrig,JoyDNow
-EXTSYM dsp_run_wrap,catchup
 
 %ifdef __MSDOS__
 EXTSYM mosdraw10,mosdraw11,mosdraw12,mosdraw13,mosdraw9,mosjmptab
