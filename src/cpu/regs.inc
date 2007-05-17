@@ -793,7 +793,7 @@ mov [zspc_time],bx
 pushad
 call zspc_read_port
 popad
-mov [zspc_data],al
+mov al,[zspc_data]
 ret
 
 ; Sound Reg #2
@@ -804,7 +804,7 @@ mov [zspc_time],bx
 pushad
 call zspc_read_port
 popad
-mov [zspc_data],al
+mov al,[zspc_data]
 ret
 
 ; Sound Reg #3
@@ -815,7 +815,7 @@ mov [zspc_time],bx
 pushad
 call zspc_read_port
 popad
-mov [zspc_data],al
+mov al,[zspc_data]
 ret
 
 ; Sound Reg #4
@@ -826,7 +826,7 @@ mov [zspc_time],bx
 pushad
 call zspc_read_port
 popad
-mov [zspc_data],al
+mov al,[zspc_data]
 ret
 
 reg2144r:
