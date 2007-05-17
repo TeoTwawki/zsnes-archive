@@ -104,6 +104,23 @@ public:
 	bool check_kon();
 #endif
 
+// Debugger
+
+	struct regs_t
+	{
+		int pc;
+		int a;
+		int x;
+		int y;
+		int psw;
+		int sp;
+	};
+	regs_t& regs() { return m.cpu_regs; }
+	
+	uint8_t* ram() { return m.ram.ram; }
+	
+	void run_until( time_t t ) { run_until_( t ); }
+	
 public:
 	BLARGG_DISABLE_NOTHROW
 	
@@ -143,15 +160,7 @@ private:
 		
 		uint8_t smp_regs [2] [reg_count];
 		
-		struct
-		{
-			int pc;
-			int a;
-			int x;
-			int y;
-			int psw;
-			int sp;
-		} cpu_regs;
+		regs_t cpu_regs;
 		
 		rel_time_t  dsp_time;
 		time_t      spc_time;
