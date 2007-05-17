@@ -1457,9 +1457,11 @@ NEWSYM cpuover
 ;    call dsp_run_wrap
 ;    popad
 EXTSYM zspc_time
+pushad
 mov bx,[curypos]
 mov [zspc_time],bx
 call zspc_flush_samples
+popad
     mov dh,80
 %ifdef __MSDOS__
     cmp byte[smallscreenon],1
