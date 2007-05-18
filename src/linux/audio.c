@@ -30,7 +30,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "../asm_call.h"
 #include "../cfg.h"
-#include "cpu/dspwrap.h"
 
 #ifdef __LIBAO__
 static pthread_t audio_thread;
@@ -156,13 +155,14 @@ static int SoundInit_ao()
 
 void SoundWrite_sdl()
 {
+/*
   SDL_LockAudio();
   if (dsp_sample_count) //Lets have less memset()s
   {
     sdl_audio_buffer_tail += dsp_samples_pull((short *)(sdl_audio_buffer+sdl_audio_buffer_tail), (sdl_audio_buffer_len-sdl_audio_buffer_tail)/2)*2;
   }
   SDL_UnlockAudio();
-
+*/
 /*
   extern unsigned int T36HZEnabled;
 

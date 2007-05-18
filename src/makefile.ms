@@ -208,8 +208,7 @@ CHIPSOBJ=${CHIP_D}/dsp1emu${OE} ${CHIP_D}/fxemu2${OE} ${CHIP_D}/sfxproc${OE}\
 
 CPUOBJ=${CPU_D}/dma${OE} ${CPU_D}/execute${OE} ${CPU_D}/executec${OE}\
 	${CPU_D}/irq${OE} ${CPU_D}/memory${OE} ${CPU_D}/memtable${OE}\
-	${CPU_D}/stable${OE} ${CPU_D}/table${OE}\
-	${CPU_D}/tablec${OE} ${CPU_D}/dspwrap${OE}\
+	${CPU_D}/stable${OE} ${CPU_D}/table${OE} ${CPU_D}/tablec${OE}\
 	$(SPC_D)/zdsp${OE} $(SPC_D)/zspc${OE}
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
@@ -327,7 +326,7 @@ debugger${OE}: debugger.c asm_call.h zpath.h ${JMA_D}/zsnesjma.h \
 endmem${OE}: endmem.asm macros.mac
 init${OE}: init.asm macros.mac
 initc${OE}: initc.c asm_call.h cfg${OE} input${OE} numconv.h zpath.h \
-	${CPU_D}/memtable.h ${CPU_D}/dspwrap.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
+	${CPU_D}/memtable.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
 input${OE}: input.psr ${PSR}
 md${OE}: md.psr ${PSR}
 patch${OE}: patch.c zpath.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
@@ -339,7 +338,7 @@ zdir${OE}: zdir.h zpath.h
 zloader${OE}: zloader.c asm_call.h cfg${OE} input${OE} zloader.h zpath.h \
 	${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
 zmovie${OE}: zmovie.c asm_call.h cfg${OE} gblvars.h input${OE} md${OE} \
-	numconv.h zmovie.h zpath.h ${CPU_D}/dspwrap.h ${JMA_D}/zsnesjma.h \
+	numconv.h zmovie.h zpath.h ${JMA_D}/zsnesjma.h \
 	zdir.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h
 zpath${OE}: zpath.c cfg${OE} zpath.h ${DOS_D}/lib.h ${JMA_D}/zsnesjma.h \
 	${WIN_D}/lib.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h ${CONFLOC}
@@ -384,7 +383,6 @@ ${CPU_D}/executec${OE}: ${CPU_D}/executec.c gblvars.h
 ${CPU_D}/irq${OE}: ${CPU_D}/irq.asm macros.mac
 ${CPU_D}/memory${OE}: ${CPU_D}/memory.asm macros.mac
 ${CPU_D}/memtable${OE}: ${CPU_D}/memtable.c gblvars.h ${CPU_D}/memtable.h
-${CPU_D}/dspwrap${OE}: ${CPU_D}/dspwrap.c asm_call.h ${CPU_D}/dsp.h ${CPU_D}/dspwrap.h
 ${CPU_D}/stable${OE}: ${CPU_D}/stable.asm macros.mac ${CPU_D}/s65816d.inc \
 	${CPU_D}/saddress.inc ${CPU_D}/saddrni.inc ${CPU_D}/se65816.inc
 ${CPU_D}/table${OE}: ${CPU_D}/table.asm macros.mac ${CPU_D}/65816d.inc \
