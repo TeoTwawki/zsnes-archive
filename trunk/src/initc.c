@@ -2606,7 +2606,7 @@ void powercycle(bool sramload, bool romload)
     {
       if (DisplayInfo) { showinfogui(); }
       initsnes();
-      zspc_init();
+      //zspc_init();
     }
 
     sramsavedis = 0;
