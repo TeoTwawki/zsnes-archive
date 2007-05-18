@@ -39,7 +39,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "input.h"
 #include "zpath.h"
 #include "cpu/memtable.h"
-#include "cpu/dspwrap.h"
+#include "cpu/zspc/zspc.h"
 #include <stdint.h>
 
 #define NUMCONV_FR4
@@ -2579,7 +2579,6 @@ bool loadfileGUI()
 extern uint32_t CheatOn, NumCheats;
 extern uint8_t CheatWinMode, CheatSearchStatus;
 void GUIQuickLoadUpdate();
-void zspc_soft_reset();
 
 void powercycle(bool sramload, bool romload)
 {
@@ -2607,7 +2606,7 @@ void powercycle(bool sramload, bool romload)
     {
       if (DisplayInfo) { showinfogui(); }
       initsnes();
-      InitSPC();
+      zspc_init();
     }
 
     sramsavedis = 0;
