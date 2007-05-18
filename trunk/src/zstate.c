@@ -46,7 +46,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "zmovie.h"
 #include "chips/dsp4emu.h"
 #include "input.h"
-#include "cpu/dsp.h"
 
 #define NUMCONV_FR3
 #define NUMCONV_FW3
@@ -1472,7 +1471,7 @@ void savespcdata()
 
       for (i = 0; i < 128; i++) //10100h-1017Fh - DSPRam
       {
-        fputc(dsp_read(i), fp);
+        //fputc(dsp_read(i), fp);
       }
 
       memset(ssdatst, 0, 64);
