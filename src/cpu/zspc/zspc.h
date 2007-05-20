@@ -1,6 +1,6 @@
-// SPC emulator interface customized for zsnes 
+// SPC emulator interface customized for zsnes
 
-// zspc 0.9.0 
+// zspc 0.9.0
 #ifndef ZSPC_H
 #define ZSPC_H
 

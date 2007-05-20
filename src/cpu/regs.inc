@@ -783,8 +783,8 @@ reg213Fr:
     mov byte[latchyr],0
     or al,[extlatch]
     ret
-    
-    
+
+
 ; Sound Reg #1
 reg2140r:
 mov byte[zspc_port],0

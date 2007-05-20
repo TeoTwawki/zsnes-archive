@@ -96,10 +96,10 @@ static void ds_initialize()
 static int ds_write_buffer(unsigned char *data, int len)
 {
   HRESULT res;
-  LPVOID lpvPtr1; 
-  DWORD dwBytes1; 
-  LPVOID lpvPtr2; 
-  DWORD dwBytes2; 
+  LPVOID lpvPtr1;
+  DWORD dwBytes1;
+  LPVOID lpvPtr2;
+  DWORD dwBytes2;
 
   // Lock the buffer
   res = ds_error(hdsbuf->Lock(ds_write_offset, len, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0));

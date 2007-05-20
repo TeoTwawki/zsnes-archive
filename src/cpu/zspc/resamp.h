@@ -48,9 +48,9 @@ static inline short* resampler_buffer( void ) { return resampler_write_pos; }
 static inline void resampler_write( int count )
 {
 	assert( count % 2 == 0 ); /* must be even */
-	
+
 	resampler_write_pos += count;
-	
+
 	/* fails if you overfill buffer */
 	assert( resampler_write_pos <= &resampler_buf [RESAMPLER_BUF_SIZE] );
 }
