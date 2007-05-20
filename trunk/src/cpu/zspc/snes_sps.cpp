@@ -31,7 +31,7 @@ void SNES_SPC::save_regs( uint8_t out [reg_count] )
 	// Use current timer counter values
 	for ( int i = 0; i < timer_count; i++ )
 		out [r_t0out + i] = m.timers [i].counter;
-	
+
 	// Last written values
 	memcpy( out, REGS, r_t0out );
 }
@@ -39,7 +39,7 @@ void SNES_SPC::save_regs( uint8_t out [reg_count] )
 void SNES_SPC::init_header( void* spc_out )
 {
 	spc_file_t* const spc = (spc_file_t*) spc_out;
-	
+
 	spc->has_id666 = 26; // has none
 	spc->version   = 30;
 	memcpy( spc, signature, sizeof spc->signature );
@@ -49,7 +49,7 @@ void SNES_SPC::init_header( void* spc_out )
 void SNES_SPC::save_spc( void* spc_out )
 {
 	spc_file_t* const spc = (spc_file_t*) spc_out;
-	
+
 	// CPU
 	spc->pcl = (uint8_t) (m.cpu_regs.pc >> 0);
 	spc->pch = (uint8_t) (m.cpu_regs.pc >> 8);
@@ -58,20 +58,20 @@ void SNES_SPC::save_spc( void* spc_out )
 	spc->y   = m.cpu_regs.y;
 	spc->psw = m.cpu_regs.psw;
 	spc->sp  = m.cpu_regs.sp;
-	
+
 	// RAM, ROM
 	memcpy( spc->ram, RAM, sizeof spc->ram );
 	if ( m.rom_enabled )
 		memcpy( spc->ram + rom_addr, m.hi_ram, sizeof m.hi_ram );
 	memset( spc->unused, 0, sizeof spc->unused );
 	memcpy( spc->ipl_rom, m.rom, sizeof spc->ipl_rom );
-	
+
 	// SMP registers
 	save_regs( &spc->ram [0xF0] );
 	int i;
 	for ( i = 0; i < port_count; i++ )
 		spc->ram [0xF0 + r_cpuio0 + i] = REGS_IN [r_cpuio0 + i];
-	
+
 	// DSP registers
 	for ( i = 0; i < SPC_DSP::register_count; i++ )
 		spc->dsp [i] = dsp.read( i );
@@ -80,14 +80,14 @@ void SNES_SPC::save_spc( void* spc_out )
 void SNES_SPC::copy_state( unsigned char** io, copy_func_t copy )
 {
 	SPC_State_Copier copier( io, copy );
-	
+
 	// Make state data more readable by putting 64K RAM, 16 SMP registers,
 	// then DSP (with its 128 registers) first
-	
+
 	// RAM
 	enable_rom( 0 ); // will get re-enabled if necessary in regs_loaded() below
 	copier.copy( RAM, 0x10000 );
-	
+
 	{
 		// SMP registers
 		uint8_t out_ports [port_count];
@@ -100,7 +100,7 @@ void SNES_SPC::copy_state( unsigned char** io, copy_func_t copy )
 		regs_loaded();
 		memcpy( &REGS [r_cpuio0], out_ports, sizeof out_ports );
 	}
-	
+
 	// CPU registers
 	SPC_COPY( uint16_t, m.cpu_regs.pc );
 	SPC_COPY(  uint8_t, m.cpu_regs.a );
@@ -109,13 +109,13 @@ void SNES_SPC::copy_state( unsigned char** io, copy_func_t copy )
 	SPC_COPY(  uint8_t, m.cpu_regs.psw );
 	SPC_COPY(  uint8_t, m.cpu_regs.sp );
 	copier.extra();
-	
+
 	SPC_COPY( int16_t, m.spc_time );
 	SPC_COPY( int16_t, m.dsp_time );
-	
+
 	// DSP
 	dsp.copy_state( io, copy );
-	
+
 	// Timers
 	for ( int i = 0; i < timer_count; i++ )
 	{

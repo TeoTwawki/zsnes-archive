@@ -41,7 +41,7 @@ enum { interp_bits = 15 };
 
 /* Number of fractional bits in s_pos. By making it interp_bits + 32, extraction
 of the high interp_bits will be more efficient on 32-bit machines. */
-enum { fixed_bits = interp_bits + 32 }; 
+enum { fixed_bits = interp_bits + 32 };
 typedef uint64_t fixed_t;
 static fixed_t const unit = (fixed_t) 1 << fixed_bits;
 
@@ -53,7 +53,7 @@ void resampler_set_rate( int in, int out )
 {
 	fixed_t numer = in * unit;
 	s_step = (numer + out / 2) / out; /* round to nearest */
-	
+
 	if ( !resampler_write_pos )
 		resampler_clear();
 }
@@ -66,7 +66,7 @@ void resampler_clear( void )
 	output sample. Since error can be in either direction, start with position
 	of half the step. */
 	s_pos = s_step / 2;
-	
+
 	s_prev [0] = 0;
 	s_prev [1] = 0;
 	resampler_write_pos = resampler_buf + extra_samples;
@@ -77,7 +77,7 @@ int resampler_read( sample_t* out_begin, int count )
 {
 	sample_t*       out     = out_begin;
 	sample_t* const out_end = out + count;
-	
+
 	sample_t const* in     = resampler_buf;
 	sample_t* const in_end = resampler_write_pos - extra_samples;
 
@@ -90,29 +90,29 @@ int resampler_read( sample_t* out_begin, int count )
 			fixed_t pos = s_pos;
 			int prev0 = s_prev [0];
 			int prev1 = s_prev [1];
-			
+
 			/* Step fractionally through input samples to generate output samples */
 			do
 			{
 				/* Linear interpolation between current and next input sample, based on
 				fractional portion of position. */
 				int const factor = pos >> (fixed_bits - interp_bits);
-				
+
 				#define INTERP( i, out ) \
 					out = (in [0 + i] * ((1 << interp_bits) - factor) + in [2 + i] * factor) >> interp_bits;\
-				
+
 				/* interpolate left and right */
 				INTERP( 0, out [0] )
 				INTERP( 1, out [1] )
 				out += stereo;
-				
+
 				/* increment fractional position and separate whole part */
 				pos += step;
 				in += (int) (pos >> fixed_bits) * stereo;
 				pos &= unit - 1;
 			}
 			while ( in < in_end && out < out_end );
-			
+
 			s_prev [1] = prev1;
 			s_prev [0] = prev0;
 			s_pos = pos;
@@ -128,7 +128,7 @@ int resampler_read( sample_t* out_begin, int count )
 			out += n;
 		}
 	}
-	
+
 	/* move unused samples to beginning of input buffer */
 	{
 		int result = out - out_begin;

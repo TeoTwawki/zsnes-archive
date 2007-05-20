@@ -80,9 +80,9 @@ zspc_err_t zspc_init()
 {
 	zspc_err_t err = spc.init();
 	if ( err ) return err;
-	
+
 	zspc_set_rate( 32000 );
-	
+
 	static unsigned char const spc_rom [SNES_SPC::rom_size] =
 	{
 		0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0,
@@ -96,7 +96,7 @@ zspc_err_t zspc_init()
 	};
 	spc.init_rom( spc_rom );
 	zspc_reset();
-	
+
 	return 0;
 }
 
@@ -166,17 +166,17 @@ const char* zspc_log_cpu()
 	spc.run_until( zspc_time );
 	if ( spc.regs().pc == r.pc )
 		return 0;
-	
+
 	// Disassemble first instruction
 	char opcode [zspc_disasm_max];
 	zspc_disasm( r.pc, opcode );
-	
+
 	// Decode PSW
 	char flags [9] = "nvdbhizc";
 	for ( int i = 0; i < 8; i++ )
 		if ( r.psw << i & 0x80 )
 			flags [i] = toupper( flags [i] );
-	
+
 	// Return disassembly string
 	static char str [64 + spc_disasm_max];
 	sprintf( str, "%-24s; A=%02X X=%02X Y=%02X SP=%03X PSW=%02X %s",

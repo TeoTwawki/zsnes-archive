@@ -122,11 +122,11 @@ int spc_disasm( unsigned addr, int opcode, int x, int y, char* out )
 		case 'i': // #i
 			out += sprintf( out, "$%02X", x );
 			break;
-		
+
 		case 'u': // PCALL u
 			out += sprintf( out, "$FF%02X", x );
 			break;
-		
+
 		case 'd': { // d, dd, ds
 			int n = y;
 			if ( *in != 'd' )
@@ -136,31 +136,31 @@ int spc_disasm( unsigned addr, int opcode, int x, int y, char* out )
 			}
 			if ( *in == 'd' || *in == 's' )
 				++in;
-			
+
 			out += sprintf( out, "$%02X", n );
 			break;
 		}
-		
+
 		case 'a': // !a
 			out += sprintf( out, "$%04X", y * 0x100 + x );
 			break;
-		
+
 		case 'm': // m.b
 			out += sprintf( out, "$%04X", (y * 0x100 + x) & 0x1FFF );
 			break;
-		
+
 		case 'b': // m.b
 			out += sprintf( out, "%d", y >> 5 );
 			break;
-		
+
 		case 'r': // branch r
 			out += sprintf( out, "$%04X", (addr + op_lens [opcode] + (signed char) x) & 0xFFFF );
 			break;
-		
+
 		default:
 			++out;
 		}
 	}
-	
+
 	return op_lens [opcode];
 }
