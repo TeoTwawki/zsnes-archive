@@ -19,7 +19,7 @@
 
 
 
-EXTSYM flagnz,flago,flagc,cpucycle,cycpbl,cycpblt,opcjmptab,doirqnext,dmadata
+EXTSYM flagnz,flago,flagc,cpucycle,doirqnext,dmadata
 
 ;*******************************************************
 ; Flag Setting Macros

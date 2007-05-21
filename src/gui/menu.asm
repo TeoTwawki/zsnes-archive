@@ -29,17 +29,10 @@ EXTSYM spcon,vesa2_bpos,vesa2_clbit,vesa2_gpos,vesa2_rpos,
 EXTSYM spritetablea,sprlefttot,newengen,Get_Key,continueprognokeys
 EXTSYM ForceNonTransp,GUIOn,Check_Key,JoyRead,SSKeyPressed
 EXTSYM SPCKeyPressed,StopSound,StartSound,ExecExitOkay,t1cc,Clear2xSaIBuffer
-EXTSYM ScreenShotFormat,spcsaved,savespcdata
-EXTSYM exiter,xpb,xpc,snesmmap,memtabler8,snesmap2,regaccessbankr8,dmadata,initaddrl
-EXTSYM spcPCRam,xp,curcyc,Curtableaddr,UpdateDPage,splitflags,execsingle,joinflags
-EXTSYM pdh,SPCRAM,cvidmode
+EXTSYM ScreenShotFormat,spcsaved,savespcdata,cvidmode
 
 %ifdef __MSDOS__
 EXTSYM GUI16VID,drawhline,drawvline
-%endif
-
-%ifndef NO_DEBUGGER
-EXTSYM numinst,debuggeron
 %endif
 
 %ifndef NO_PNG
