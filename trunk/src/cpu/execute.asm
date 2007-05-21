@@ -780,6 +780,7 @@ NEWSYM execloop
    popad
 %else
 .skipallspc
+    add dword[zspc_time],33
 %endif
    mov bl,[esi]
    inc esi
@@ -1459,9 +1460,8 @@ NEWSYM cpuover
 ;    pushad
 ;    call dsp_run_wrap
 ;    popad
+    add dword[zspc_time],33
     pushad
-    mov bx,[curypos]
-    mov [zspc_time],bx
     call zspc_flush_samples
     popad
     mov dh,80
