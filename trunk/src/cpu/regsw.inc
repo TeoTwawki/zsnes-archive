@@ -1218,8 +1218,6 @@ reg2133w:
 reg2140w:
 mov byte[zspc_port],0
 mov [zspc_data],al
-mov bx,[curypos]
-mov [zspc_time],bx
 pushad
 call zspc_write_port
 popad
@@ -1229,8 +1227,6 @@ ret
 reg2141w:
 mov byte[zspc_port],1
 mov [zspc_data],al
-mov bx,[curypos]
-mov [zspc_time],bx
 pushad
 call zspc_write_port
 popad
@@ -1240,8 +1236,6 @@ ret
 reg2142w:
 mov byte[zspc_port],2
 mov [zspc_data],al
-mov bx,[curypos]
-mov [zspc_time],bx
 pushad
 call zspc_write_port
 popad
@@ -1251,8 +1245,6 @@ ret
 reg2143w:
 mov byte[zspc_port],3
 mov [zspc_data],al
-mov bx,[curypos]
-mov [zspc_time],bx
 pushad
 call zspc_write_port
 popad
