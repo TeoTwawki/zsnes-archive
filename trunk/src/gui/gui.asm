@@ -125,7 +125,6 @@ EXTSYM GUIJT_offset,GUIJT_viewable,GUIGenericJumpTo,SSAutoFire,SSPause
 
 %ifdef __UNIXSDL__
 EXTSYM numlockptr
-EXTSYM CheckOpenGL
 %elifdef __WIN32__
 EXTSYM initDirectDraw,reInitSound,CheckAlwaysOnTop,CheckPriority,AlwaysOnTop
 EXTSYM CheckScreenSaver,MouseWheel,TrapMouseCursor,AllowMultipleInst,TripleBufferWin

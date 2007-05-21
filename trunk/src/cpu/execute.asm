@@ -28,10 +28,10 @@ EXTSYM splitflags,joinflags,KeyQuickSnapShot,csounddisable,videotroub
 EXTSYM InitPreGame,Curtableaddr,curcyc,debugdisble,dmadata,guioff,memtabler8
 EXTSYM zspc_flush_samples,zspc_time
 EXTSYM SetupPreGame,memtablew8,regaccessbankr8,showmenu,snesmap2,snesmmap
-EXTSYM DeInitPostGame,spcPCRam,xp,xpb,xpc,tablead,tableadc,SA1UpdateDPage
-EXTSYM Makemode7Table,nextmenupopup,MovieProcessing,SFXEnable,wramdata,cycpbl
-EXTSYM cycpblt,irqon,spcon,multchange,romispal,scrndis,sprlefttot,sprleftpr
-EXTSYM processsprites,cachesprites,opcjmptab,CheatOn,Output_Text,Check_Key
+EXTSYM DeInitPostGame,xp,xpb,xpc,tablead,tableadc,SA1UpdateDPage
+EXTSYM Makemode7Table,nextmenupopup,MovieProcessing,SFXEnable,wramdata
+EXTSYM irqon,spcon,multchange,romispal,scrndis,sprlefttot,sprleftpr
+EXTSYM processsprites,cachesprites,CheatOn,Output_Text,Check_Key
 EXTSYM Get_Key,INTEnab,JoyCRead,NMIEnab,NumCheats,CurrentExecSA1,ReadInputDevice
 EXTSYM StartDrawNewGfx,VIRQLoc,cachevideo,cfield,cheatdata,curblank,curnmi
 EXTSYM curypos,cycpl,doirqnext,drawline,exechdma,hdmadelay,intrset,newengen
@@ -51,7 +51,7 @@ EXTSYM switchtovirqdeb,switchtonmideb,MovieSeekBehind,BackupCVFrame
 EXTSYM RestoreCVFrame,loadstate,xe,KeyInsrtChap,KeyNextChap,KeyPrevChap
 EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
 EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
-EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame,dsp_run_wrap
+EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame
 EXTSYM KeyRewind,statesaver,UpdateDPage
 
 %ifndef NO_DEBUGGER
@@ -1020,6 +1020,9 @@ NEWSYM cpuover
     ;pushad
     ;call catchup
     ;popad
+    pushad
+    call zspc_flush_samples
+    popad
 .nosound
     mov ax,[resolutn]
     inc ax
