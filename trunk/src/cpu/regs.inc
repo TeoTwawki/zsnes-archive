@@ -22,7 +22,7 @@
 EXTSYM SFXEnable,regptr,initsfxregsr,initSA1regs,SA1Enable,initSDD1regs
 EXTSYM SPC7110Enable,initSPC7110regs,RTCEnable,RTCReset,curypos,cycpl
 EXTSYM pdh,vram,romispal,JoyEOrig,JoyENow,device2,cycphb,joycontren,totlines
-EXTSYM zspc_read_port,zspc_data,zspc_time,zspc_port,zspc_write_port
+EXTSYM zspc_read_port,zspc_data,zspc_port,zspc_write_port
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron
@@ -787,8 +787,6 @@ reg213Fr:
 ; Sound Reg #1
 reg2140r:
 mov byte[zspc_port],0
-mov bx,[curypos]
-mov [zspc_time],bx
 pushad
 call zspc_read_port
 popad
@@ -798,8 +796,6 @@ ret
 ; Sound Reg #2
 reg2141r:
 mov byte[zspc_port],1
-mov bx,[curypos]
-mov [zspc_time],bx
 pushad
 call zspc_read_port
 popad
@@ -809,8 +805,6 @@ ret
 ; Sound Reg #3
 reg2142r:
 mov byte[zspc_port],2
-mov bx,[curypos]
-mov [zspc_time],bx
 pushad
 call zspc_read_port
 popad
@@ -820,8 +814,6 @@ ret
 ; Sound Reg #4
 reg2143r:
 mov byte[zspc_port],3
-mov bx,[curypos]
-mov [zspc_time],bx
 pushad
 call zspc_read_port
 popad
