@@ -22,6 +22,7 @@
 EXTSYM SFXEnable,regptr,initsfxregsr,initSA1regs,SA1Enable,initSDD1regs
 EXTSYM SPC7110Enable,initSPC7110regs,RTCEnable,RTCReset,curypos,cycpl
 EXTSYM pdh,vram,romispal,JoyEOrig,JoyENow,device2,cycphb,joycontren,totlines
+EXTSYM zspc_read_port,zspc_data,zspc_time,zspc_port,zspc_write_port
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron
@@ -770,8 +771,6 @@ reg213Er:
     mov al,01h
     ret
 
-
-EXTSYM zspc_read_port,zspc_data,zspc_time,zspc_port,zspc_write_port
 ; PPU Status Flag & Version number (NTSC/PAL/EXTRN Latch flag)
 reg213Fr:
 ;    mov byte[debstop3],1
