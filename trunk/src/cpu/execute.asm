@@ -1021,9 +1021,9 @@ NEWSYM cpuover
     ;pushad
     ;call catchup
     ;popad
-    pushad
-    call zspc_flush_samples
-    popad
+    ;pushad
+    ;call zspc_flush_samples
+    ;popad
 .nosound
     mov ax,[resolutn]
     inc ax
