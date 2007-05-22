@@ -752,6 +752,7 @@ NEWSYM execute
 NEWSYM execloop
    mov bl,dl
    test byte[curexecstate],2
+
    jnz .sound
 .startagain
    cmp byte[xe],1
@@ -774,15 +775,7 @@ NEWSYM execloop
 .cpuover
    jmp cpuover
 .sound
-   pushad
-   xor ebp,ebp
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   add dword[zspc_time],eax
-   popad
+
    mov edi,[tableadc+ebx*4]
    mov bl,[esi]
    inc esi
@@ -1039,7 +1032,6 @@ NEWSYM cpuover
 ;    cmp [curypos],ax
 ;    je near .hdma
 .hdmacont
-
     ; check for VIRQ/HIRQ/NMI
     ProcessIRQStuff
     mov ax,[resolutn]
@@ -1121,6 +1113,15 @@ NEWSYM cpuover
 .nocache
     cmp byte[curblank],0
     jne .nodrawlineb2
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   add [zspc_time],eax
+   popad
     call drawline
 .nodrawlineb2
     cmp byte[curexecstate],0
@@ -1462,9 +1463,8 @@ NEWSYM cpuover
 ;    pushad
 ;    call dsp_run_wrap
 ;    popad
-    add dword[zspc_time],33
     pushad
-    call zspc_flush_samples
+   ; call zspc_flush_samples
     popad
     mov dh,80
 %ifdef __MSDOS__
