@@ -741,6 +741,13 @@ ALIGN16
 %endif
 %endmacro
 
+section .data
+
+NEWSYM prev, dd 0
+NEWSYM cur, dd 0
+
+section .text
+
 NEWSYM execute
 NEWSYM execloop
    mov bl,dl
@@ -767,21 +774,16 @@ NEWSYM execloop
 .cpuover
    jmp cpuover
 .sound
-   mov edi,[tableadc+ebx*4]
-%ifdef OPENSPC
    pushad
-   mov bl,[esi]
-   movzx eax,byte[cpucycle+ebx]
-   mov ebx,0xC3A13DE6
-   mul ebx
-   add [ospc_cycle_frac],eax
-   adc [SPC_Cycles],edx
-   call OSPC_Run
+   xor ebp,ebp
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   add dword[zspc_time],eax
    popad
-%else
-.skipallspc
-    add dword[zspc_time],33
-%endif
+   mov edi,[tableadc+ebx*4]
    mov bl,[esi]
    inc esi
    sub dh,[cpucycle+ebx]
