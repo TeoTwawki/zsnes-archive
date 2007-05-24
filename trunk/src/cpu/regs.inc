@@ -18,11 +18,10 @@
 ;Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-
 EXTSYM SFXEnable,regptr,initsfxregsr,initSA1regs,SA1Enable,initSDD1regs
 EXTSYM SPC7110Enable,initSPC7110regs,RTCEnable,RTCReset,curypos,cycpl
 EXTSYM pdh,vram,romispal,JoyEOrig,JoyENow,device2,cycphb,joycontren,totlines
-EXTSYM zspc_read_port,zspc_data,zspc_port,zspc_write_port
+EXTSYM zspc_read_port,zspc_data,zspc_port,zspc_write_port,zspc_time,curcyc
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron
@@ -783,10 +782,18 @@ reg213Fr:
     or al,[extlatch]
     ret
 
-
 ; Sound Reg #1
 reg2140r:
-mov byte[zspc_port],0
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   ;add [zspc_time],eax
+   popad
+   mov byte[zspc_port],0
 pushad
 call zspc_read_port
 popad
@@ -795,7 +802,16 @@ ret
 
 ; Sound Reg #2
 reg2141r:
-mov byte[zspc_port],1
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   ;add [zspc_time],eax
+   popad
+   mov byte[zspc_port],1
 pushad
 call zspc_read_port
 popad
@@ -804,7 +820,16 @@ ret
 
 ; Sound Reg #3
 reg2142r:
-mov byte[zspc_port],2
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   ;add [zspc_time],eax
+   popad
+   mov byte[zspc_port],2
 pushad
 call zspc_read_port
 popad
@@ -813,7 +838,16 @@ ret
 
 ; Sound Reg #4
 reg2143r:
-mov byte[zspc_port],3
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   ;add [zspc_time],eax
+   popad
+   mov byte[zspc_port],3
 pushad
 call zspc_read_port
 popad

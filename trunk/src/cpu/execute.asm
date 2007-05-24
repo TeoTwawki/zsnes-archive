@@ -813,6 +813,15 @@ NEWSYM NoHDMALine, db 0
 SECTION .text
 
 NEWSYM cpuover
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,120
+   div ebp
+   add [zspc_time],eax
+   popad
     dec esi
     cmp byte[HIRQNextExe],0
     je .nohirq
@@ -1113,15 +1122,6 @@ NEWSYM cpuover
 .nocache
     cmp byte[curblank],0
     jne .nodrawlineb2
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   add [zspc_time],eax
-   popad
     call drawline
 .nodrawlineb2
     cmp byte[curexecstate],0
@@ -1464,7 +1464,7 @@ NEWSYM cpuover
 ;    call dsp_run_wrap
 ;    popad
     pushad
-   ; call zspc_flush_samples
+    call zspc_flush_samples
     popad
     mov dh,80
 %ifdef __MSDOS__
