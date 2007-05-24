@@ -54,53 +54,47 @@ static const int freqtab[7] = { 8000, 11025, 22050, 44100, 16000, 32000, 48000 }
 
 
 #ifdef __LIBAO__
+static short ao_buffer1[2048];
+static short ao_buffer2[2048];
+static unsigned int ao_samples = 0;
 
 void SoundWrite_ao()
 {
-/*
-  if (!pthread_mutex_lock(&audio_mutex))
+  if (!pthread_mutex_trylock(&audio_mutex))
   {
-    samples_waiting += dsp_sample_count;
-    if (samples_waiting > 1280)
-    {
-      //pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
-    }
+    zspc_flush_samples();
+    ao_samples = zspc_sample_count();
+    memcpy(ao_buffer2, ao_buffer1, ao_samples*sizeof(short));
+    zspc_set_output(ao_buffer1, sizeof(ao_buffer1)/sizeof(short));
+
+    pthread_cond_broadcast(&audio_wait); //Send signal
     pthread_mutex_unlock(&audio_mutex);
   }
-*/
+  else
+  {
+    pthread_cond_broadcast(&audio_wait); //Send signal
+  }
 }
 
 static void *SoundThread_ao(void *useless)
 {
-/*
-  static unsigned int buffer_loc = 0;
-  unsigned int play_amount;
-  char blank[16] = {0};
-
   for (;;)
   {
+    unsigned int samples;
     pthread_mutex_lock(&audio_mutex);
-//    pthread_cond_broadcast(&audio_wait); //Send signal
 
-    if (samples_waiting > 128) { play_amount = 128; }
-    else { play_amount =  samples_waiting; }
-    samples_waiting -= play_amount;
-    pthread_mutex_unlock(&audio_mutex);
+    //The while() is there to prevent error codes from breaking havoc
+     while (!ao_samples)
+     {
+       pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
+     }
 
-    if (buffer_loc + play_amount >= dsp_buffer_size)
-    {
-      unsigned int current_amount = dsp_buffer_size - buffer_loc;
-      ao_play(audio_device, (char *)(dsp_samples_buffer+buffer_loc), current_amount*sizeof(short));
-      play_amount -= current_amount;
-      buffer_loc = 0;
-    }
-    if (play_amount)
-    {
-      ao_play(audio_device, (char *)(dsp_samples_buffer+buffer_loc), play_amount*sizeof(short));
-      buffer_loc += play_amount;
-    }
+     samples = ao_samples;
+     ao_samples = 0;
+     pthread_mutex_unlock(&audio_mutex);
+
+     ao_play(audio_device, (char*)ao_buffer2, samples*2);
   }
-*/
   return(0);
 }
 
@@ -142,6 +136,10 @@ static int SoundInit_ao()
   {
     ao_info *di = ao_driver_info(driver_id);
     printf("\nAudio Opened.\nDriver: %s\nChannels: %u\nRate: %u\n\n", di->name, driver_format.channels, driver_format.rate);
+
+    memset(ao_buffer1, 0, sizeof(ao_buffer1));
+    memset(ao_buffer2, 0, sizeof(ao_buffer2));
+    zspc_set_output(ao_buffer1, sizeof(ao_buffer1)/sizeof(short));
   }
   else
   {
@@ -290,7 +288,7 @@ int InitSound()
   #ifdef __LIBAO__
   if (strcmp(libAoDriver, "sdl") && !(!strcmp(libAoDriver, "auto") && !strcmp(ao_driver_info(ao_default_driver_id())->name, "null")))
   {
-    //return(SoundInit_ao());
+    return(SoundInit_ao());
   }
   #endif
   return(SoundInit_sdl());
