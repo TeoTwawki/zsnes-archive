@@ -1216,6 +1216,15 @@ reg2133w:
 
 ; Sound Register #1
 reg2140w:
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   ;add [zspc_time],eax
+   popad
 mov byte[zspc_port],0
 mov [zspc_data],al
 pushad
@@ -1225,6 +1234,15 @@ ret
 
 ; Sound Register #2
 reg2141w:
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   ;add [zspc_time],eax
+   popad
 mov byte[zspc_port],1
 mov [zspc_data],al
 pushad
@@ -1234,6 +1252,15 @@ ret
 
 ; Sound Register #3
 reg2142w:
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   ;add [zspc_time],eax
+   popad
 mov byte[zspc_port],2
 mov [zspc_data],al
 pushad
@@ -1243,6 +1270,15 @@ ret
 
 ; Sound Register #4
 reg2143w:
+   pushad
+   xor eax,eax
+   mov eax,65
+   mul dh
+   xor edx,edx
+   mov ebp,185
+   div ebp
+   ;add [zspc_time],eax
+   popad
 mov byte[zspc_port],3
 mov [zspc_data],al
 pushad
