@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "safelib.h"
 #include "../cfg.h"
 #include "../input.h"
-#include "../cpu/zspc/zspc.h"
+#include "../zmovie.h"
 
 #include <stdint.h>
 
@@ -1440,21 +1440,13 @@ void clearwin()
 void drawscreenwin()
 {
 #ifdef __LIBAO__
-  extern bool RawDumpInProgress;
   if (!sound_sdl && !GUIOn2 && !GUIOn && !EMUPause && !RawDumpInProgress)
   {
-    //SoundWrite_ao();
+    SoundWrite_ao();
   }
 #endif
 
-  if (!sound_sdl && !GUIOn2 && !GUIOn && !EMUPause && !RawDumpInProgress)
-  {
-    static short buffer[4096] = {0};
-    write_audio(buffer, zspc_sample_count()*2);
-    zspc_set_output(buffer, 4096);
-  }
-
-  /* Just in case - DDOI */
+//   /* Just in case - DDOI */
   if (sdl_state == vid_none)
   {
     return;
