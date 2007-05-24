@@ -2633,19 +2633,19 @@ void CheckTimers()
   }
 
   void SwitchFullScreen();
+  void WriteLine();
 
   void WinUpdateDevices()
   {
     int i, j;
     unsigned char *keys;
     unsigned char keys2[256];
-
     for (i = 0; i < 256; i++)
     {
       keys2[i] = 0;
     }
     keys = (unsigned char*)&pressed;
-
+WriteLine();
     if (KeyboardInput && InputEn == 1)
     {
       KeyboardInput->GetDeviceState(256, keys2);
@@ -3105,12 +3105,12 @@ void CheckTimers()
     }
   }
 
-  extern int NumberOfOpcodes;
+  extern int zspc_time;
 
   void WriteLine()
   {
     char buf[50];
-    sprintf(buf, "%d\n", NumberOfOpcodes);
+    sprintf(buf, "%d\n", zspc_time);
     WriteConsole(debugWindow, buf, strlen(buf), NULL, NULL);
   }
 
