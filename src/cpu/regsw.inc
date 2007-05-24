@@ -23,7 +23,7 @@ EXTSYM initsfxregsw,reg420Bw,reg420Cw,regptw,initSA1regsw,SDD1Reset
 EXTSYM SPC7110Reset,RTCReset2,NextLineCache,vidmemch2,vidmemch4
 EXTSYM vidmemch8,vrama,HIRQCycNext,HIRQNextExe,cycpblt
 EXTSYM cycpb268,cycpb358,opexec268,opexec268cph,opexec358
-
+EXTSYM opexec358cph
 
 %ifndef NO_DEBUGGER
 EXTSYM debstop
@@ -418,8 +418,6 @@ reg2103w:
     mov [oamaddr+1],bl
     shl word[oamaddr],1
 .afteroamlow
-    cmp word[poamaddrs],200h
-    jbe .notinvptr
     mov bx,[poamaddrs]
     mov [oamaddr],bx
     mov byte[nosprincr],1
