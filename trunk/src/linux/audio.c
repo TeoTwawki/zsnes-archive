@@ -54,7 +54,7 @@ static const int freqtab[7] = { 8000, 11025, 22050, 44100, 16000, 32000, 48000 }
 
 
 #ifdef __LIBAO__
-static short ao_buffer1[2048];
+static short ao_buffer1[1070];
 static short ao_buffer2[2048];
 static unsigned int ao_samples = 0;
 
@@ -64,6 +64,7 @@ void SoundWrite_ao()
   {
     zspc_flush_samples();
     ao_samples = zspc_sample_count();
+    //printf("Samples Ready: %u\n", ao_samples);
     memcpy(ao_buffer2, ao_buffer1, ao_samples*sizeof(short));
     zspc_set_output(ao_buffer1, sizeof(ao_buffer1)/sizeof(short));
 
