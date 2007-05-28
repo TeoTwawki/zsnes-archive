@@ -280,7 +280,7 @@ WINVIDOBJ=${VID_D}/sw_draw${OE} ${VID_D}/copyvwin${OE} ${VID_D}/ntsc${OE}\
 ifeq (${QTD},yes)
   DEBUGGEROBJ=${DEBUGGER_D}/load${OE} ${DEBUGGER_D}/ui${OE} ${DEBUGGER_D}/moc_ui${OE}
   LIBS+= -lQtCore4 -lQtGui4
-  MSVCLIBS+= ${QT_BASE}${SLASH}lib${SLASH}qtcore.lib ${QT_BASE}${SLASH}lib${SLASH}qtgui.lib advapi32.lib imm32.lib winspool.lib
+  MSVCLIBS+= ${QT_BASE}${SLASH}lib${SLASH}qtcore.lib ${QT_BASE}${SLASH}lib${SLASH}qtgui.lib advapi32.lib imm32.lib winspool.lib comdlg32.lib
 endif
 
 OBJS+=${WINOBJ} ${WINVIDOBJ} ${NETOBJ} ${DEBUGGEROBJ}
