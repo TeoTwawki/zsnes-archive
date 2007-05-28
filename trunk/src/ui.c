@@ -99,6 +99,8 @@ unsigned char MMXextSupport = 0;
 void init(), WaitForKey(), MMXCheck(), DosExit();
 void SystemInit(), StartUp(), MultiMouseInit();
 
+void zexit(), zexit_error();
+
 void *alloc_ptr;
 unsigned int alloc_size;
 
@@ -344,7 +346,7 @@ void zstart()
   if (guioff && !*ZCartName)
   {
     puts("Will not start without a GUI unless a filename is supplied.");
-    exit(0);
+    zexit();
   }
   else
   {
