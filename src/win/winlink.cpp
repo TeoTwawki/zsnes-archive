@@ -1941,7 +1941,7 @@ extern "C"
 
       MoveWindow(hMainWindow, X, Y, WindowWidth, WindowHeight, TRUE);
 
-      wndpl.length = sizeof(wndpl);
+	  wndpl.length = sizeof(wndpl);
       GetWindowPlacement(hMainWindow, &wndpl);
       SetRect(&rc1, 0, 0, WindowWidth, WindowHeight);
 
@@ -1951,7 +1951,10 @@ extern "C"
       GetClientRect(hMainWindow, &rcWindow);
       ClientToScreen(hMainWindow, (LPPOINT)&rcWindow);
       ClientToScreen(hMainWindow, (LPPOINT)&rcWindow + 1);
-    }
+
+	  if (debugger) DockDebugger();
+
+	}
     else
     {
       atexit(ExitFunction);
