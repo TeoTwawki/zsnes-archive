@@ -111,6 +111,7 @@ DWORD CurrentJoy = 0;
 BYTE BitDepth;
 BYTE BackColor = 0;
 DEVMODE mode;
+HWND DebugWindowHandle;
 
 float MouseMinX = 0;
 float MouseMaxX = 256;
@@ -145,7 +146,7 @@ extern "C"
   void ShutdownSemaphore();
   void DisplayWIPDisclaimer();
   void InitDebugger();
-
+  void DockDebugger();
   void Clear2xSaIBuffer();
   void clear_display();
   DWORD CurMode = ~0;
@@ -673,6 +674,8 @@ LRESULT CALLBACK Main_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       if (LOWORD(wParam) != WA_INACTIVE)
       {
         IsActivated = 1;
+		if (debugger) SetForegroundWindow(DebugWindowHandle);
+
         if (FirstActivate == 0)
         {
           initwinvideo();
@@ -682,7 +685,8 @@ LRESULT CALLBACK Main_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
           EMUPause = 0;
         }
         InputAcquire();
-        if (FirstActivate == 1)
+
+		if (FirstActivate == 1)
         {
           FirstActivate = 0;
         }
@@ -692,6 +696,8 @@ LRESULT CALLBACK Main_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         CheckPriority();
         CheckScreenSaver();
+		SetForegroundWindow(hMainWindow);
+
       }
       if (LOWORD(wParam) == WA_INACTIVE)
       {
@@ -1693,7 +1699,6 @@ extern "C"
   WINDOWPLACEMENT wndpl;
   RECT rc1;
   DWORD newmode = 0;
-  HWND DebugWindowHandle;
 
   void initwinvideo()
   {
@@ -2004,16 +2009,7 @@ extern "C"
       InitSound();
       TestJoy();
 
-      if (debugger)
-	  {
-		 RECT MainWindowXY,DebugWindowXY;
-		 ZeroMemory(&MainWindowXY, sizeof(RECT));
-		 ZeroMemory(&DebugWindowXY, sizeof(RECT));
-		 GetWindowRect(hMainWindow, &MainWindowXY);
-		 DebugWindowHandle = FindWindow(NULL ,"ZSNES Debugger");
-		 GetWindowRect(DebugWindowHandle, &DebugWindowXY);
-		 MoveWindow(DebugWindowHandle, MainWindowXY.left+WindowWidth, MainWindowXY.top, DebugWindowXY.right, DebugWindowXY.bottom, TRUE);
-	  }
+      if (debugger) DockDebugger();
     }
 
     if (FirstVid == 1)
@@ -3199,4 +3195,17 @@ WriteLine();
       PrevBuildNum = CurrentBuildNum;
     }
   }
+
+void DockDebugger()
+{
+   RECT MainWindowXY,DebugWindowXY;
+   ZeroMemory(&MainWindowXY, sizeof(RECT));
+   ZeroMemory(&DebugWindowXY, sizeof(RECT));
+   GetWindowRect(hMainWindow, &MainWindowXY);
+   DebugWindowHandle = FindWindow(NULL ,"ZSNES Debugger");
+   GetWindowRect(DebugWindowHandle, &DebugWindowXY);
+   MoveWindow(DebugWindowHandle, MainWindowXY.left+WindowWidth, MainWindowXY.top, DebugWindowXY.right, DebugWindowXY.bottom, TRUE);
 }
+
+}
+
