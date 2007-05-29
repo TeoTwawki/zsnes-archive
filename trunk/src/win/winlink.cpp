@@ -48,6 +48,10 @@ extern "C"
 
 #include "winlink.h"
 
+#ifdef QT_DEBUGGER
+#include "debugger/load.h"
+#endif
+
 DWORD Moving = 0;
 DWORD SoundBufferSize = 1024 * 18;
 DWORD FirstSound = 1;
@@ -494,6 +498,10 @@ LRESULT CALLBACK Main_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
   static bool shiftpr;
   bool accept;
   int vkeyval = 0;
+
+#ifdef QT_DEBUGGER
+  if (debugger_quit) { debug_exit(0); }
+#endif
 
   switch (uMsg)
   {
@@ -3199,14 +3207,14 @@ WriteLine();
     }
   }
 
-void DockDebugger()
-{
-   RECT MainWindowXY;
-   ZeroMemory(&MainWindowXY, sizeof(RECT));
-   GetWindowRect(hMainWindow, &MainWindowXY);
-   DebugWindowHandle = FindWindow(NULL ,"ZSNES Debugger");
-   SetWindowPos(DebugWindowHandle, HWND_TOP, MainWindowXY.right, MainWindowXY.top, NULL, NULL, SWP_NOSIZE);
-}
+  void DockDebugger()
+  {
+    RECT MainWindowXY;
+    ZeroMemory(&MainWindowXY, sizeof(RECT));
+    GetWindowRect(hMainWindow, &MainWindowXY);
+    DebugWindowHandle = FindWindow(NULL ,"ZSNES Debugger");
+    SetWindowPos(DebugWindowHandle, HWND_TOP, MainWindowXY.right, MainWindowXY.top, 0, 0, SWP_NOSIZE);
+  }
 
 }
 
