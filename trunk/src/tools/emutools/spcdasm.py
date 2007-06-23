@@ -15,7 +15,7 @@ def uint8(n):
 rules = { "NOP":   lambda op, addr, n: [n],
           "CSWAP": lambda op, addr, n: [(n >> 8) & 255, n & 255],
           "CREL":  lambda op, addr, n: [(n & 255), addr + op.bytes + uint8(n >> 8)],
-          "R1":    lambda op, addr, n: [addr + op.bytes + uint8(n >> 8)]
+          "R1":    lambda op, addr, n: [addr + op.bytes + uint8(n)]
         }
 
 class Op:
@@ -70,5 +70,5 @@ def disasm(mem, start, stop):
 
 if __name__ == '__main__':
     import sys
-    mem = array.array('B', file(sys.argv[1]).read()[0x100:0x10100])
+    mem = array.array('B', file(sys.argv[1], 'rb').read()[0x100:0x10100])
     disasm(mem, 0x0000, 0x10000)
