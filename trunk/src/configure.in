@@ -319,7 +319,7 @@ else
   JMA_F=""
   if test x$qtd != xyes; then
     ZC="$CC"
-    ZCFLAGS="$CFLAGS"
+    ZCFLAGS="$CFLAGS -fno-exceptions"
   else
     ZC="$CXX"
     ZCFLAGS="$CXXFLAGS"
