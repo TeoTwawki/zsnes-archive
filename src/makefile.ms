@@ -453,7 +453,7 @@ ${VID_D}/newgfx2${OE}: ${VID_D}/newgfx2.asm macros.mac ${VID_D}/newgfx.mac \
 	${VID_D}/newgfx2.mac ${VID_D}/newgfxwn.mac ${VID_D}/vidmacro.mac
 ${VID_D}/ntsc${OE}: ${VID_D}/ntsc.c ${VID_D}/ntsc.h ${NTSC_D}/snes_ntsc.c \
 	${NTSC_D}/snes_ntsc.h ${NTSC_D}/snes_ntsc_config.h ${NTSC_D}/snes_ntsc_impl.h
-${VID_D}/procvid${OE}: ${VID_D}/procvid.asm macros.mac ${VID_D}/copyvid.inc
+${VID_D}/procvid${OE}: ${VID_D}/procvid.asm macros.mac
 ${VID_D}/procvidc${OE}: ${VID_D}/procvidc.c zmovie.h zpath.h \
 	${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
 ${VID_D}/sw_draw${OE}: ${VID_D}/sw_draw.asm macros.mac
