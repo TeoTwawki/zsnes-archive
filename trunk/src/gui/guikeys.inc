@@ -152,23 +152,6 @@
 %endrep
 %endmacro
 
-%ifdef __MSDOS__
-%macro DOSClearScreenKey 0
-  call DOSClearScreen
-  push eax
-  push ecx
-  mov eax,[vidbufferofsb]
-  mov ecx,288*128
-%%sloop
-  mov dword[eax],0
-  add eax,4
-  dec ecx
-  jnz %%sloop
-  pop ecx
-  pop eax
-%endmacro
-%endif
-
 %macro GUIInputBoxText 2
   cmp dh,0
   je near %%nokeypressed
@@ -301,7 +284,6 @@ GUIgetcurrentinput:
   GUIqcheckkeys 1
   GUIqcheckkeys 1Ch
 
-%ifndef __MSDOS__
   GUIqcheckkeys 0C8h
   GUIqcheckkeys 0D0h
   GUIqcheckkeys 0CBh
@@ -311,7 +293,6 @@ GUIgetcurrentinput:
   GUIqcheckkeys 0C7h
   GUIqcheckkeys 0CFh
   GUIqcheckkeys 09Ch
-%endif
 .notwinport
 
   cmp byte[JoyPad1Move],0
@@ -858,37 +839,6 @@ GUIInputKeys:
   mov byte[MultiTap],0
 .mtap
 .nousepl34
-%ifdef __MSDOS__
-  GUIKeyCheckbox SidewinderFix,'S'
-  cmp dh,'J'
-  jne .nop209
-  cmp byte[cplayernum],0
-  jne .nopl1
-  GUIKeyCheckbox pl1p209,'J'
-  jmp .nopl5
-.nopl1
-  cmp byte[cplayernum],1
-  jne .nopl2
-  GUIKeyCheckbox pl2p209,'J'
-  jmp .nopl5
-.nopl2
-  cmp byte[cplayernum],2
-  jne .nopl3
-  GUIKeyCheckbox pl3p209,'J'
-  jmp .nopl5
-.nopl3
-  cmp byte[cplayernum],3
-  jne .nopl4
-  GUIKeyCheckbox pl4p209,'J'
-  jmp .nopl5
-.nopl4
-  cmp byte[cplayernum],4
-  jne .nopl5
-  GUIKeyCheckbox pl5p209,'J'
-.nopl5
-  call SetDevice
-.nop209
-%endif
   ret
 
 GUITCPIPKeys:
@@ -1015,11 +965,7 @@ GUIGUIOptnsKeys:
   cmp dh,'F'
   jne .guioptn8
   xor byte[FilteredGUI],1
-%ifdef __MSDOS__
-  call DOSClearScreen
-%endif
   pushad
-%ifndef __MSDOS__
   xor ebx,ebx
   mov bl,[cvidmode]
   cmp byte[GUIBIFIL+ebx],0
@@ -1029,12 +975,9 @@ GUIGUIOptnsKeys:
   call initDirectDraw
 %elifdef __OPENGL__
   call initwinvideo
-%else
-
 %endif
   popad
 .skipinit
-%endif
   call Clear2xSaIBuffer
   popad
 .guioptn8
@@ -1056,9 +999,7 @@ GUIGUIOptnsKeys:
 ret
 
 GUIVideoKeys:
-%ifndef __MSDOS__
   GUIInputBoxText GUICustomResTextPtr,SetCustomXY
-%endif
   cmp dh,9
   jne near .tabdone
   cmp byte[NTSCFilter],0
@@ -1223,17 +1164,10 @@ GUIVideoKeys:
   cmp dword[GUIVideoTabs],2
   jne near .notfilterstab
 
-%ifdef __MSDOS__
-  cmp byte[smallscreenon],1
-  je .noquarterscanlines
-  cmp byte[ScreenScale],1
-  je .nohq4x
-%endif
   cmp dh,'I'
   jne .nointerpolation
   xor ebx,ebx
   mov bl,[cvidmode]
-%ifndef __MSDOS__
   cmp byte[GUIBIFIL+ebx],0
   je .nobilinearfilter
   xor byte[BilinearFilter],1
@@ -1248,10 +1182,6 @@ GUIVideoKeys:
   popad
   jmp .nointerpolation
 .nobilinearfilter
-%elifdef __MSDOS__
-  cmp byte[GUIEAVID+ebx],0
-  jne .interpolation
-%endif
 %ifdef __WIN32__
   cmp byte[GUIDSIZE+ebx],0
 %else
@@ -1281,19 +1211,13 @@ GUIVideoKeys:
   mov byte[Keep4_3Ratio],1
 .noforce4_3
 %endif
-%ifndef __MSDOS__
   pushad
   call NTSCFilterInit
   popad
-%endif
 .nontscfilter
   xor ebx,ebx
   mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUI2xVID+ebx],0
-%else
   cmp byte[GUIDSIZE+ebx],0
-%endif
   je near .nosuper2xsai
   cmp dh,'S'
   jne .no2xsai
@@ -1321,12 +1245,10 @@ GUIVideoKeys:
   mov bl,[cvidmode]
   cmp byte[GUIHQ2X+ebx],0
   jne .hqfilter
-%ifndef __MSDOS__
   cmp byte[GUIHQ3X+ebx],0
   jne .hqfilter
   cmp byte[GUIHQ4X+ebx],0
   jne .hqfilter
-%endif
   jmp .nohqfilter
 .hqfilter
   pushad
@@ -1336,7 +1258,6 @@ GUIVideoKeys:
   jz .nohqfilter
   FilterExcl2 scanlines,En2xSaI,antienab,NTSCFilter
 .nohqfilter
-%ifndef __MSDOS__
   cmp dh,'X'
   jne .nohq2x
   cmp byte[hqFilter],0
@@ -1375,69 +1296,30 @@ GUIVideoKeys:
   call Clear2xSaIBuffer
   popad
   GUIKeyButtonHole hqFilterlevel,4,'4'
-%endif
 .nohq4x
 
   xor ebx,ebx
   mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUISLVID+ebx],0
-%else
   cmp byte[GUIDSIZE+ebx],0
-%endif
   je .nofullscanlines
   GUIKeyButtonHole scanlines,0,'O'
-%ifdef __MSDOS__
-  cmp dh,'O'
-  je .needupdate
-%endif
   cmp dh,'F'
   jne .nofullscanlines
   FilterExcl2 En2xSaI,hqFilter,NTSCFilter
   GUIKeyButtonHole scanlines,1,'F'
-%ifdef __MSDOS__
-.needupdate
-  pushad
-  call DOSClearScreen
-  cmp byte[cvidmode],2  ;modeQ
-  je .refresh
-  cmp byte[cvidmode],5
-  jne .nomodex
-.refresh
-  mov byte[cbitmode],1
-  call initvideo2
-  mov byte[cbitmode],0
-  call GUISetPal
-.nomodex
-  popad
-%endif
 .nofullscanlines
-%ifdef __MSDOS__
-  cmp byte[ScreenScale],1
-  je .noquarterscanlines
-%endif
   xor ebx,ebx
   mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUIHSVID+ebx],0
-%else
   cmp byte[GUIDSIZE+ebx],0
-%endif
   je near .noquarterscanlines
   cmp dh,'5'
   jne .nohalfscanlines
   FilterExcl2 En2xSaI,hqFilter,NTSCFilter
-%ifdef __MSDOS__
-  call DOSClearScreen
-%endif
   GUIKeyButtonHole scanlines,3,'5'
 .nohalfscanlines
   cmp dh,'2'
   jne .noquarterscanlines
   FilterExcl2 En2xSaI,hqFilter,NTSCFilter
-%ifdef __MSDOS__
-  call DOSClearScreen
-%endif
   GUIKeyButtonHole scanlines,2,'2'
 .noquarterscanlines
   GUIKeyCheckbox GrayscaleMode,'G'
@@ -1470,9 +1352,6 @@ GUIVideoKeys:
   call initDirectDraw
   call Clear2xSaIBuffer
   popad
-%elifdef __MSDOS__
-  jz .novsync
-  FilterExcl2 Triplebufen
 %elifdef __OPENGL__
   pushad
   call initwinvideo
@@ -1502,7 +1381,6 @@ GUIVideoKeys:
 %endif
 .notriplebuffer
 %endif
-%ifndef __MSDOS__
   cmp dh,'R'
   jne .nokeep4_3
   xor ebx,ebx
@@ -1515,28 +1393,6 @@ GUIVideoKeys:
   call Clear2xSaIBuffer
   popad
 .nokeep4_3
-%else
-  cmp dh,'M'
-  jne .nosmallscreen
-  xor ebx,ebx
-  mov bl,[cvidmode]
-  cmp byte[GUISSVID+ebx],0
-  je .nosmallscreen
-  xor byte[smallscreenon],1
-  FilterExcl2 ScreenScale,antienab,En2xSaI,scanlines
-  DOSClearScreenKey
-.nosmallscreen
-  cmp dh,'C'
-  jne .nofullscreen
-  xor ebx,ebx
-  mov bl,[cvidmode]
-  cmp byte[GUIWSVID+ebx],0
-  je .nofullscreen
-  xor byte[ScreenScale],1
-  FilterExcl2 smallscreenon,antienab,En2xSaI
-  DOSClearScreenKey
-.nofullscreen
-%endif
 .notfilterstab
 
   cmp dword[GUIVntscTab],1
@@ -1562,9 +1418,6 @@ GUISoundKeys:
   GUIKeyCheckbox RevStereo,'V'
   GUIKeyCheckbox Surround,'M'
   GUIKeyCheckbox SPCDisable,'D'
-%ifdef __MSDOS__
-  GUIKeyCheckbox Force8b,'F'
-%endif
 %ifdef __WIN32__
   GUIKeyCheckbox PrimaryBuffer,'P'
 %endif
@@ -2941,10 +2794,6 @@ WaitForKey:
 .nokey
   cmp byte[MouseDis],1
   je .mousedis2
-  push ebx
-;    mov eax,0Bh
-;    int 33h
-  pop ebx
 .mousedis2
   mov byte[GUIpclicked],1
   ret

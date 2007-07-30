@@ -82,8 +82,6 @@ NEWSYM PrintStr          ; Print ASCIIZ string
     push edx
     call putchar
     pop edx
-;    mov ah,02h
-;    int 21h
     pop edx
     inc edx
     jmp .next
@@ -206,8 +204,6 @@ NEWSYM Check_Key
 .nokeys
     popad
     mov al,[wfkey]
-;    mov ah,0Bh
-;    int 21h
     ret
 
 NEWSYM Get_Key
@@ -285,9 +281,6 @@ SECTION .text
 
 NEWSYM Get_Memfree
     mov eax,02000000h
-;    mov ax,0500h
-;    mov edi,edx
-;    int 31h
     ret
 
 NEWSYM Output_Text       ; Output character (ah=02h) or string (ah=09h)
@@ -303,7 +296,6 @@ NEWSYM Output_Text       ; Output character (ah=02h) or string (ah=09h)
     push edx
     call putchar
     pop edx
-;    int 21h     ; print dl
     popad
     ret
 .string
@@ -427,31 +419,26 @@ NEWSYM DrawScreen               ; In-game screen render w/ triple buffer check
     cmp dword[converta],1
     jne near .skipconv
     pushad
-        mov dword[UnusedBit],     10000000000000001000000000000000b
-        mov dword[HalfTrans],     01111011110111100111101111011110b
-        mov dword[UnusedBitXor],  01111111111111110111111111111111b
-        mov dword[UnusedBit+4],   10000000000000001000000000000000b
-        mov dword[HalfTrans+4],   01111011110111100111101111011110b
-        mov dword[UnusedBitXor+4],01111111111111110111111111111111b
-        mov dword[HalfTransB],    00000100001000010000010000100001b
-        mov dword[HalfTransB+4],  00000100001000010000010000100001b
-        mov dword[HalfTransC],    01111011110111100111101111011110b
-        mov dword[HalfTransC+4],  01111011110111100111101111011110b
-        mov dword[ngrposng],10
-        mov dword[nggposng],5
-        mov dword[ngbposng],0
-
+    mov dword[UnusedBit],     10000000000000001000000000000000b
+    mov dword[HalfTrans],     01111011110111100111101111011110b
+    mov dword[UnusedBitXor],  01111111111111110111111111111111b
+    mov dword[UnusedBit+4],   10000000000000001000000000000000b
+    mov dword[HalfTrans+4],   01111011110111100111101111011110b
+    mov dword[UnusedBitXor+4],01111111111111110111111111111111b
+    mov dword[HalfTransB],    00000100001000010000010000100001b
+    mov dword[HalfTransB+4],  00000100001000010000010000100001b
+    mov dword[HalfTransC],    01111011110111100111101111011110b
+    mov dword[HalfTransC+4],  01111011110111100111101111011110b
+    mov dword[ngrposng],10
+    mov dword[nggposng],5
+    mov dword[ngbposng],0
     call ConvertToAFormat
-
     popad
-
 .skipconv
     pushad
     call drawscreenwin
     popad
-
     ret
-;   jmp DosDrawScreen
 
 NEWSYM vidpastecopyscr       ; GUI screen render
    pushad
@@ -542,7 +529,7 @@ db 'VARIABLE    OD  W',0  ;59
 
 
 ; Video Mode Feature Availability (1 = Available, 0 = Not Available)
-; Left side starts with Video Mode 0
+; Left side starts with Video Mode 0     1                   2                   3                   4                   5
 ;                    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
 NEWSYM GUIWFVID,  db 0,1,0,0,0,0,1,1,1,0,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,1,1,1,0,0,1,1,1,0,0,1,1,1,0,1,0,1,1,0,1,0,0,1,0,1,0,0,1,0,1,0,1,0,1,0 ; Fullscreen
 NEWSYM GUIDSIZE,  db 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,0,1,1,0,1,0,1,1,0,1,1,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ; D Modes

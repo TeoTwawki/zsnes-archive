@@ -184,10 +184,8 @@ static void outofmemory()
 
 extern unsigned char wramdataa[65536], ram7fa[65536];
 
-#ifndef __MSDOS__
 unsigned char *BitConv32Ptr = 0;
 unsigned char *RGBtoYUVPtr = 0;
-#endif
 unsigned char *spcBuffera = 0;
 unsigned char *spritetablea = 0;
 unsigned char *vbufaptr = 0;
@@ -212,10 +210,8 @@ unsigned int dspRptr[256];
 
 void deallocmem()
 {
-#ifndef __MSDOS__
   deallocmemhelp(BitConv32Ptr);
   deallocmemhelp(RGBtoYUVPtr);
-#endif
   deallocmemhelp(spcBuffera);
   deallocmemhelp(spritetablea);
   deallocmemhelp(vbufaptr);
@@ -238,10 +234,8 @@ void deallocmem()
 
 static void allocmem()
 {
-#ifndef __MSDOS__
   AllocmemFail(BitConv32Ptr, 4096+65536*16);
   AllocmemFail(RGBtoYUVPtr,65536*4+4096);
-#endif
   AllocmemFail(spcBuffera,65536*4+4096);
   AllocmemFail(spritetablea,256*512+4096);
   AllocmemFail(vbufaptr,512*296*4+4096+512*296);
@@ -419,58 +413,54 @@ static char *seconds_to_asc(unsigned int seconds)
 
 void DisplayBatteryStatus()
 {
-#ifndef __MSDOS__
-   int CheckBattery();
-   int CheckBatteryTime();
-   int CheckBatteryPercent();
+  int CheckBattery();
+  int CheckBatteryTime();
+  int CheckBatteryPercent();
 
-   *CSStatus2 = 0;
-   *CSStatus3 = 0;
+  *CSStatus2 = 0;
+  *CSStatus3 = 0;
 
-   switch (CheckBattery())
-   {
-     case -1: //No battery
-       strcpy(CSStatus, "No battery present");
-       break;
+  switch (CheckBattery())
+  {
+    case -1: //No battery
+      strcpy(CSStatus, "No battery present");
+    break;
 
-     case 0: //Plugged in
-       {
-         int percent = CheckBatteryPercent();
+    case 0: //Plugged in
+    {
+      int percent = CheckBatteryPercent();
 
-         strcpy(CSStatus, "PC is plugged in");
-         if (percent > 0)
-         {
-           sprintf(CSStatus2, "%d%% charged", percent);
-         }
-       }
-       break;
+      strcpy(CSStatus, "PC is plugged in");
+      if (percent > 0)
+      {
+        sprintf(CSStatus2, "%d%% charged", percent);
+      }
+    }
+    break;
 
-     case 1: //Not plugged in
-       {
-         int percent = CheckBatteryPercent();
-         int battery_time = CheckBatteryTime();
+    case 1: //Not plugged in
+    {
+      int percent = CheckBatteryPercent();
+      int battery_time = CheckBatteryTime();
 
-         strcpy(CSStatus, "PC is running off of battery");
-         if (battery_time > 0)
-         {
-           sprintf(CSStatus2, "Time remaining: %s", seconds_to_asc(battery_time));
-         }
-         if (percent > 0)
-         {
-           sprintf(CSStatus3, "%d%% remaining", percent);
-         }
-       }
-       break;
-   }
+      strcpy(CSStatus, "PC is running off of battery");
+      if (battery_time > 0)
+      {
+        sprintf(CSStatus2, "Time remaining: %s", seconds_to_asc(battery_time));
+      }
+      if (percent > 0)
+      {
+        sprintf(CSStatus3, "%d%% remaining", percent);
+      }
+    }
+    break;
+  }
 
-   Msgptr = CSStatus;
-   MessageOn = 100;
-#endif
+  Msgptr = CSStatus;
+  MessageOn = 100;
 }
 
 // Make use of multiple mice.
-
-#ifndef __MSDOS__
 
 int MouseCount = 0;
 
@@ -585,8 +575,6 @@ void MultiMouseProcess()
   }
 }
 
-#endif
-
 char panickeyp[] = "ALL SWITCHES NORMAL\0";
 char mztrtr0[] = "LOAD MZT MODE - OFF\0";
 char mztrtr1[] = "LOAD MZT MODE - RECORD\0";
@@ -611,9 +599,9 @@ char bglayermsg[] = "BG  LAYER DISABLED\0";
 char gammamsg[] = "GAMMA LEVEL:   \0";
 
 extern unsigned int MsgCount, MessageOn;
-extern unsigned char pressed[];
-extern unsigned char scrndis, disableeffects, osm2dis, snesinputdefault1, snesinputdefault2;
-extern unsigned char mousexloc, mouseyloc, t1cc, current_zst;
+extern unsigned short t1cc;
+extern unsigned char pressed[], scrndis, disableeffects, osm2dis, current_zst;
+extern unsigned char mousexloc, mouseyloc, snesinputdefault1, snesinputdefault2;
 /*
 extern unsigned char Voice0Disable, Voice1Disable, Voice2Disable, Voice3Disable;
 extern unsigned char Voice4Disable, Voice5Disable, Voice6Disable, Voice7Disable;

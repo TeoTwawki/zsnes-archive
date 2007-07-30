@@ -1869,10 +1869,6 @@ void SetAddressingModesSA1(), GenerateBank0TableSA1();
 void InitDSP(), InitDSP2(), InitDSP3(), InitDSP4(), InitOBC1(), InitFxTables();
 void initregr(), initregw();
 
-#ifdef __MSDOS__
-void dosmakepal();
-#endif
-
 void CheckROMType()
 {
   char *ROM = (char *)romdata;
@@ -2106,13 +2102,6 @@ void SetupROM()
 
   CheckROMType();
   SetIRQVectors();
-
-  #ifdef __MSDOS__
-  if (!cbitmode) // 8-bit mode uses a palette
-  {
-    asm_call(dosmakepal);
-  }
-  #endif
 
   /* get timing (pal/ntsc)
   ForceROMTiming is from the GUI.

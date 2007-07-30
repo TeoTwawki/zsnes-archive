@@ -40,11 +40,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define NUMCONV_FW4
 #include "../numconv.h"
 
-#ifdef __MSDOS__
-#define MAX_PNGNAME_LEN 13
-#else
 #define MAX_PNGNAME_LEN (strlen(ZSaveName)+11) //11 = _12345.png\0
-#endif
 
 char *generate_image_filename(const char *image_suffix)
 {
@@ -52,16 +48,11 @@ char *generate_image_filename(const char *image_suffix)
   if (filename)
   {
     unsigned int i;
-#ifdef __MSDOS__
-    char *p = filename+3;
-    strcpy(filename, "img");
-#else
     char *p;
     strcpy(filename, ZSaveName);
     p = strrchr(filename, '.');
     if (!p) { p = filename+strlen(filename); }
     *p++ = '_';
-#endif
     for (i = 0; i < 100000; i++)
     {
       sprintf(p, "%05d.%s", i, image_suffix);
@@ -224,59 +215,6 @@ void Grab_BMP_Data()
         for (x = 0; x < width; x++)
         {
           fwrite3(((PIXEL&0xF800) << 8) | ((PIXEL&0x07E0) << 5) | ((PIXEL&0x001F) << 3), fp);
-        }
-      }
-      fclose(fp);
-    }
-    free(filename);
-  }
-}
-
-void Grab_BMP_Data_8()
-{
-  char *filename = generate_image_filename("bmp");
-  if (filename)
-  {
-    FILE *fp = fopen_dir(ZSnapPath, filename, "wb");
-    if (fp)
-    {
-      const unsigned int colors = 256;
-      const unsigned int palette_size = colors*4;
-      const unsigned int header_size = palette_size+54;
-      const unsigned short width = SNAP_WIDTH;
-      const unsigned short height = SNAP_HEIGHT;
-      unsigned short y, x;
-
-      fputs("BM", fp);                          //Header
-      fwrite4(width*height+header_size, fp);    //File size
-      fwrite4(0, fp);                           //Reserved
-      fwrite4(header_size, fp);                 //Offset to bitmap
-      fwrite4(40, fp);                          //Length of color explain field;
-      fwrite4(width, fp);                       //Width
-      fwrite4(height, fp);                      //Height
-      fwrite2(1, fp);                           //Planes
-      fwrite2(8, fp);                           //Bits per pixel
-      fwrite4(0, fp);                           //Compression Format
-      fwrite4(width*height, fp);                //Bitmap data size
-      fwrite4(0, fp);                           //H-Res?
-      fwrite4(0, fp);                           //V-Res?
-      fwrite4(colors, fp);                      //Colors
-      fwrite4(colors, fp);                      //Important Colors
-
-      for (y = 0; y < colors; y++) //Write palette
-      {
-        unsigned char byte = 0;
-        fwrite((unsigned char *)vidbuffer+100000+y*3+3, 1, 1, fp);
-        fwrite((unsigned char *)vidbuffer+100000+y*3+2, 1, 1, fp);
-        fwrite((unsigned char *)vidbuffer+100000+y*3+1, 1, 1, fp);
-        fwrite(&byte, 1, 1, fp);
-      }
-
-      for (y = height; y-- ;) //Have to write image upside down
-      {
-        for (x = 0; x < width; x++)
-        {
-          fwrite((unsigned char *)vidbuffer+(y+1)*288+x+16, 1, 1, fp);
         }
       }
       fclose(fp);

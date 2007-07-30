@@ -63,13 +63,6 @@ STRIP=-Ws -s
 
 QT_BASE=c:\qt\4.2.3
 
-
-ifeq (${ENV},dos)
-  CC = gcc
-  CPPC = gxx
-  OS=__MSDOS__
-endif
-
 ifeq (${ENV},win32-unix-shell)
   ENV=win32
   CROSS=yes
@@ -91,13 +84,6 @@ ifeq (${ENV},msvc)
   DRESOBJ=${WIN_D}/zsnes.res
   OS=__WIN32__
   QT_BASE=c:\qt
-endif
-
-ifeq (${ENV},dos-cross)
-  CC = i586-msdosdjgpp-gcc
-  CPPC = i586-msdosdjgpp-g++
-  OS=__MSDOS__
-  CROSS=yes
 endif
 
 ifeq (${ENV},win32-cross)
@@ -122,14 +108,6 @@ ifeq (${CROSS},no)
   endif
   SLASH=\${BLAHBLAHBLAH}
   SEP=,
-endif
-
-ifeq (${OS},__MSDOS__)
-  EXE=zsnes.exe
-  FILEFORMAT=coff
-  LIBS=${LIBSORIG} -lm
-  OE=.do
-  CONFLOC=
 endif
 
 ifeq (${OS},__WIN32__)
@@ -177,9 +155,6 @@ ifeq (${JMA},no)
   CFLAGSORIG+= -DNO_JMA
   ASMFLAGSORIG+= -DNO_JMA
   CXXFLAGSORIG+= -fno-exceptions
-  ifeq (${OS},__MSDOS__)
-    LINK=${CC}
-  endif
 else
   ifeq (${ENV},msvc)
     CFLAGSORIG+= /EHsc
@@ -236,12 +211,8 @@ MAINOBJ=endmem${OE} init${OE} initc${OE} patch${OE} ui${OE} vcache${OE}\
 
 ifneq (${DEBUGGER},no)
   MAINOBJ+= debugger${OE} debugasm${OE}
-  ifeq (${OS},__MSDOS__)
-    LIBS+= -lpdcur
-  else
     LIBS+= -lpdcurses
     MSVCLIBS+= pdcurses.lib
-  endif
 endif
 
 NETOBJ=
@@ -257,15 +228,6 @@ VIDEOBJ=${VID_D}/makev16b${OE} ${VID_D}/makev16t${OE} ${VID_D}/makevid${OE}\
 ZIPOBJ=${ZIP_D}/unzip${OE} ${ZIP_D}/zpng${OE}
 
 OBJS=${CHIPSOBJ} ${CPUOBJ} ${GUIOBJ} ${VIDEOBJ} ${MAINOBJ} ${ZIPOBJ} ${EFFECTSOBJ} ${JMAOBJ}
-
-ifeq (${OS},__MSDOS__)
-DOSOBJ=${DOS_D}/dosintrf${OE} ${DOS_D}/gppro${OE} ${DOS_D}/initvid${OE}\
-	${DOS_D}/sound${OE} ${DOS_D}/sw${OE} ${DOS_D}/lib${OE} ${DOS_D}/joy${OE}\
-	${DOS_D}/vesa12${OE} ${DOS_D}/vesa2${OE}
-
-DOSVIDOBJ=${VID_D}/mode7ext${OE} ${VID_D}/newgfx2${OE} ${VID_D}/mode7${OE}
-OBJS+=${DOSOBJ} ${DOSVIDOBJ}
-endif
 
 ifeq (${OS},__WIN32__)
 WINOBJ=${DRESOBJ}\

@@ -51,9 +51,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define mkdir_p(path) mkdir(path, mmode)
 #endif
 
-#ifdef __MSDOS__
-char ZCfgFile[] = "zsnes.cfg";
-#elif defined(__WIN32__)
+#ifdef __WIN32__
 char ZCfgFile[] = "zsnesw.cfg";
 #else
 char ZCfgFile[] = "zsnesl.cfg";
@@ -508,13 +506,6 @@ char *realpath_dir(const char *path, const char *file, char *buf)
   return(realpath(strdupcat_internal(path, file), buf));
 #endif
 }
-
-#ifdef __MSDOS__
-char *realpath_sfn_dir(const char *path, const char *file, char *buf)
-{
-  return(realpath_sfn(strdupcat_internal(path, file), buf));
-}
-#endif
 
 FILE *fdreopen_dir(const char *path, const char *file, const char *mode, int fd)
 {

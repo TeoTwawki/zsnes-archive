@@ -45,10 +45,9 @@
 ;EXTSYM dsp_reset
 EXTSYM curblank,vidpastecopyscr,frameskip,newengen,cvidmode,antienab
 EXTSYM soundon,StereoSound,SoundQuality,MusicRelVol,endprog
-EXTSYM continueprog,spcBuffera,cbitmode,t1cc
+EXTSYM continueprog,spcBuffera,t1cc,TwelveHourClock
 EXTSYM romloadskip,romdata,init65816,current_zst
-EXTSYM procexecloop
-EXTSYM statesaver,loadstate2
+EXTSYM procexecloop,statesaver,loadstate2
 EXTSYM vidbuffer,ASCII2Font,hirestiledat,showallext,scanlines
 EXTSYM sprlefttot,spritetablea,KeyRTRCycle
 EXTSYM cgram,tempco0,prevbright,maxbr,prevpal,coladdr,coladdg
@@ -64,7 +63,7 @@ EXTSYM GUIDeInit,SpecialLine,DrawWater,DrawBurn,DrawSmoke
 EXTSYM GetDate,horizon_get,MessageOn,GetTime
 EXTSYM Clear2xSaIBuffer,MouseWindow,Show224Lines
 EXTSYM newgfx16b,NumVideoModes,MusicVol,NumInputDevices
-EXTSYM GUIInputNames,GUIVideoModeNames,GameSpecificInput,device1,device2,TwelveHourClock
+EXTSYM GUIInputNames,GUIVideoModeNames,GameSpecificInput,device1,device2
 EXTSYM GUIM7VID,GUINTVID,GUIHQ2X,RawDumpInProgress
 EXTSYM MultiTap,SFXEnable,RestoreSystemVars
 EXTSYM nssdip1,nssdip2,nssdip3,nssdip4,nssdip5,nssdip6
@@ -118,10 +117,14 @@ EXTSYM FastFwdToggle,gui_key,gui_key_extended,GUILoadKeysNavigate
 EXTSYM KeyDisplayBatt,KeyIncreaseGamma,KeyDecreaseGamma,vsyncon
 EXTSYM MovieVideoMode,MovieAudio,MovieVideoAudio,MovieAudioCompress,newfont
 EXTSYM d_names,selected_names,GUIfileentries,GUIdirentries,GUIcurrentdirviewloc
-EXTSYM GUIcurrentfilewin,GUIcurrentcursloc,GUIcurrentviewloc,SetMovieForcedLength
+EXTSYM GUIcurrentfilewin,GUIcurrentcursloc,GUIcurrentviewloc
 EXTSYM GUIcurrentdircursloc,GetLoadData,ZRomPath,SaveSecondState,ClockBox,DisplayInfo
 EXTSYM GUIJT_currentviewloc,GUIJT_currentcursloc,GUIJT_entries,ScreenShotFormat
 EXTSYM GUIJT_offset,GUIJT_viewable,GUIGenericJumpTo,SSAutoFire,SSPause
+EXTSYM ZsnesPage,DocsPage,GUICustomX,GUICustomY,GetCustomXY,SetCustomXY
+EXTSYM SetMovieForcedLength,initwinvideo,Keep4_3Ratio,PrevFSMode,PrevWinMode
+EXTSYM NTSCFilterInit,hqFilterlevel,BilinearFilter,GUIBIFIL,GUIWFVID,GUIDSIZE
+EXTSYM GUIHQ3X,GUIHQ4X,GUIKEEP43,Keep43Check,changeRes,sl_intensity
 
 %ifdef __UNIXSDL__
 EXTSYM numlockptr
@@ -130,17 +133,6 @@ EXTSYM initDirectDraw,reInitSound,CheckAlwaysOnTop,CheckPriority,AlwaysOnTop
 EXTSYM CheckScreenSaver,MouseWheel,TrapMouseCursor,AllowMultipleInst,TripleBufferWin
 EXTSYM HighPriority,DisableScreenSaver,SaveMainWindowPos,PrimaryBuffer
 EXTSYM CBBuffer,CBLength,PasteClipBoard,ctrlptr,PauseFocusChange
-%elifdef __MSDOS__
-EXTSYM dssel,SetInputDevice209,initvideo2,Force8b,smallscreenon,ExitFromGUI
-EXTSYM pl1p209,pl2p209,pl3p209,pl4p209,pl5p209,SidewinderFix,Triplebufen,ScreenScale,ErrorPointer
-EXTSYM GUIEAVID,GUIWSVID,GUISSVID,GUITBVID,GUISLVID,GUIHSVID,GUI2xVID,TripBufAvail
-EXTSYM JoyMinX209,JoyMaxX209,JoyMinY209,JoyMaxY209,DOSClearScreen,dosmakepal,ResetTripleBuf
-%endif
-
-%ifndef __MSDOS__
-EXTSYM ZsnesPage,DocsPage,GUICustomX,GUICustomY,GetCustomXY,SetCustomXY,initwinvideo
-EXTSYM Keep4_3Ratio,PrevFSMode,PrevWinMode,NTSCFilterInit,hqFilterlevel,BilinearFilter,GUIBIFIL
-EXTSYM GUIWFVID,GUIDSIZE,GUIHQ3X,GUIHQ4X,GUIKEEP43,Keep43Check,changeRes,sl_intensity
 %endif
 
 %ifndef __WIN32__
@@ -212,11 +204,7 @@ MenuDat1 db 12, 3,1,1,1,1,1,1,1,1,1,0,1,2,0
 MenuDat2 db 8,  3,1,1,0,1,1,1,0,2,0
 MenuDat3 db 10, 3,0,1,1,0,1,1,1,1,1,2,0
 MenuDat4 db 2,  3,1,2,0
-%ifndef __MSDOS__
 MenuDat5 db 0,  2,0,0
-%else
-MenuDat5 db 1,  3,2,0
-%endif
 MenuDat6 db 6,  3,1,1,1,1,0,2,0
 
 NEWSYM GUIPrevMenuData,
@@ -260,13 +248,8 @@ GUICheatMenuData:
   db 1,'BROWSE      ',0
   db 1,'SEARCH      ',0
 GUINetPlayMenuData:
-%ifndef __MSDOS__
   db 1,'INTERNET    ',0
   db 0,'------------',0
-%else
-  db 1,'MODEM       ',0
-  db 1,'IPX         ',0
-%endif
 GUIMiscMenuData:
   db 1,'MISC KEYS   ',0
   db 1,'GUI OPTS    ',0
@@ -427,24 +410,6 @@ GUIt1ccSwap db 0
 GUIskipnextkey42 db 0
 
 SECTION .text
-NEWSYM GUIinit18_2hz
-  mov al,00110110b
-  out 43h,al
-  mov ax,0
-  out 40h,al
-  mov al,ah
-  out 40h,al
-  ret
-
-NEWSYM GUIinit36_4hz
-  mov al,00110110b
-  out 43h,al
-  mov ax,32768
-  out 40h,al
-  mov al,ah
-  out 40h,al
-  ret
-
 NEWSYM GUI36hzcall
   inc dword[GUIt1cc]
   inc dword[SnowMover]
@@ -477,76 +442,6 @@ NEWSYM GUI36hzcall
   inc byte[GUILDFlash]
   and byte[GUILDFlash],0Fh
   ret
-
-%ifdef __MSDOS__
-NEWSYM GUIhandler8h
-  cli
-  push ds
-  push eax
-  mov ax,[cs:dssel]
-  mov ds,ax
-  call GUI36hzcall
-  xor byte[GUIt1ccSwap],1
-  cmp byte[GUIt1ccSwap],0
-  je .nocall
-  pushf
-  call far [GUIoldhand8o]
-.nocall
-  mov al,20h
-  out 20h,al
-  pop eax
-  pop ds
-  sti
-  iretd
-
-NEWSYM GUIhandler9h
-  cli
-  push ds
-  push eax
-  push ebx
-  mov ax,[cs:dssel]
-  mov ds,ax
-
-  xor ebx,ebx
-  in al,60h                 ; get keyboard scan code
-  cmp al,42
-  jne .no42
-  cmp byte[GUIskipnextkey42],0
-  je .no42
-  mov byte[GUIskipnextkey42],0
-  jmp .skipkeyrel
-.no42
-  cmp al,0E0h
-  jne .noE0
-  mov byte[GUIskipnextkey42],1
-  jmp .skipkeyrel
-.noE0
-  mov byte[GUIskipnextkey42],0
-  mov bl,al
-  xor bh,bh
-  test bl,80h               ; check if bit 7 is on (key released)
-  jnz .keyrel
-  cmp byte[pressed+ebx],0
-  jne .skipa
-  mov byte[pressed+ebx],1        ; if not, set key to pressed
-.skipa
-  jmp .skipkeyrel
-.keyrel
-  and bl,7Fh
-  mov byte[pressed+ebx],0        ; if not, set key to pressed
-.skipkeyrel
-  mov byte[pressed],0
-
-  pushf
-  call far [GUIoldhand9o]
-  mov al,20h
-  out 20h,al
-  pop ebx
-  pop eax
-  pop ds
-  sti
-  iretd
-%endif
 
 %macro loadmenuopen 1
   mov al,[GUIcmenupos]
@@ -607,9 +502,6 @@ LoadDetermine:
   mov byte[GUICheatMenuData+14*2],1
   mov byte[GUIMiscMenuData+14*2],1
   mov byte[GUINetPlayMenuData],2             ; Gray out Netplay options
-%ifdef __MSDOS__
-  mov byte[GUINetPlayMenuData+14],2
-%endif
   cmp byte[romloadskip],0
   je .noromloaded
   mov byte[GUIGameMenuData+14],2
@@ -791,12 +683,6 @@ NEWSYM StartGUI
 .skipbl
 %endif
   mov byte[GUILoadPos],0
-%ifdef __MSDOS__
-  cmp byte[TripBufAvail],0
-  jne .notexttb
-  mov byte[Triplebufen],0
-.notexttb
-%endif
   cmp byte[MMXSupport],1
   jne .2xSaIdis
   cmp byte[newgfx16b],0
@@ -808,9 +694,6 @@ NEWSYM StartGUI
 .no2xSaIdis
   cmp byte[En2xSaI],0
   je .no2xsaien
-%ifdef __MSDOS__
-  mov byte[Triplebufen],0
-%endif
   mov byte[hqFilter],0
   mov byte[scanlines],0
   mov byte[antienab],0
@@ -839,10 +722,6 @@ NEWSYM StartGUI
   mov eax,[NumComboGlob]
 .local
   mov [NumCombo],eax
-%ifdef __MSDOS__
-  call ResetTripleBuf
-%endif
-
   cmp dword[GUIwinposx+16*4],0
   jne .notzero
   mov dword[GUIwinposx+16*4],3
@@ -1105,13 +984,6 @@ NEWSYM StartGUI
   xor eax,eax
   rep stosd
   GUIDeInitIRQs
-%ifdef __MSDOS__
-  call DOSClearScreen
-  cmp byte[cbitmode],0
-  jne .nomakepal
-  call dosmakepal
-.nomakepal
-%endif
   mov word[t1cc],1
 
   pushad
@@ -1460,106 +1332,8 @@ guipostvideo:
 SECTION .data
 guipostvidmsg1 db 'VIDEO MODE CHANGED.',0
 guipostvidmsg2 db '  PRESS SPACEBAR.',0
+
 SECTION .text
-
-%ifdef __MSDOS__
-guipostvideofail:
-  mov dword[guipostvidptr],guipostvidmsg3b
-  mov byte[guipostvidmsg3b],0
-  mov byte[guipostvidmsg4b],0
-  mov byte[guipostvidmsg5b],0
-  mov eax,[ErrorPointer]
-  mov ebx,eax
-.loop
-  cmp byte[ebx],0
-  je .found
-  cmp byte[ebx],'$'
-  je .found
-  inc ebx
-  jmp .loop
-.found
-  mov edx,ebx
-  sub edx,eax
-.detnext
-  or edx,edx
-  jz .notext
-  cmp edx,25
-  jbe .copytext
-.nospace
-  dec edx
-  cmp byte[eax+edx],32
-  jne .nospace
-  jmp .detnext
-.copytext
-  push ebx
-  mov ecx,[guipostvidptr]
-.copytextloop
-  mov bl,[eax]
-  cmp bl,'$'
-  jne .notdol
-  mov bl,0
-.notdol
-  mov [ecx],bl
-  inc eax
-  inc ecx
-  dec edx
-  jnz .copytextloop
-  mov byte[ecx],0
-  pop ebx
-  add dword[guipostvidptr],26
-  cmp byte[eax],0
-  je .notext
-  cmp byte[eax],'$'
-  je .notext
-  inc eax
-  jmp .found
-.notext
-
-  xor ebx,ebx
-  mov ecx,256
-.a
-  mov byte[pressed+ebx],0
-  inc ebx
-  dec ecx
-  jnz .a
-  call GUIUnBuffer
-  call DisplayBoxes
-  call DisplayMenu
-  GUIBox 43,90,213,163,160
-  GUIBox 43,90,213,90,162
-  GUIBox 43,90,43,163,161
-  GUIBox 213,90,213,163,159
-  GUIBox 43,163,213,163,158
-  GUIOuttext 56,96,guipostvidmsg1b,220-15
-  GUIOuttext 55,95,guipostvidmsg1b,220
-  GUIOuttext 56,108,guipostvidmsg2b,220-15
-  GUIOuttext 55,107,guipostvidmsg2b,220
-  GUIOuttext 56,119,guipostvidmsg3b,220-15
-  GUIOuttext 55,118,guipostvidmsg3b,220
-  GUIOuttext 56,129,guipostvidmsg4b,220-15
-  GUIOuttext 55,128,guipostvidmsg4b,220
-  GUIOuttext 56,139,guipostvidmsg5b,220-15
-  GUIOuttext 55,138,guipostvidmsg5b,220
-  GUIOuttext 56,152,guipostvidmsg8b,220-15
-  GUIOuttext 55,151,guipostvidmsg8b,220
-  call vidpastecopyscr
-  call GUIUnBuffer
-  call DisplayBoxes
-  call DisplayMenu
-  mov dword[GUIkeydelay],0FFFFFFFFh
-  jmp guipostvideo.pressedfail
-
-SECTION .data
-guipostvidmsg1b db 'VIDEO MODE CHANGE FAILED.',0
-guipostvidmsg2b db 'UNABLE TO INIT VESA2:',0
-guipostvidmsg3b db 'AAAAAAAAAAAAAAAAAAAAAAAAA',0
-guipostvidmsg4b db 'AAAAAAAAAAAAAAAAAAAAAAAAA',0
-guipostvidmsg5b db 'AAAAAAAAAAAAAAAAAAAAAAAAA',0
-guipostvidmsg8b db 'PRESS ANY KEY',0
-SECTION .bss
-guipostvidptr resd 1
-SECTION .text
-%endif
 
 NEWSYM guicheaterror
     xor ebx,ebx
@@ -1619,10 +1393,6 @@ NEWSYM guicheaterror
 .nokey
     cmp byte[MouseDis],1
     je .mousedis2
-    push ebx
-;    mov eax,0Bh
-;    int 33h
-    pop ebx
 .mousedis2
     mov dword[GUIcurrentcheatwin],1
     mov byte[GUIpclicked],1
@@ -1846,10 +1616,6 @@ GUITryMenuItem:                     ; Defines which menu item calls what window 
 .nocheat
   cmp byte[GUIcmenupos],5
   jne near .nonet
-%ifdef __MSDOS__
-;    GUICheckMenuItem 8, 0        ; Disable DOS Netplay Options
-;    GUICheckMenuItem 8, 1
-%endif
 ;    GUICheckMenuItem 8, 0        ; Disable WIN/SDL Internet Option
   cmp byte[GUIcrowpos],0
   jne near .nonet
@@ -2304,11 +2070,7 @@ DisplayMenu:
 .nomenu4
   cmp byte[GUIcmenupos],5
   jne near .nomenu5
-%ifdef __MSDOS__
-  GUIDrawMenuM 140,16,10,2,GUINetPlayMenuData,142,145,22,39,48 ;19+2*10
-%else
   GUIDrawMenuM 140,16,10,1,GUINetPlayMenuData,142,145,22,29,48 ;19+1*10
-%endif
   mov dword[GUICYLocPtr],MenuDat5
 .nomenu5
   cmp byte[GUIcmenupos],6
@@ -2382,395 +2144,12 @@ GUIMenuDisplay:
   ret
 
 InitGUI:
-%ifdef __MSDOS__
-  call DOSClearScreen
-%endif
   pushad
   call Clear2xSaIBuffer
   popad
-  call GUISetPal
+  call GUISetPal16
   call GUIBufferData
   ret
-
-GUISetPal:
-%ifdef __MSDOS__
-  cmp byte[cbitmode],1
-  je near GUISetPal16
-  ; set palette
-  ; Fixed Color Scale = 0 .. 31
-  mov dx,03C8h
-  mov al,0
-  out dx,al
-  inc dx
-  out dx,al
-  out dx,al
-  out dx,al
-
-  inc al
-  mov dx,03C8h
-  mov bl,1
-  out dx,al
-  inc dx
-.loopd
-  mov al,bl
-  add al,[GUIRAdd]
-  out dx,al
-  mov al,bl
-  add al,[GUIGAdd]
-  out dx,al
-  mov al,bl
-  add al,[GUIBAdd]
-  out dx,al
-  inc bl
-  cmp bl,32
-  jne .loopd
-  ; gray scale = 32 .. 63
-  mov dx,03C8h
-  mov bl,32
-  mov al,32
-  out dx,al
-  inc dx
-.loopc
-  mov al,bl
-  add al,al
-  out dx,al
-  out dx,al
-  out dx,al
-  inc bl
-  cmp bl,64
-  jne .loopc
-  ; shadow = 96 .. 127
-  inc al
-  mov al,96
-  mov dx,03C8h
-  mov bl,0
-  out dx,al
-  inc dx
-.loope
-  mov al,bl
-  add al,[GUIRAdd]
-  mov ah,al
-  add al,al
-  add al,ah
-  shr al,2
-  out dx,al
-  mov al,bl
-  add al,[GUIGAdd]
-  mov ah,al
-  add al,al
-  add al,ah
-  shr al,2
-  out dx,al
-  mov al,bl
-  add al,[GUIBAdd]
-  mov ah,al
-  add al,al
-  add al,ah
-  shr al,2
-  out dx,al
-  inc bl
-  cmp bl,32
-  jne .loope
-
-  ; 0,10,31
-  mov al,[GUITRAdd]
-  mov [TRVal],al
-  mov al,[GUITGAdd]
-  mov [TGVal],al
-  mov al,[GUITBAdd]
-  mov [TBVal],al
-  mov ax,[TRVal]
-  inc ax
-  shr ax,3
-  mov [TRVali],ax
-  shl ax,3
-  add [TRVal],ax
-  mov ax,[TGVal]
-  inc ax
-  shr ax,3
-  mov [TGVali],ax
-  shl ax,3
-  add [TGVal],ax
-  mov ax,[TBVal]
-  inc ax
-  shr ax,3
-  mov [TBVali],ax
-  shl ax,3
-  add [TBVal],ax
-
-  GUIPal 64,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 65,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 66,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 67,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 68,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 69,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 70,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 71,[TRVal],[TGVal],[TBVal]
-
-  GUIPal 72,40,0,20
-  GUIPal 73,34,0,21
-
-  GUIPal 80,0,10,28
-  GUIPal 81,0,10,27
-  GUIPal 82,0,10,25
-  GUIPal 83,0,09,24
-  GUIPal 84,0,08,22
-  GUIPal 85,0,07,20
-  GUIPal 86,0,06,18
-  GUIPal 87,0,05,15
-  GUIPal 88,20,0,10
-  GUIPal 89,17,0,10
-
-  ; Orange Scale
-  mov dx,03C8h
-  mov al,128
-  mov cl,20
-  out dx,al
-  mov bh,0
-  mov ah,0
-  inc dx
-.loopf
-  add bh,2
-  inc ah
-  mov al,63
-  out dx,al
-  mov al,bh
-  out dx,al
-  mov al,ah
-  out dx,al
-  dec cl
-  jnz .loopf
-
-  ; Blue scale = 148 .. 167
-  mov al,[GUIWRAdd]
-  add al,al
-  mov [TRVal],al
-  mov al,[GUIWGAdd]
-  add al,al
-  mov [TGVal],al
-  mov al,[GUIWBAdd]
-  add al,al
-  mov [TBVal],al
-  mov byte[TRVali],4
-  mov byte[TGVali],4
-  mov byte[TBVali],4
-
-  GUIPal 152,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 151,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 150,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 149,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 148,[TRVal],[TGVal],[TBVal]
-
-  mov al,[GUIWRAdd]
-  add al,al
-  mov [TRVal],al
-  mov al,[GUIWGAdd]
-  add al,al
-  mov [TGVal],al
-  mov al,[GUIWBAdd]
-  add al,al
-  mov [TBVal],al
-  mov byte[TRVali],4
-  mov byte[TGVali],4
-  mov byte[TBVali],4
-  call DecPalVal
-  call DecPalVal
-
-  GUIPal 157,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 156,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 155,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 154,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 153,[TRVal],[TGVal],[TBVal]
-
-  mov al,[GUIWRAdd]
-  add al,al
-  mov [TRVal],al
-  mov al,[GUIWGAdd]
-  add al,al
-  mov [TGVal],al
-  mov al,[GUIWBAdd]
-  add al,al
-  mov [TBVal],al
-  mov byte[TRVali],4
-  mov byte[TGVali],4
-  mov byte[TBVali],4
-  call DecPalVal
-  call DecPalVal
-  call DecPalVal
-  call DecPalVal
-
-  GUIPal 162,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 161,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 160,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 159,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 158,[TRVal],[TGVal],[TBVal]
-
-  GUIPal 163,40,40,00
-  GUIPal 164,30,30,00
-  GUIPal 165,50,00,00
-  GUIPal 166,35,00,00
-  GUIPal 167,00,00,00
-
-  ; Blue scale shadow
-  mov al,[GUIWRAdd]
-  mov [TRVal],al
-  mov al,[GUIWGAdd]
-  mov [TGVal],al
-  mov al,[GUIWBAdd]
-  mov [TBVal],al
-  mov byte[TRVali],2
-  mov byte[TGVali],2
-  mov byte[TBVali],2
-
-  GUIPal 172,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 171,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 170,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 169,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 168,[TRVal],[TGVal],[TBVal]
-
-  mov al,[GUIWRAdd]
-  mov [TRVal],al
-  mov al,[GUIWGAdd]
-  mov [TGVal],al
-  mov al,[GUIWBAdd]
-  mov [TBVal],al
-  mov byte[TRVali],2
-  mov byte[TGVali],2
-  mov byte[TBVali],2
-  call DecPalVal
-  call DecPalVal
-
-  GUIPal 177,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 176,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 175,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 174,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 173,[TRVal],[TGVal],[TBVal]
-
-  mov al,[GUIWRAdd]
-  mov [TRVal],al
-  mov al,[GUIWGAdd]
-  mov [TGVal],al
-  mov al,[GUIWBAdd]
-  mov [TBVal],al
-  mov byte[TRVali],2
-  mov byte[TGVali],2
-  mov byte[TBVali],2
-  call DecPalVal
-  call DecPalVal
-  call DecPalVal
-  call DecPalVal
-
-  GUIPal 182,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 181,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 180,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 179,[TRVal],[TGVal],[TBVal]
-  call DecPalVal
-  GUIPal 178,[TRVal],[TGVal],[TBVal]
-
-  GUIPal 183,20,20,00
-  GUIPal 184,15,15,00
-  GUIPal 185,25,00,00
-  GUIPal 186,17,00,00
-  GUIPal 187,00,00,00
-
-  ; gray scale2 = 189 .. 220
-  mov dx,03C8h
-  mov al,189
-  mov bl,0
-  out dx,al
-  inc dx
-.loopi
-  mov al,bl
-  add al,al
-  mov ah,bl
-  shr ah,1
-  sub al,ah
-  out dx,al
-  out dx,al
-  add al,ah
-  out dx,al
-  inc bl
-  cmp bl,64
-  jne .loopi
-
-  GUIPal 221,00,55,00
-  GUIPal 222,00,45,00
-  GUIPal 223,00,25,00
-
-  GUIPal 224,40,0,20
-  GUIPal 225,32,0,15
-
-  GUIPal 226,20,0,10
-  GUIPal 227,16,0,07
-
-  GUIPal 228,45,45,50
-  GUIPal 229,40,40,45
-  GUIPal 230,35,35,40
-  GUIPal 231,30,30,35
-
-  GUIPal 232,35,15,15
-
-  GUIPal 233,50,12,60
-  GUIPal 234,30,14,60
-
-  cmp byte[GUIPalConv],0
-  je .convert
-  ret
-.convert
-  mov byte[GUIPalConv],1
-
-  ; Convert Image data to Gray Scale
-  ; Create Palette Table
-  call GUIconvpal
-  ; Convert Current Image in Buffer
-  mov esi,[vidbuffer]
-  mov ecx,288*240
-  xor eax,eax
-.next
-  mov al,[esi]
-  mov bl,[SubPalTable+eax]
-  mov [esi],bl
-  inc esi
-  dec ecx
-  jnz .next
-%else
-  jmp GUISetPal16
-%endif
-  ret
-
-SECTION .bss
-NEWSYM GUICPC, resw 256
-SECTION .text
 
 %macro GUIPal16b 4
   mov ax,%2
@@ -3211,20 +2590,15 @@ GUISetPal16:
   ret
 
 SECTION .data
-.multab db 1,1,1,2,2,3,4,4,5,6,6,7,8,8,9,10,10,11,12,12,13,14,14,15,16,16,
+.multab db 1,1,1,2,2,3,4,4,5,6,6,7,8,8,9,10,10,11,12,12,13,14,14,15,16,16
   db 17,18,18,19,20,20,21,22,22,23,24,24,25,26,26,27,28,28,29,30,30,31
+SECTION .bss
+NEWSYM GUICPC, resw 256
+
 SECTION .text
 
 GUIBufferData:
-%ifdef __MSDOS__
-  mov ecx,16384
-  cmp byte[cbitmode],1
-  jne near .16b
-  add ecx,16384
-.16b
-%else
   mov ecx,32768
-%endif
   ; copy to spritetable
   mov esi,[vidbuffer]
   cmp word[PrevResoln],224

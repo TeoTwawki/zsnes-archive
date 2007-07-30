@@ -44,11 +44,9 @@ ProcessMouse:
   mov cl,[ntscCurVar]
   cmp cl,[ntscLastVar+edx]
   je .norelease1
-%ifndef __MSDOS__
   pushad
   call NTSCFilterInit
   popad
-%endif
   mov [ntscLastVar+edx],cl
 .norelease1
   mov ecx,0
@@ -335,9 +333,6 @@ ProcessMouseButtons:
   jmp .noclick
 .noclicked
 
-%ifdef __MSDOS__
-  jmp .noclick
-%else
   mov byte[GUIpclicked],1
   mov byte[GUIHold],255
   mov eax,[GUImouseposy]
@@ -346,7 +341,6 @@ ProcessMouseButtons:
   mov [GUIHoldXlimL],eax
   call MouseWindow
   jmp .noclick
-%endif
 .nomenu
   cmp byte[GUIcmenupos],0
   je near .checkmenuboxclick
@@ -564,8 +558,6 @@ ProcessMouseButtons:
 %endif
 
 .notwinpressa
-
-%ifndef __MSDOS__
   cmp byte[GUIcwinpress],2
   jne .notwinpressb
   mov byte[GUIcwinpress],0
@@ -579,8 +571,8 @@ ProcessMouseButtons:
   ja .notwinpressb
   mov byte[GUIQuit],1
   ret
-.notwinpressb
 
+.notwinpressb
   cmp byte[GUIcwinpress],3
   jne .notwinpressc
   mov byte[GUIcwinpress],0
@@ -592,17 +584,14 @@ ProcessMouseButtons:
   jb .notwinpressc
   cmp word[GUImouseposx],242
   ja .notwinpressc
-%endif
 %ifdef __WIN32__
   pushad
   call MinimizeWindow
   popad
 %endif
-%ifndef __MSDOS__
   ret
-%endif
-.notwinpressc
 
+.notwinpressc
   ; ButtonProcess
   cmp byte[GUICBHold],1
   je near GUILoadData
@@ -612,10 +601,8 @@ ProcessMouseButtons:
   je near GUIProcReset
   cmp byte[GUICBHold],4  ; set video mode
   je near GUIProcVideo
-%ifndef __MSDOS__
   cmp byte[GUICBHold],12  ; set custom video mode
   je near GUIProcCustomVideo
-%endif
   cmp byte[GUICBHold],37 ; reset ntsc options
   je near GUINTSCReset
   cmp byte[GUICBHold],38 ; reset ntsc options
@@ -648,8 +635,6 @@ ProcessMouseButtons:
   je near CheatCodeFix
   cmp byte[GUICBHold],14
   je near SetDevice
-  cmp byte[GUICBHold],15
-  je near CalibrateDev1
   cmp byte[GUICBHold],16  ; movie replay
   jne .notMoviePlay
   mov byte[GUICBHold],0
@@ -824,7 +809,6 @@ ProcessMouseButtons:
   call AddCSCheatCode
 ;    call InsertSearchDescription
 .noinsertscc
-%ifndef __MSDOS__
   cmp byte[GUICBHold],65
   jne .nozsnespage
   pushad
@@ -837,9 +821,9 @@ ProcessMouseButtons:
   call DocsPage
   popad
 .nodocspage
-%endif
   mov byte[GUICBHold],0
   ret
+
 .checkmenuboxclick
   mov byte[GUIpclicked],1
   xor eax,eax
@@ -916,45 +900,28 @@ GUIProcVideo:
   mov [.prevvid],al
   mov al,[GUIcurrentvideocursloc]
   mov [cvidmode],al
-%ifdef __MSDOS__
-  mov byte[ExitFromGUI],1
-%endif
   call initvideo
-%ifdef __MSDOS__
-  cmp byte[videotroub],1
-  je .failed
-%endif
-  call GUISetPal
+  call GUISetPal16
   call guipostvideo
   cmp dword[GUIkeydelay],0
   je .failed2
   mov dword[GUIkeydelay],0
   ret
+
 .fullsc
-%ifndef __MSDOS__
   mov [PrevFSMode],al
-%endif
   ret
-%ifdef __MSDOS__
-.failed
-  mov byte[videotroub],0
-  mov al,[.prevvid]
-  mov [cvidmode],al
-  call initvideo
-  call GUISetPal
-  call guipostvideofail
-  mov dword[GUIkeydelay],0
-  ret
-%endif
+
 .failed2
   mov byte[videotroub],0
   mov al,[.prevvid]
   mov [cvidmode],al
   call initvideo
-  call GUISetPal
+  call GUISetPal16
   call vidpastecopyscr
   mov dword[GUIkeydelay],0
   ret
+
 SECTION .bss
 .prevvid resb 1
 SECTION .text
@@ -983,11 +950,9 @@ GUINTSCReset:
   mov byte[NTSCWarp],0
 .reset2done
   mov byte[GUICBHold],0
-%ifndef __MSDOS__
   pushad
   call NTSCFilterInit
   popad
-%endif
   ret
 
 GUINTSCPreset:
@@ -1010,16 +975,13 @@ GUINTSCPreset:
   jne near .lastpreset
   mov byte[NTSCPresetVar],3
 .lastpreset
-%ifndef __MSDOS__
   pushad
   call NTSCFilterInit
   popad
-%endif
   mov byte[NTSCPresetVar],4
   mov byte[GUICBHold],0
   ret
 
-%ifndef __MSDOS__
 GUIProcCustomVideo:
   pushad
   call SetCustomXY
@@ -1039,31 +1001,23 @@ GUIProcCustomVideo:
   popad
 .notcustomres
   ret
-%endif
 
 NEWSYM SwitchFullScreen
   pushad
   call Clear2xSaIBuffer
   xor eax,eax
   mov al,[cvidmode]
-%ifndef __MSDOS__
   cmp byte[GUIWFVID+eax],0
   je .fullsc
-%else
-  jmp .fullsc
-%endif
-%ifndef __MSDOS__
   mov al,[PrevWinMode]
   mov [cvidmode],al
-%endif
   call initvideo
   popad
   ret
+
 .fullsc
-%ifndef __MSDOS__
   mov al,[PrevFSMode]
   mov [cvidmode],al
-%endif
   call initvideo
   popad
   ret
@@ -1113,9 +1067,7 @@ GUIWinClicked:
   pushad
   call init_save_paths
   call SetMovieForcedLength
-%ifndef __MSDOS__
   call SetCustomXY
-%endif
   popad
   ret
 .noclose
@@ -1271,32 +1223,6 @@ GUIWinClicked:
 %%noclick
 %endmacro
 
-%ifdef __MSDOS__
-%macro GUIClickCButton3 3
-  GUIClickArea %1+1,%2+3,%1+6,%2+8,%%noclick
-  xor %3,1
-  DOSClearScreenMouse
-  ret
-%%noclick
-%endmacro
-
-%macro DOSClearScreenMouse 0
-  call DOSClearScreen
-  push eax
-  push ecx
-  mov eax,[vidbufferofsb]
-  mov ecx,288*128
-%%loop
-  mov dword[eax],0
-  add eax,4
-  dec ecx
-  jnz %%loop
-  pop ecx
-  pop eax
-  ret
-%endmacro
-%endif
-
 %macro GUIClickCButton5 4
   GUIClickArea %1+1,%2+3,%1+6,%2+8,%%noclick
   cmp %3,%4
@@ -1360,7 +1286,6 @@ GUIWinClicked:
   GUIClickArea %1+1,%2+3,%1+6,%2+8,%%noclick
   xor %3,1
   pushad
-%ifndef __MSDOS__
   xor ebx,ebx
   mov bl,[cvidmode]
   cmp byte[GUIBIFIL+ebx],0
@@ -1371,7 +1296,6 @@ GUIWinClicked:
   call initwinvideo
 %endif
 %%skipinit
-%endif
   call Clear2xSaIBuffer
   popad
 %%noclick
@@ -1686,27 +1610,6 @@ SECTION .text
 %%noclick
 %endmacro
 
-%macro GUIPButtonHoleS 4
-  GUIClickArea %1+1,%2+1,%1+7,%2+7,%%noclick
-  mov %3,%4
-%ifdef __MSDOS__
-  pushad
-  call DOSClearScreen
-  cmp byte[cvidmode],2  ;modeQ
-  je %%refresh
-  cmp byte[cvidmode],5
-  jne %%nomodex
-%%refresh
-  mov byte[cbitmode],1
-  call initvideo2
-  mov byte[cbitmode],0
-  call GUISetPal
-%%nomodex
-  popad
-%endif
-%%noclick
-%endmacro
-
 %macro GUIPButtonHoleLoad 4
   GUIClickArea %1+1,%2+1,%1+7,%2+7,%%noclick
   mov %3,%4
@@ -1839,7 +1742,6 @@ SECTION .text
   cmp ebx,3Bh
   je %%cancelkey
   mov %3,ebx
-%ifndef __MSDOS__
   cmp dword[keycontrolval],0
   je %%notwin32
   push ebx
@@ -1847,7 +1749,6 @@ SECTION .text
   mov byte[ebx],1
   pop ebx
 %%notwin32
-%endif
   ret
 %%cancelkey
   xor ebx,ebx
@@ -1979,9 +1880,6 @@ DisplayGUIConfirmClick:
   GUIPHoldbutton 186,165,228,176,1
   GUIPButtonHoleLoad 9,163,byte[GUIloadfntype],0
   GUIPButtonHoleLoad 9,171,byte[GUIloadfntype],1
-%ifdef __MSDOS__
-  GUIPButtonHoleLoad 9,179,byte[GUIloadfntype],2
-%endif
   GUIClickCButton5 144,177,byte[ForceROMTiming],1
   GUIClickCButton5 144,187,byte[ForceROMTiming],2
   GUIClickCButton5 184,177,byte[ForceHiLoROM],1
@@ -2162,9 +2060,6 @@ DisplayGUIInputClick:
 
   GUIPHoldbutton 123,34,153,45,14            ; Buttons
   GUIPHoldbutton 123,50,177,61,40
-%ifdef __MSDOS__
-  GUIPHoldbutton 123,66,183,77,15
-%endif
 
   cmp byte[cplayernum],0
   jne near .nopl1
@@ -2191,31 +2086,6 @@ DisplayGUIInputClick:
   mov dword[keycontrolval],pl5contrl
   GUIInputSetIndKey pl5
 .nopl5
-
-%ifdef __MSDOS__
-  cmp byte[cplayernum],0
-  jne .notpl1
-  GUIClickCButtonID 5,190,byte[pl1p209]
-.notpl1
-  cmp byte[cplayernum],1
-  jne .notpl2
-  GUIClickCButtonID 5,190,byte[pl2p209]
-.notpl2
-  cmp byte[cplayernum],2
-  jne .notpl3
-  GUIClickCButtonID 5,190,byte[pl3p209]
-.notpl3
-  cmp byte[cplayernum],3
-  jne .notpl4
-  GUIClickCButtonID 5,190,byte[pl4p209]
-.notpl4
-  cmp byte[cplayernum],4
-  jne .notpl5
-  GUIClickCButtonID 5,190,byte[pl5p209]
-.notpl5
-
-  GUIClickCButton 105,160,byte[SidewinderFix]
-%endif
 
   GUIClickCButton 5,160,byte[GameSpecificInput]
   GUIClickCButton 5,170,byte[AllowUDLR]
@@ -2298,12 +2168,9 @@ DisplayGUIVideoClick:
 
   GUIPHoldbutton 130,31,166,41,4
 
-%ifndef __MSDOS__
   GUIPHoldbutton 182,116,218,126,12
-
   GUITextBoxInputNach 130,130,178,140,0,5,SetCustomXY
   GUITextBoxInputNach 191,130,239,140,1,5,SetCustomXY
-%endif
 
 .notmodestab
 
@@ -2314,14 +2181,6 @@ DisplayGUIVideoClick:
   call Clear2xSaIBuffer
   popad
 
-%ifdef __MSDOS__
-  cmp byte[smallscreenon],1
-  je .nohsline
-  cmp byte[ScreenScale],1
-  je .noradiobuttons
-%endif
-
-%ifndef __MSDOS__
   xor ebx,ebx                             ; Bilinear
   mov bl,[cvidmode]
   cmp byte[GUIBIFIL+ebx],0
@@ -2330,13 +2189,9 @@ DisplayGUIVideoClick:
   GUIClickCButtonI 18,35,byte[BilinearFilter]
   jmp near .noswinterp
 .nocheckbox1bf
-%endif
+
   xor ebx,ebx                             ; Interpolations
   mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUIEAVID+ebx],0
-  jne near .yesinterp
-%endif
 %ifdef __WIN32__
   cmp byte[GUIDSIZE+ebx],0
 %else
@@ -2357,18 +2212,12 @@ DisplayGUIVideoClick:
 %ifdef __OPENGL__
   FilterExcl 128,35,BilinearFilter
 %endif
-%ifndef __MSDOS__
   GUIClickCButtonN 128,35,byte[NTSCFilter],NTSCFilterInit
-%endif
 .nontscfilter
 
   xor ebx,ebx                             ; Kreed 2x filters
   mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUI2xVID+ebx],0
-%else
   cmp byte[GUIDSIZE+ebx],0
-%endif
   je near .no2xSaI
   FilterExcl 18,45,hqFilter,scanlines,antienab,NTSCFilter
   FilterExcl 128,45,hqFilter,scanlines,antienab,NTSCFilter
@@ -2380,24 +2229,12 @@ DisplayGUIVideoClick:
 
   xor ebx,ebx                             ; Hq*x filters
   mov bl,[cvidmode]
-%ifndef __MSDOS__
   cmp byte[GUIHQ4X+ebx],0
-  jne near .radiobuttonhq4x
+  jne .radiobuttonhq4x
   cmp byte[GUIHQ3X+ebx],0
-  jne near .radiobuttonhq3x
-%endif
+  jne .radiobuttonhq3x
   cmp byte[GUIHQ2X+ebx],0
-%ifdef __MSDOS__
-  jne .checkboxhq
-%else
-  jne near .radiobuttonhq2x
-%endif
-  jmp .nocheckboxhq
-.checkboxhq
-  FilterExcl 128,55,En2xSaI,scanlines,antienab,NTSCFilter
-  GUIClickCButton 128,55,byte[hqFilter]
-.nocheckboxhq
-%ifndef __MSDOS__
+  jne .radiobuttonhq2x
   jmp .noradiobuttons
 .radiobuttonhq4x
   GUIPButtonHole 188,68,byte[hqFilterlevel],4
@@ -2407,10 +2244,8 @@ DisplayGUIVideoClick:
   GUIPButtonHole 128,68,byte[hqFilterlevel],2
   FilterExcl 128,55,En2xSaI,scanlines,antienab,NTSCFilter
   GUIClickCButton 128,55,byte[hqFilter]
-%endif
 .noradiobuttons
 
-%ifndef __MSDOS__
   xor ebx,ebx                             ; GL Scanlines
   mov bl,[cvidmode]
   cmp byte[GUIBIFIL+ebx],0
@@ -2439,35 +2274,22 @@ DisplayGUIVideoClick:
 .nobar
   jmp near .noswscanlines
 .noglscanlines
-%endif
   xor ebx,ebx                             ; Scanlines
   mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUISLVID+ebx],0
-%else
   cmp byte[GUIDSIZE+ebx],0
-%endif
   je near .nocheckboxb
   FilterExcl 168,87,En2xSaI,hqFilter,NTSCFilter
-  GUIPButtonHoleS 18,87,byte[scanlines],0
-  GUIPButtonHoleS 168,87,byte[scanlines],1
+  GUIPButtonHole 18,87,byte[scanlines],0
+  GUIPButtonHole 168,87,byte[scanlines],1
 .nocheckboxb
-%ifdef __MSDOS__
-  cmp byte[ScreenScale],1
-  je .nohsline
-%endif
   xor ebx,ebx
   mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUIHSVID+ebx],0
-%else
   cmp byte[GUIDSIZE+ebx],0
-%endif
   je near .nohsline
   FilterExcl 68,87,En2xSaI,hqFilter,NTSCFilter
   FilterExcl 118,87,En2xSaI,hqFilter,NTSCFilter
-  GUIPButtonHoleS 68,87,byte[scanlines],2
-  GUIPButtonHoleS 118,87,byte[scanlines],3
+  GUIPButtonHole 68,87,byte[scanlines],2
+  GUIPButtonHole 118,87,byte[scanlines],3
 .nohsline
 .noswscanlines
 
@@ -2480,17 +2302,8 @@ DisplayGUIVideoClick:
   GUIClickCButton5 128,115,byte[Mode7HiRes16b],1
 .nocheckboxtm7
 
-%ifdef __MSDOS__
-  xor ebx,ebx                             ; Triple buffs/vsyncs
-  mov bl,[cvidmode]
-  cmp byte[GUITBVID+ebx],0
-  je .nocheckboxttb
-  GUIClickCButtonT 128,145,byte[Triplebufen],byte[vsyncon]
-.nocheckboxttb
-  GUIClickCButtonT 18,145,byte[vsyncon],byte[Triplebufen]
-%endif
 %ifdef __WIN32__
-  xor ebx,ebx
+  xor ebx,ebx                             ; Triple buffs/vsyncs
   mov bl,[cvidmode]
   cmp byte[GUIWFVID+ebx],0
   je near .notriplebufferwin
@@ -2507,7 +2320,6 @@ DisplayGUIVideoClick:
 .novsync
 %endif
 
-%ifndef __MSDOS__
   xor ebx,ebx                             ; Keep 4:3 Ratio
   mov bl,[cvidmode]
   cmp byte[GUIKEEP43+ebx],0
@@ -2515,23 +2327,6 @@ DisplayGUIVideoClick:
   GUIClickCButtonK 18,175,byte[Keep4_3Ratio],initwinvideo
 .nocheckboxk43
 
-%else
-  xor ebx,ebx                             ; Small Screen
-  mov bl,[cvidmode]
-  cmp byte[GUISSVID+ebx],0
-  je .nocheckbox2b
-  FilterExcl 18,175,ScreenScale,antienab,En2xSaI,scanlines
-  GUIClickCButton3 18,175,byte[smallscreenon]
-.nocheckbox2b
-
-  xor ebx,ebx                             ; Full/Wide Screen
-  mov bl,[cvidmode]
-  cmp byte[GUIWSVID+ebx],0
-  je .nocheckbox3b
-  FilterExcl 128,175,smallscreenon,antienab,En2xSaI
-  GUIClickCButton3 128,175,byte[ScreenScale]
-.nocheckbox3b
-%endif
 .notfilterstab
 
   cmp dword[GUIVntscTab],1  ; NTSC Tab
@@ -2630,12 +2425,10 @@ DisplayGUIVideoClick:
 .nomovebar
   cmp byte[NTSCRef],0
   je .notntsctab
-%ifndef __MSDOS__
   mov dword[NTSCPresetVar],4
   pushad
   call NTSCFilterInit
   popad
-%endif
 .notntsctab
 
   cmp dword[GUIVntscTab],2  ; NTSC Tab
@@ -2739,14 +2532,12 @@ DisplayGUIVideoClick:
 .nomovebar2
   cmp byte[NTSCRef],0
   je .notadvntsctab
-%ifndef __MSDOS__
   mov dword[NTSCPresetVar],4
   pushad
   call NTSCFilterInit
   popad
-%endif
-.notadvntsctab
 
+.notadvntsctab
   xor eax,eax
   ret
 
@@ -2773,9 +2564,6 @@ DisplayGUISoundClick:
   GUIClickCButton 11,41,byte[StereoSound]
   GUIClickCButton 11,51,byte[RevStereo]
   GUIClickCButton 11,61,byte[Surround]
-%ifdef __MSDOS__
-  GUIClickCButton 11,71,byte[Force8b]
-%endif
 %ifdef __WIN32__
   GUIClickCButton 11,71,byte[PrimaryBuffer]
 %endif
@@ -2921,10 +2709,6 @@ guipresstest:
   call Get_Key
   jmp .again2
 .nokey
-;    push ebx
-;    mov eax,0Bh
-;    int 33h
-;    pop ebx
   ret
 
 SECTION .data
@@ -2997,10 +2781,6 @@ guipresstestb:
   mov eax,[guicpressptr]
   mov [eax],ebx
 .skip
-;    push ebx
-;    mov eax,0Bh
-;    int 33h
-;    pop ebx
   ret
 
 SECTION .data
@@ -3051,9 +2831,7 @@ DisplayGameOptnsClick:
   DGOptnsProcBox 78,100,[KeyUsePlayer1234]
   DGOptnsProcBox 78,110,[KeyResetAll]
   DGOptnsProcBox 78,120,[KeyDisplayFPS]
-%ifndef __MSDOS__
   DGOptnsProcBox 78,130,[KeyDisplayBatt]
-%endif
 
   DGOptnsProcBox 191,100,[KeyNewGfxSwt]
   DGOptnsProcBox 191,110,[KeyWinDisble]
@@ -3211,7 +2989,7 @@ DisplayGUIOptnsClick:
 
   cmp byte[TRVal2+1],1
   jne .nopalchange
-  call GUISetPal
+  call GUISetPal16
   mov byte[TRVal2+1],0
 .nopalchange
 
@@ -3227,13 +3005,11 @@ DisplayGUIOptnsClick:
   ret
 
 DisplayGUIAboutClick:
-%ifndef __MSDOS__
   cmp byte[EEgg],1
   je near .eegg
   GUIPHoldbutton 90,22,175,32,65
   GUIPHoldbutton 90,33,175,43,66
 .eegg
-%endif
   ret
 
 ; DrawSlideBar 16,192,20,[GUIccombviewloc],[NumCombo],8,61,GUICSStC,13,14
@@ -3441,12 +3217,6 @@ DisplayGUIChipClick:
   GUIClickCButton 109,53,byte[nssdip6]
   ret
 
-%ifdef __MSDOS__
-%define path_length 256
-%else
-%define path_length 1024
-%endif
-
 DisplayGUIPathsClick:
   GUIPTabClick 0,51,1,GUIPathTabs
   GUIPTabClick 52,86,2,GUIPathTabs
@@ -3456,10 +3226,10 @@ DisplayGUIPathsClick:
   cmp dword[GUIPathTabs],1
   jne near .notgeneral
 
-  GUITextBoxInputNach 8,41,237,51,0,path_length,init_save_paths        ;SRAMPath
-  GUITextBoxInputNach 8,76,237,86,1,path_length,init_save_paths        ;SStatePath
-  GUITextBoxInputNach 8,111,237,121,2,path_length,init_save_paths      ;MoviePath
-  GUITextBoxInputNach 8,146,237,156,3,path_length,init_save_paths      ;IPSPath
+  GUITextBoxInputNach 8,41,237,51,0,1024,init_save_paths        ;SRAMPath
+  GUITextBoxInputNach 8,76,237,86,1,1024,init_save_paths        ;SStatePath
+  GUITextBoxInputNach 8,111,237,121,2,1024,init_save_paths      ;MoviePath
+  GUITextBoxInputNach 8,146,237,156,3,1024,init_save_paths      ;IPSPath
 
   GUIPButtonHole 8,178,byte[RelPathBase],0
   GUIPButtonHole 88,178,byte[RelPathBase],1
@@ -3468,29 +3238,29 @@ DisplayGUIPathsClick:
   cmp dword[GUIPathTabs],2
   jne near .notmorepaths
 
-  GUITextBoxInputNach 8,41,237,51,0,path_length,init_save_paths        ;SnapPath
-  GUITextBoxInputNach 8,76,237,86,1,path_length,init_save_paths        ;SPCPath
-  GUITextBoxInputNach 8,111,237,121,2,path_length,init_save_paths      ;CHTPath
-  GUITextBoxInputNach 8,146,237,156,3,path_length,init_save_paths      ;ComboPath
-  GUITextBoxInputNach 8,181,237,191,4,path_length,init_save_paths      ;INPPath
+  GUITextBoxInputNach 8,41,237,51,0,1024,init_save_paths        ;SnapPath
+  GUITextBoxInputNach 8,76,237,86,1,1024,init_save_paths        ;SPCPath
+  GUITextBoxInputNach 8,111,237,121,2,1024,init_save_paths      ;CHTPath
+  GUITextBoxInputNach 8,146,237,156,3,1024,init_save_paths      ;ComboPath
+  GUITextBoxInputNach 8,181,237,191,4,1024,init_save_paths      ;INPPath
 .notmorepaths
 
   cmp dword[GUIPathTabs],3
   jne near .notbc
 
-  GUITextBoxInputNach 8,41,237,51,0,path_length,init_save_paths        ;BSXPath
-  GUITextBoxInputNach 8,76,237,86,1,path_length,init_save_paths        ;STPath
-  GUITextBoxInputNach 8,111,237,121,2,path_length,init_save_paths      ;GNextPath
-  GUITextBoxInputNach 8,146,237,156,3,path_length,init_save_paths      ;SGPath
+  GUITextBoxInputNach 8,41,237,51,0,1024,init_save_paths        ;BSXPath
+  GUITextBoxInputNach 8,76,237,86,1,1024,init_save_paths        ;STPath
+  GUITextBoxInputNach 8,111,237,121,2,1024,init_save_paths      ;GNextPath
+  GUITextBoxInputNach 8,146,237,156,3,1024,init_save_paths      ;SGPath
 .notbc
 
   cmp dword[GUIPathTabs],4
   jne near .notgfxpacks
 
-  GUITextBoxInputNach 8,41,237,51,0,path_length,init_save_paths        ;FEOEZPath
-  GUITextBoxInputNach 8,76,237,86,1,path_length,init_save_paths        ;SJNSPath
-  GUITextBoxInputNach 8,111,237,121,2,path_length,init_save_paths      ;MDHPath
-  GUITextBoxInputNach 8,146,237,156,3,path_length,init_save_paths      ;SPL4Path
+  GUITextBoxInputNach 8,41,237,51,0,1024,init_save_paths        ;FEOEZPath
+  GUITextBoxInputNach 8,76,237,86,1,1024,init_save_paths        ;SJNSPath
+  GUITextBoxInputNach 8,111,237,121,2,1024,init_save_paths      ;MDHPath
+  GUITextBoxInputNach 8,146,237,156,3,1024,init_save_paths      ;SPL4Path
 .notgfxpacks
   ret
 

@@ -51,14 +51,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define NUMCONV_FW3
 #include "numconv.h"
 
-#ifdef __MSDOS__
-#define clim() __asm__ __volatile__ ("cli");
-#define stim() __asm__ __volatile__ ("sti");
-#else
-#define clim()
-#define stim()
-#endif
-
 void SA1UpdateDPageC(), unpackfunct(), repackfunct();
 void PrepareOffset(), ResetOffset(), initpitch(), UpdateBanksSDD1();
 void procexecloop(), outofmemory();
@@ -903,8 +895,6 @@ void statesaver()
     return;
   }
 
-  clim();
-
   //'Auto increment savestate slot' code
   if(!isextension(ZStateName, "zss"))
   {
@@ -934,8 +924,6 @@ void statesaver()
       zst_name();
     }
   }
-
-  stim();
 }
 
 extern uint32_t Totalbyteloaded, SfxMemTable[256], SfxCPB;
@@ -1192,8 +1180,6 @@ void stateloader(char *statename, bool keycheck, bool xfercheck)
       break;
   }
 
-  clim();
-
   if(!isextension(ZStateName, "zss"))
   {
     zst_name();
@@ -1226,8 +1212,6 @@ void stateloader(char *statename, bool keycheck, bool xfercheck)
 
   Voice0Disable = Voice1Disable = Voice2Disable = Voice3Disable = 1;
   Voice4Disable = Voice5Disable = Voice6Disable = Voice7Disable = 1;
-
-  stim();
 }
 
 void debugloadstate()
@@ -1295,7 +1279,6 @@ void SaveSramData()
 
       if (!special || CHIPBATT)
       {
-        clim();
         if (!nosaveSRAM && (fp = fopen_dir(ZSramPath, ZSaveName,"wb")))
         {
           fwrite(data_to_save, 1, ramsize, fp);
@@ -1306,7 +1289,6 @@ void SaveSramData()
           fwrite(sram2, 1, ramsize, fp);
           fclose(fp);
         }
-        stim();
       }
     }
     sramb4save = 0;

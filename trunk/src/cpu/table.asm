@@ -41,19 +41,13 @@ EXTSYM DPageR8,DPageW8,DPageR16,DPageW16
 EXTSYM SDD1Enable
 EXTSYM JoyAOrig,JoyANow,JoyBOrig,JoyBNow,JoyCOrig,JoyCNow,JoyDOrig,JoyDNow
 
-%ifdef __MSDOS__
-EXTSYM mosdraw10,mosdraw11,mosdraw12,mosdraw13,mosdraw9,mosjmptab
-EXTSYM mosdraw14,mosdraw15,mosdraw16,mosdraw2,mosdraw3
-EXTSYM mosdraw4,mosdraw5,mosdraw6,mosdraw7,mosdraw8
-%endif
-
 %include "cpu/65816d.inc"
 %include "cpu/address.inc"
 %include "cpu/addrni.inc"
 %include "cpu/e65816.inc"
 %include "cpu/regs.mac"
 %include "cpu/regsw.mac"
-%include "cpu/regs.inc"     ; start problem here
+%include "cpu/regs.inc"
 %include "cpu/regsw.inc"
 
 section .data
@@ -82,23 +76,6 @@ section .text
 
 NEWSYM inittable
     ; set up mosaic
-%ifdef __MSDOS__
-    mov dword[mosjmptab],mosdraw2
-    mov dword[mosjmptab+4],mosdraw3
-    mov dword[mosjmptab+8],mosdraw4
-    mov dword[mosjmptab+12],mosdraw5
-    mov dword[mosjmptab+16],mosdraw6
-    mov dword[mosjmptab+20],mosdraw7
-    mov dword[mosjmptab+24],mosdraw8
-    mov dword[mosjmptab+28],mosdraw9
-    mov dword[mosjmptab+32],mosdraw10
-    mov dword[mosjmptab+36],mosdraw11
-    mov dword[mosjmptab+40],mosdraw12
-    mov dword[mosjmptab+44],mosdraw13
-    mov dword[mosjmptab+48],mosdraw14
-    mov dword[mosjmptab+52],mosdraw15
-    mov dword[mosjmptab+56],mosdraw16
-%endif
     mov dword[mosjmptab16b],mosdraw216b
     mov dword[mosjmptab16b+4],mosdraw316b
     mov dword[mosjmptab16b+8],mosdraw416b

@@ -3430,15 +3430,9 @@ mmxvalanda dd 11111111110000001111111111000000b,11111111110000001111111111000000
 mmxvalandb dd 00000000000111110000000000011111b,00000000000111110000000000011111b
 
 SECTION .text
+
 NEWSYM genfulladdtab
     ; Write to buffer
-%ifdef __MSDOS__
-    cmp byte[newengen],1
-    jne .notneweng
-    cmp byte[vesa2red10],0
-    jne near genfulladdtabred
-.notneweng
-%endif
     xor ecx,ecx
 .loopers
     mov ax,cx
@@ -3462,34 +3456,6 @@ NEWSYM genfulladdtab
     dec cx
     jnz .loopers
     ret
-
-%ifdef __MSDOS__
-NEWSYM genfulladdtabred
-    ; Write to buffer
-    xor ecx,ecx
-.loopers
-    mov ax,cx
-    test cx,0100000000000000b
-    jz .nor
-    and ax,1011111111111111b
-    or ax, 0011110000000000b
-.nor
-    test cx,0000001000000000b
-    jz .nog
-    and ax,1111110111111111b
-    or ax, 0000000111100000b
-.nog
-    test cx,0000000000010000b
-    jz .nob
-    and ax,1111111111101111b
-    or ax, 0000000000001111b
-.nob
-    shl ax,1
-    mov [fulladdtab+ecx*2],ax
-    dec cx
-    jnz .loopers
-    ret
-%endif
 
 NEWSYM ConvertToAFormat
     cmp byte[GUIOn],1
