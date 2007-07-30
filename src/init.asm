@@ -43,20 +43,14 @@ EXTSYM pl5Xtk,pl5Ytk,pl5Atk,pl5Btk,pl5Ltk,pl5Rtk,pl5ULk,pl5URk,pl5DLk,pl5DRk
 EXTSYM CombinDataGlob,NumCombo,GUIComboGameSpec,mousexloc,mouseyloc,extlatch
 EXTSYM AllowMMX,MMXextSupport,romdata,procexecloop,wramdata,LoadSecondState
 EXTSYM romispal,initregr,initregw,loadfileGUI,loadstate2,CMovieExt,AutoState
-EXTSYM MoviePlay,MovieDumpRaw,AllowUDLR,device1,device2,processmouse1,SaveSecondState
-EXTSYM processmouse2,cpalval,init65816,clearmem,SetupROM,ZCartName,initsnes,SSPause
-
-%ifdef __MSDOS__
-EXTSYM init18_2hz
-%endif
+EXTSYM MoviePlay,MovieDumpRaw,AllowUDLR,device1,device2,processmouse1
+EXTSYM SaveSecondState,processmouse2,cpalval,init65816,clearmem,SetupROM
+EXTSYM ZCartName,initsnes,SSPause
 
 %ifndef NO_DEBUGGER
-EXTSYM startdebugger
-%ifndef __MSDOS__
+EXTSYM startdebugger, Start60HZ
 %ifdef __WIN32__
 EXTSYM initwinvideo
-%endif
-EXTSYM Start60HZ
 %endif
 %endif
 
@@ -224,13 +218,11 @@ NEWSYM init
     je near start65816
     cmp byte[romloadskip],1
     je near start65816
-%ifndef __MSDOS__
-    ;; Prevent nasty hang in debugger. Likely not a good way...
-    ;; If we don't do this, then on the SDL and win32 ports, update_ticks_pc2
-    ;; won't be set and CheckTimers will hang.
 
-    ;; Most likely it isn't desirable to be checking timers under the
-    ;; debugger anyway, but this is a much simpler fix.
+; Prevent nasty hang in debugger. Likely not a good way...
+; If we don't do this then update_ticks_pc2 won't be set and CheckTimers
+; will hang. Most likely it isn't desirable to be checking timers under the
+; debugger anyway, but this is a much simpler fix.
 
     pushad
 %ifdef __WIN32__
@@ -239,7 +231,6 @@ NEWSYM init
 %endif
     call Start60HZ
     popad
-%endif
     jmp startdebugger
 %else
     jmp start65816
@@ -906,9 +897,6 @@ NEWSYM DosExit ; Terminate Program
   call SaveSecondState
   popad
 .noautostate
-%ifdef __MSDOS__
-  call init18_2hz
-%endif
   call zexit
 
 NEWSYM MMXCheck

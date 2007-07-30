@@ -30,8 +30,8 @@ EXTSYM zspc_flush_samples,zspc_time
 EXTSYM SetupPreGame,memtablew8,regaccessbankr8,showmenu,snesmap2,snesmmap
 EXTSYM DeInitPostGame,xp,xpb,xpc,tablead,tableadc,SA1UpdateDPage
 EXTSYM Makemode7Table,nextmenupopup,MovieProcessing,SFXEnable,wramdata
-EXTSYM irqon,spcon,multchange,romispal,scrndis,sprlefttot,sprleftpr
-EXTSYM processsprites,cachesprites,CheatOn,Output_Text,Check_Key
+EXTSYM irqon,spcon,multchange,scrndis,sprlefttot,sprleftpr
+EXTSYM processsprites,cachesprites,CheatOn,Check_Key
 EXTSYM Get_Key,INTEnab,JoyCRead,NMIEnab,NumCheats,CurrentExecSA1,ReadInputDevice
 EXTSYM StartDrawNewGfx,VIRQLoc,cachevideo,cfield,cheatdata,curblank,curnmi
 EXTSYM curypos,cycpl,doirqnext,drawline,exechdma,hdmadelay,intrset,newengen
@@ -56,11 +56,6 @@ EXTSYM KeyRewind,statesaver,UpdateDPage
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger
-%endif
-
-%ifdef __MSDOS__
-EXTSYM dssel,Game60hzcall,NextLineStart,FlipWait,LastLineStart,smallscreenon
-EXTSYM cvidmode,GUI16VID,ScreenShotFormat,ResetTripleBuf,ScreenScale
 %endif
 
 SECTION .data
@@ -124,12 +119,6 @@ NEWSYM UpdateRewind
     call UpdateDPage
 .norewinds
     ret
-
-%macro stim 0
-%ifdef __MSDOS__
-    sti
-%endif
-%endmacro
 
 %macro ProcessIRQStuff 0
     ; check for VIRQ/HIRQ
@@ -248,18 +237,10 @@ NEWSYM continueprognokeys
     mov byte[debuggeron],0
 %endif
     mov byte[exiter],0
-
     call InitPreGame
-    jmp reexecuteb2
+    jmp reexecute.b
 
-; Incorrect
-
-NEWSYM reexecuteb
-%ifndef __MSDOS__
-    jmp reexecuteb2
-%endif
 NEWSYM reexecute
-
     ; clear keyboard presses
     mov esi,pressed
     mov ecx,256+128+64
@@ -272,7 +253,7 @@ NEWSYM reexecute
     inc esi
     dec ecx
     jnz .loopa
-reexecuteb2:
+.b
     cmp byte[NoSoundReinit],1
     je .skippregame
     call SetupPreGame
@@ -337,10 +318,6 @@ reexecuteb2:
     mov eax,[initaddrl]
     sub esi,eax                 ; subtract program counter by address
     mov [xpc],si
-%ifdef __MSDOS__
-    call ResetTripleBuf
-%endif
-
     mov eax,[KeySaveState]
     test byte[pressed+eax],1
     jnz .soundreinit
@@ -389,7 +366,7 @@ reexecuteb2:
     pushad
     call statesaver
     popad
-    jmp reexecuteb
+    jmp reexecute.b
 .nosavestt
     mov eax,[KeyLoadState]
     test byte[pressed+eax],1
@@ -397,7 +374,7 @@ reexecuteb2:
     pushad
     call loadstate
     popad
-    jmp reexecuteb
+    jmp reexecute.b
 .noloadstt0
     mov eax,[KeyInsrtChap]
     test byte[pressed+eax],1
@@ -470,21 +447,11 @@ NEWSYM endprog
     pushad
     call MovieStop
     popad
-
     jmp DosExit
-
-NEWSYM interror
-    stim
-    call deinitvideo
-    mov edx,.nohand         ;use extended
-    mov ah,9                ;DOS- API
-    call Output_Text                 ;to print a string
-    jmp DosExit
-
-SECTION .data
-.nohand db 'Cannot process interrupt handler!',13,10,0
 
 ; global variables
+SECTION .data
+ALIGN32
 NEWSYM invalid, db 0
 NEWSYM invopcd, db 0
 NEWSYM pressed, times 256+128+64 db 0 ; keyboard pressed keys in scancode
@@ -493,173 +460,26 @@ NEWSYM oldhand9o, dd 0
 NEWSYM oldhand9s, dw 0
 NEWSYM oldhand8o, dd 0
 NEWSYM oldhand8s, dw 0
-NEWSYM opcd,      dd 0
-NEWSYM pdh,       dd 0
-NEWSYM pcury,     dd 0
+NEWSYM opcd, dd 0
+NEWSYM pdh, dd 0
+NEWSYM pcury, dd 0
 NEWSYM timercount, dd 0
-NEWSYM initaddrl, dd 0                  ; initial address location
+NEWSYM initaddrl, dd 0 ; initial address location
 NEWSYM NetSent, dd 0
-NEWSYM nextframe, dd 0                  ; tick count for timer
-NEWSYM curfps,    db 0                  ; frame/sec for current screen
-;NEWSYM newgfxerror, db 'NEED MEMORY FOR GFX ENGINE',0
-;NEWSYM newgfxerror2, db 'NEED 320x240 FOR NEW GFX 16B',0
-;newgfxerror db 'NEW GFX IN 16BIT IS N/A',0
-NEWSYM HIRQCycNext,   dd 0
-NEWSYM HIRQNextExe,   db 0
-
-
-SECTION .text
-
-;*******************************************************
-; Int 08h vector
-;*******************************************************
-
-; sets to either 60Hz or 50Hz depending on PAL/NTSC
-NEWSYM init60hz
-    cmp byte[romispal],0
-    jne .dopal
-    mov al,00110110b
-    out 43h,al
-    mov ax,19900        ; 65536/(60/((65536*24+175)/(60*60*24)))
-    mov dword[timercount],19900
-    out 40h,al
-    mov al,ah
-    out 40h,al
-    ret
-.dopal
-    mov al,00110110b
-    out 43h,al
-    mov ax,23863        ; 65536/(50/((65536*24+175)/(60*60*24)))
-    mov dword[timercount],23863
-    out 40h,al
-    mov al,ah
-    out 40h,al
-    ret
-
-NEWSYM init18_2hz
-    mov al,00110110b
-    out 43h,al
-    mov ax,0
-    mov dword[timercount],65536
-    out 40h,al
-    mov al,ah
-    out 40h,al
-    ret
-
-%ifdef __MSDOS__
-NEWSYM handler8h
-    cli
-    push ds
-    push eax
-;    mov ax,0
-    mov ax,[cs:dssel]
-NEWSYM handler8hseg
-    mov ds,ax
-    call Game60hzcall
-    mov eax,[timercount]
-    sub dword[timeradj],eax
-    jnc .noupd
-    add dword[timeradj],65536
-    pushf
-    call far [oldhand8o]
-.noupd
-    mov al,20h
-    out 20h,al
-    pop eax
-    pop ds
-    sti
-    iretd
-%endif
-
-SECTION .data
-NEWSYM timeradj, dd 65536
+NEWSYM nextframe, dd 0 ; tick count for timer
+NEWSYM curfps, db 0    ; frame/sec for current screen
+NEWSYM HIRQCycNext, dd 0
+NEWSYM HIRQNextExe, db 0
 NEWSYM t1cc, dw 0
-SECTION .text
-
-;*******************************************************
-; Int 09h vector
-;*******************************************************
-
-%ifdef __MSDOS__
-SECTION .bss
-NEWSYM skipnextkey42, resb 1
-SECTION .text
-
-NEWSYM handler9h
-    cli
-    push ds
-    push eax
-    push ebx
-    mov ax,[cs:dssel]
-    mov ds,ax
-    xor ebx,ebx
-    in al,60h                 ; get keyboard scan code
-    cmp al,42
-    jne .no42
-    cmp byte[skipnextkey42],0
-    je .no42
-    mov byte[skipnextkey42],0
-    jmp .skipkeyrel
-.no42
-    cmp al,0E0h
-    jne .noE0
-    mov byte[skipnextkey42],1
-    jmp .skipkeyrel
-.noE0
-    mov byte[skipnextkey42],0
-    mov bl,al
-    xor bh,bh
-    test bl,80h               ; check if bit 7 is on (key released)
-    jnz .keyrel
-    cmp byte[pressed+ebx],0
-    jne .skipa
-    mov byte[pressed+ebx],1        ; if not, set key to pressed
-.skipa
-    jmp .skipkeyrel
-.keyrel
-    and ebx,7Fh
-    cmp ebx,59
-    je .skipkeyrel
-    cmp ebx,[KeySaveState]
-    je .skipkeyrel
-    cmp ebx,[KeyLoadState]
-    je .skipkeyrel
-    cmp ebx,[KeyQuickExit]
-    je .skipkeyrel
-    cmp ebx,[KeyQuickLoad]
-    je .skipkeyrel
-    cmp ebx,[KeyQuickRst]
-    je .skipkeyrel
-    cmp bl,1
-    je .skipkeyrel
-    mov byte[pressed+ebx],0        ; if not, set key to pressed
-.skipkeyrel
-    mov byte[pressed],0
-    in al,61h
-    mov ah,al
-    or al,80h
-    out 61h,al
-    mov al,20h                ; turn off interrupt mode
-    out 20h,al
-    pop ebx                          ; Pop registers off
-    pop eax                          ; stack in correct
-    pop ds
-    sti
-    iretd
-%endif
-
-SECTION .data
-ALIGN32
 NEWSYM soundcycleft, dd 0
 NEWSYM curexecstate, dd 0
-
-NEWSYM nmiprevaddrl, dd 0       ; observed address -5
-NEWSYM nmiprevaddrh, dd 0       ; observed address +5
-NEWSYM nmirept,      dd 0       ; NMI repeat check, if 6 then okay
-NEWSYM nmiprevline,  dd 224     ; previous line
-NEWSYM nmistatus,    dd 0       ; 0 = none, 1 = waiting for nmi location,
-                        ; 2 = found, disable at next line
-NEWSYM joycontren,   dd 0       ; joystick read control check
+NEWSYM nmiprevaddrl, dd 0   ; observed address -5
+NEWSYM nmiprevaddrh, dd 0   ; observed address +5
+NEWSYM nmirept,      dd 0   ; NMI repeat check, if 6 then okay
+NEWSYM nmiprevline,  dd 224 ; previous line
+NEWSYM nmistatus,    dd 0   ; 0 = none, 1 = waiting for nmi location,
+                            ; 2 = found, disable at next line
+NEWSYM joycontren, dd 0 ; joystick read control check
 NEWSYM NextLineCache, db 0
 NEWSYM ZMVZClose, db 0
 
@@ -710,49 +530,17 @@ NEWSYM exitloop2
 NEWSYM exitloop
    ret
 
+SECTION .data
 ALIGN16
-
-%macro FlipCheck 0
-%ifdef __MSDOS__
-   cmp byte[FlipWait],0
-   je %%noflip
-   push edx
-   push eax
-   mov dx,3DAh             ;VGA status port
-   in al,dx
-   test al,8
-   jz %%skipflip
-   push ebx
-   push ecx
-   mov ax,4F07h
-   mov bh,00h
-   mov bl,00h
-   xor cx,cx
-   mov dx,[NextLineStart]
-   mov [LastLineStart],dx
-   int 10h
-   mov byte[FlipWait],0
-   pop ecx
-   pop ebx
-%%skipflip
-   pop eax
-   pop edx
-%%noflip
-%endif
-%endmacro
-
-section .data
-
 NEWSYM prev, dd 0
 NEWSYM cur, dd 0
 
-section .text
+SECTION .text
 
 NEWSYM execute
 NEWSYM execloop
    mov bl,dl
    test byte[curexecstate],2
-
    jnz .sound
 .startagain
    cmp byte[xe],1
@@ -775,7 +563,6 @@ NEWSYM execloop
 .cpuover
    jmp cpuover
 .sound
-
    mov edi,[tableadc+ebx*4]
    mov bl,[esi]
    inc esi
@@ -783,10 +570,7 @@ NEWSYM execloop
    jc .cpuovers
    call dword near [edi+ebx*4]
 .cpuovers
-
    jmp cpuover
-
-
 
 SECTION .data
 ALIGN32
@@ -813,15 +597,15 @@ NEWSYM NoHDMALine, db 0
 SECTION .text
 
 NEWSYM cpuover
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,120
-   div ebp
-   add [zspc_time],eax
-   popad
+    pushad
+    xor eax,eax
+    mov eax,65
+    mul dh
+    xor edx,edx
+    mov ebp,120
+    div ebp
+    add [zspc_time],eax
+    popad
     dec esi
     cmp byte[HIRQNextExe],0
     je .nohirq
@@ -988,7 +772,6 @@ NEWSYM cpuover
     jmp .virq
 .nosa1chirq
 .nosa1b
-    FlipCheck
     cmp byte[NextLineCache],0
     je .nosprcache
     call Donextlinecache
@@ -1169,13 +952,6 @@ NEWSYM cpuover
     jz .nosskey
     test byte[pressed+eax],1
     jz .nosskey
-%ifdef __MSDOS__
-    movzx eax,byte[cvidmode]
-    cmp byte[GUI16VID+eax],1
-    je .pngok
-    mov byte[ScreenShotFormat],0
-.pngok
-%endif
     mov byte[SSKeyPressed],1
     mov byte[pressed+eax],2
     jmp exitloop
@@ -1467,12 +1243,6 @@ NEWSYM cpuover
     call zspc_flush_samples
     popad
     mov dh,80
-%ifdef __MSDOS__
-    cmp byte[smallscreenon],1
-    je .nocfield
-    cmp byte[ScreenScale],1
-    je .nocfield
-%endif
     cmp byte[scanlines],0
     jne .nocfield
     xor byte[cfield],1

@@ -102,14 +102,6 @@ NEWSYM breakops
     mov [PrevBreakPt_offset],cx
     mov [PrevBreakPt_page],bl
 
-;     push ebx
-;     mov ah,02h
-;     mov bl,0
-;     mov dh,12
-;     mov dl,60
-;     int 10h
-;     pop ebx
-
     test cx,8000h
     jz .loweraddr2
     mov esi,[snesmmap+ebx*4]
@@ -173,14 +165,6 @@ NEWSYM breakops
     inc dword[numinst]
     cmp byte[numinst],0
     jne .skipa
-
-        ;; not DOS anymore
-;     mov ah,0bh
-;     int 21h
-;     test al,0FFh
-;     jz .skipa
-;     mov ah,07h
-;     int 21h
 
     pushad
     call my_getch

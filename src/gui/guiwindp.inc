@@ -971,10 +971,6 @@ DisplayGUILoad:
   GUIDrawWindowBox 1,GUILoadDisp
 
   GUIDisplayText 1,21,166,GUILoadText3
-%ifdef __MSDOS__
-  GUIDisplayTextY 1,6,157,GUILoadText2
-  GUIDisplayText 1,21,182,GUILoadText4
-%endif
   GUIDisplayText 1,21,174,GUILoadText5
   GUIDisplayText 1,6,16,GUILoadText7
   GUIDisplayText 1,161,16,GUILoadText8
@@ -1006,7 +1002,6 @@ DisplayGUILoad:
   mov byte[GUItextcolor],196
 .text
   mov dword[cloadmaxlen],39
-%ifndef __MSDOS__
   cmp dword[GUIcurrentfilewin],0
   je near .nodir
   mov eax,[GUIcurrentdircursloc]
@@ -1033,7 +1028,6 @@ DisplayGUILoad:
   add byte[GUItextcolor],15
   GUIOuttextwin2l 1,5,157,[cloadnpos]
 .nofiles                           ; Button
-%endif
   mov byte[GUItextcolor],217
   cmp byte[GUIWincoladd],0
   je .text2
@@ -1144,10 +1138,6 @@ DisplayGUILoad:
 
   GUIDisplayButtonHole 1,9,163,byte[GUIloadfntype],0 ; Radio Buttons
   GUIDisplayButtonHole 1,9,171,byte[GUIloadfntype],1
-%ifdef __MSDOS__
-  GUIDisplayButtonHole 1,9,179,byte[GUIloadfntype],2
-%endif
-
   GUIDisplayCheckboxTn 1,10,187,showallext,1,GUILoadText6         ; Checkboxes
   GUIDisplayCheckboxTn 1,144,177,ForceROMTiming,1,GUILoadTextC
   GUIDisplayCheckboxTn 1,144,187,ForceROMTiming,2,GUILoadTextD
@@ -1200,13 +1190,7 @@ DisplayGUILoad:
 
 SECTION .data
 GUILoadText1 db 'SELECT FILE TO LOAD:',0
-%ifndef __MSDOS__
 GUILoadText3 db 'LONG FILENAME',0
-%else
-GUILoadText2 db 'DISPLAY TYPE:',0
-GUILoadText3 db 'WIN9X LONG FILENAME',0
-GUILoadText4 db 'DOS 8.3 FORMAT',0
-%endif
 GUILoadText5 db 'SNES HEADER NAME',0
 GUILoadText6 db 'SHOW ALL EXTENSIONS',0
 GUILoadText7 db 'FILENAME',0
@@ -1570,31 +1554,6 @@ DisplayGUIInput:    ; Player Select, Joystick/keyboard Type List, Button Assignm
   GUIDisplayText 3,113,154,GUIInputTextD3
   GUIDisplayText 3,153,154,GUIInputTextD4
 
-%ifdef __MSDOS__
-  GUIDisplayCheckboxu 3,105,160,SidewinderFix,GUIInputTextE4,0
-
-  cmp byte[cplayernum],0
-  jne .notp1
-  GUIDisplayCheckboxu 3,5,190,pl1p209,GUIInputTextE5,4
-.notp1
-  cmp byte[cplayernum],1
-  jne .notp2
-  GUIDisplayCheckboxu 3,5,190,pl2p209,GUIInputTextE5,4
-.notp2
-  cmp byte[cplayernum],2
-  jne .notp3
-  GUIDisplayCheckboxu 3,5,190,pl3p209,GUIInputTextE5,4
-.notp3
-  cmp byte[cplayernum],3
-  jne .notp4
-  GUIDisplayCheckboxu 3,5,190,pl4p209,GUIInputTextE5,4
-.notp4
-  cmp byte[cplayernum],4
-  jne .notp5
-  GUIDisplayCheckboxu 3,5,190,pl5p209,GUIInputTextE5,4
-.notp5
-%endif
-
   GUIDisplayCheckboxu 3,5,160,GameSpecificInput,GUIInputTextE6,0
   GUIDisplayCheckboxu 3,5,170,AllowUDLR,GUIInputTextE7,0
   GUIDisplayCheckboxu 3,105,170,Turbo30hz,GUIInputTextE8,0
@@ -1602,9 +1561,6 @@ DisplayGUIInput:    ; Player Select, Joystick/keyboard Type List, Button Assignm
 
   DrawGUIButton 3,123,34,153,45,GUIInputTextE1,14,0,0   ; Buttons
   DrawGUIButton 3,123,50,177,61,GUIInputTextE2,40,0,0
-%ifdef __MSDOS__
-  DrawGUIButton 3,123,66,183,77,GUIInputTextE3,15,0,0
-%endif
 
   GUIDisplayBBoxS 3,5,34,107,77,167        ; Main Box
   mov ebx,[GUIcurrentinputcursloc]
@@ -1734,11 +1690,6 @@ GUIInputTextD4 db 'DR',0
 GUIInputTextE dd 0
 GUIInputTextE1 db 'SET',0
 GUIInputTextE2 db 'SET KEYS',0
-%ifdef __MSDOS__
-GUIInputTextE3 db 'CALIBRATE',0
-GUIInputTextE4 db 'SIDEWINDER FIX',0
-GUIInputTextE5 db 'USE JOYSTICK PORT 209H',0
-%endif
 GUIInputTextE6 db 'GAME SPECIFIC',0
 GUIInputTextE7 db 'ALLOW U+D/L+R',0
 GUIInputTextE8 db 'TURBO AT 30HZ',0
@@ -1905,12 +1856,6 @@ SECTION .text
 %endmacro
 
 DisplayGUIVideo:
-%ifdef __MSDOS__
-  cmp byte[TripBufAvail],0        ; Check features
-  jne .notexttb
-  mov byte[Triplebufen],0
-.notexttb
-%endif
   cmp byte[MMXSupport],1
   jne .2xSaIdis
   cmp byte[newgfx16b],0
@@ -1922,9 +1867,6 @@ DisplayGUIVideo:
 .no2xSaIdis
   cmp byte[En2xSaI],0
   je .no2xsaien
-%ifdef __MSDOS__
-  mov byte[Triplebufen],0
-%endif
   mov byte[hqFilter],0
   mov byte[scanlines],0
   mov byte[antienab],0
@@ -1959,8 +1901,7 @@ DisplayGUIVideo:
   jne near .notmodestab
   DrawGUIButton 5,128,30,164,41,GUIVideoTextA4,4,0,0        ; Mode Set Button
 
-%ifndef __MSDOS__                              ; Legend
-  GUIDisplayTextY 5,130,50,GUIVideoTextA1
+  GUIDisplayTextY 5,130,50,GUIVideoTextA1 ; Legend
   GUIDisplayText 5,130,58,GUIVideoTextA1a
   GUIDisplayText 5,130,66,GUIVideoTextA1b
   GUIDisplayText 5,130,74,GUIVideoTextA1c
@@ -1983,7 +1924,6 @@ DisplayGUIVideo:
 
   GUIOuttextwin2d 5,138,133,GUICustomX,4,GUICustomResTextPtr,0
   GUIOuttextwin2d 5,199,133,GUICustomY,4,GUICustomResTextPtr,1
-%endif
 
   GUIDisplayBBoxS 5,5,26,115,189,167           ; Video Modes Box
   DrawSlideBarWin 5,117,34,[GUIcurrentvideoviewloc],[NumVideoModes],20,148,GUIVStA
@@ -2075,15 +2015,7 @@ DisplayGUIVideo:
   cmp dword[GUIVideoTabs],2
   jne near .notfilterstab
 
-                                                  ; Video Filters
-%ifdef __MSDOS__
-  cmp byte[smallscreenon],1
-  je .nocheckboxw
-  cmp byte[ScreenScale],1
-  je .notexthq4xa
-%endif
-
-%ifndef __MSDOS__
+; Video Filters
   xor eax,eax                                     ; Bilinear
   mov al,[cvidmode]
   cmp byte[GUIBIFIL+eax],0
@@ -2092,7 +2024,6 @@ DisplayGUIVideo:
   GUIDisplayCheckboxu 5,18,35,BilinearFilter,GUIVideoTextB1c,1
   jmp near .noswinterp
 .nocheckboxe
-%endif
   xor eax,eax                                     ; Interpolations
   mov al,[cvidmode]
 %ifdef __WIN32__
@@ -2104,15 +2035,6 @@ DisplayGUIVideo:
   GUIDisplayTextY 5,13,30,GUIVideoTextB1
   GUIDisplayCheckboxu 5,18,35,antienab,GUIVideoTextB1a,0
 .notext3
-%ifdef __MSDOS__                                  ; Eagle Filter
-  xor eax,eax
-  mov al,[cvidmode]
-  cmp byte[GUIEAVID+eax],0
-  je near .notext4
-  GUIDisplayTextY 5,13,30,GUIVideoTextB1
-  GUIDisplayCheckboxu 5,18,35,antienab,GUIVideoTextB1b,9
-.notext4
-%endif
 .noswinterp
 
   xor eax,eax                                     ; NTSC filter
@@ -2126,11 +2048,7 @@ DisplayGUIVideo:
   je near .nocheckboxx
   xor eax,eax                                     ; Kreed 2x filters
   mov al,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUI2xVID+eax],0
-%else
   cmp byte[GUIDSIZE+eax],0
-%endif
   je near .nocheckboxx
   GUIDisplayCheckboxun 5,18,45,En2xSaI,1,GUIVideoTextB1e,2   ;2x
   GUIDisplayCheckboxun 5,128,45,En2xSaI,2,GUIVideoTextB1f,6  ;Seagle
@@ -2143,18 +2061,11 @@ DisplayGUIVideo:
   mov al,[cvidmode]
   cmp byte[GUIHQ2X+eax],0
   je near .notexthq2xa
-%ifdef __MSDOS__
-  GUIDisplayCheckboxu 5,128,55,hqFilter,GUIVideoTextB1h,1
-%else
   GUIDisplayCheckboxu 5,128,55,hqFilter,GUIVideoTextB1i,1
   cmp byte[hqFilter],0
   je near .notexthq4xa
   GUIDisplayButtonHoleTu 5,128,68,byte[hqFilterlevel],2,GUIVideoTextB1j,1
-  jmp .notexthq2xa
-%endif
-  jmp .notexthq4xa
 .notexthq2xa
-%ifndef __MSDOS__
   xor eax,eax
   mov al,[cvidmode]
   cmp byte[GUIHQ3X+eax],0
@@ -2166,10 +2077,8 @@ DisplayGUIVideo:
   cmp byte[GUIHQ4X+eax],0
   je near .notexthq4xa
   GUIDisplayButtonHoleTu 5,188,68,byte[hqFilterlevel],4,GUIVideoTextB1l,0
-%endif
 .notexthq4xa
 
-%ifndef __MSDOS__
   xor eax,eax                                     ; GL Scanlines
   mov al,[cvidmode]
   cmp byte[GUIBIFIL+eax],0
@@ -2178,30 +2087,17 @@ DisplayGUIVideo:
   GUIDrawSlider 5,23,100,90,sl_intensity,GUIVideoTextB2z,glscslidSet,glscslidText
   jmp near .noswscanlines
 .noglscanlines
-%endif
   xor eax,eax                                     ; Scanlines
   mov al,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUISLVID+eax],0
-%else
   cmp byte[GUIDSIZE+eax],0
-%endif
   je near .nocheckboxb
   GUIDisplayTextY 5,13,80,GUIVideoTextB2          ; Scanlines text
   GUIDisplayButtonHoleTu 5,18,87,byte[scanlines],0,GUIVideoTextB2a,1   ; None
   GUIDisplayButtonHoleTu 5,168,87,byte[scanlines],1,GUIVideoTextB2d,0  ; Full
 .nocheckboxb
-%ifdef __MSDOS__
-  cmp byte[ScreenScale],1
-  je .nocheckboxw
-%endif
   xor eax,eax
   mov al,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUIHSVID+eax],0
-%else
   cmp byte[GUIDSIZE+eax],0
-%endif
   je near .nocheckboxw
   GUIDisplayButtonHoleTu 5,68,87,byte[scanlines],2,GUIVideoTextB2b,0   ; 25%
   GUIDisplayButtonHoleTu 5,118,87,byte[scanlines],3,GUIVideoTextB2c,0  ; 50%
@@ -2219,8 +2115,8 @@ DisplayGUIVideo:
   je near .nocheckboxm72
   GUIDisplayCheckboxu 5,128,115,Mode7HiRes16b,GUIVideoTextB3b,0
 .nocheckboxm72
-                                                  ; Monitor Refresh
-%ifdef __UNIXSDL__
+
+%ifdef __UNIXSDL__                              ; Monitor Refresh
 %ifdef __OPENGL__                                 ; VSync
   cmp byte[allow_glvsync],1
   jne near .novsync
@@ -2244,18 +2140,7 @@ DisplayGUIVideo:
   GUIDisplayCheckboxu 5,128,145,TripleBufferWin,GUIVideoTextB4b,0
 .nocheckboxslw2
 %endif
-%ifdef __MSDOS__
-  xor eax,eax
-  mov al,[cvidmode]
-  cmp byte[GUITBVID+eax],0
-  je near .nocheckboxtbb
-  cmp byte[TripBufAvail],0
-  je near .nocheckboxtbb
-  GUIDisplayCheckboxu 5,128,145,Triplebufen,GUIVideoTextB4b,0
-.nocheckboxtbb
-%endif
 
-%ifndef __MSDOS__
   xor eax,eax                                     ; Keep 4:3 Ratio
   mov al,[cvidmode]
   cmp byte[GUIKEEP43+eax],0
@@ -2269,23 +2154,6 @@ DisplayGUIVideo:
   GUIDisplayCheckboxu 5,18,175,Keep4_3Ratio,GUIVideoTextB5a,8
 .nocheckboxk43
 
-%else
-  xor eax,eax                                     ; Small Screen
-  mov al,[cvidmode]
-  cmp byte[GUISSVID+eax],0
-  je near .nocheckbox3b
-  GUIDisplayTextY 5,13,170,GUIVideoTextB5
-  GUIDisplayCheckboxu 5,18,175,smallscreenon,GUIVideoTextB5b,1
-.nocheckbox3b
-
-  xor eax,eax                                     ; Full/Widescreen
-  mov al,[cvidmode]
-  cmp byte[GUIWSVID+eax],0
-  je near .nofs
-  GUIDisplayTextY 5,13,170,GUIVideoTextB5
-  GUIDisplayCheckboxu 5,128,175,ScreenScale,GUIVideoTextB5c,6
-.nofs
-%endif
 .notfilterstab
 
   cmp dword[GUIVntscTab],1                        ; NTSC Tab
@@ -2347,8 +2215,7 @@ GUIVntscTab dd 0,2
   db 'NTSC',0
   db 'ADV NTSC',0
 
-%ifndef __MSDOS__                        ; Modes Tab
-GUIVideoTextA1 db 'LEGEND:',0
+GUIVideoTextA1 db 'LEGEND:',0                       ; Modes Tab
 GUIVideoTextA1a db 'D = ALLOW FILTERS',0
 GUIVideoTextA1b db 'S = STRETCH',0
 GUIVideoTextA1c db 'R = KEEP 8:7 RATIO',0
@@ -2360,32 +2227,21 @@ GUIVideoTextA1f db 'O = USES OPENGL',0
 
 GUIVideoTextA2 db 'CUSTOM:',0
 GUIVideoTextA2a db 'X',0
-%endif
 
 GUIVideoTextA3 db 'CURRENT:',0
 GUIVideoTextA4 db 'SET',0                ; set button
 
 GUIVideoTextB1 db 'VIDEO FILTERS:',0     ; Filters.Exclusive
 GUIVideoTextB1a db 'INTERPOLATION',0     ; -y
-%ifdef __MSDOS__
-GUIVideoTextB1b db 'EAGLE ENGINE',0      ; same loc at interpolation   -y
-%endif
-%ifndef __MSDOS__
 GUIVideoTextB1c db 'BILINEAR FILTER',0
-%endif
 GUIVideoTextB1d db 'NTSC FILTER',0
 GUIVideoTextB1e db '2XSAI ENGINE',0
 GUIVideoTextB1f db 'SUPER EAGLE',0
 GUIVideoTextB1g db 'SUPER 2XSAI',0
-
-%ifdef __MSDOS__
-GUIVideoTextB1h db 'HQ2X',0
-%else
 GUIVideoTextB1i db 'HQ FILTER',0
 GUIVideoTextB1j db '2X',0
 GUIVideoTextB1k db '3X',0
 GUIVideoTextB1l db '4X',0
-%endif
 
 GUIVideoTextB2 db 'SCANLINES:',0         ; Filters.Scanlines
 GUIVideoTextB2a db 'NONE',0
@@ -2405,13 +2261,8 @@ GUIVideoTextB4b db 'TRIPLE BUFFERING',0  ; -3
 %endif
 
 GUIVideoTextB5 db 'DISPLAY OPTIONS:',0   ; Video.Display
-%ifndef __MSDOS__
 GUIVideoTextB5a db 'USE 4:3 RATIO',0
 NEWSYM ShowKeep43, db 0
-%else
-GUIVideoTextB5b db 'SMALL SCREEN',0      ; -c
-GUIVideoTextB5c db 'WIDE SCREEN',0       ; -cc
-%endif
 
 GUIVideoTextC1a db 'BLEND FRAMES',0      ; NTSC Tab
 GUIVideoTextC1b db 'REFRESH',0
@@ -2482,9 +2333,6 @@ DisplayGUISound:                     ; Sound Related Options
   GUIDisplayCheckboxu 6,11,51,RevStereo,GUISoundTextA4,2
   GUIDisplayCheckboxu 6,11,61,Surround,GUISoundTextA5,2
 .nostereo
-%ifdef __MSDOS__
-  GUIDisplayCheckboxu 6,11,71,Force8b,GUISoundTextA6,0
-%endif
 %ifdef __WIN32__
   GUIDisplayCheckboxu 6,11,71,PrimaryBuffer,GUISoundTextA7,4
 %endif
@@ -2509,23 +2357,6 @@ DisplayGUISound:                     ; Sound Related Options
 .nohiqualityfilter
 
   GUIDisplayTextY 6,6,93,GUISoundTextB
-%ifdef __MSDOS__
-  cmp byte[SoundQuality],2
-  jbe .okay
-  cmp byte[SoundQuality],4
-  je .okay
-  cmp byte[StereoSound],1
-  jne .okay
-;  cmp byte[SBHDMA],0
-;  jne .okay
-;  cmp byte[vibracard], 1
-;  je .okay
-  GUIDisplayBBox 6,15,101,69,109,167
-  GUIDisplayTextG 6,23,104,GUISoundTextB0
-  jmp .nosrate
-.okay
-%endif
-
   GUIDisplayBBox 6,15,101,69,109,167            ;Sampling Rate Box
   mov eax,[SoundQuality]
   lea eax,[eax*8+GUISoundTextB1]
@@ -2544,7 +2375,6 @@ GUISoundTextA2 db 'ENABLE SOUND',0
 GUISoundTextA3 db 'ENABLE STEREO SOUND',0
 GUISoundTextA4 db 'REVERSE STEREO CHANNELS',0
 GUISoundTextA5 db 'SIMULATE SURROUND SOUND',0
-GUISoundTextA6 db 'FORCE 8-BIT OUTPUT',0        ; DOS Only
 GUISoundTextA7 db 'USE PRIMARY BUFFER',0        ; Win Only
 
 GUISoundTextB db 'SAMPLING RATE:',0
@@ -3478,9 +3308,7 @@ DisplayGameOptns:        ; Misc Key Window
   GUIDisplayText 9,9,102,GUIGameOptnsTextD1a
   GUIDisplayText 9,9,112,GUIGameOptnsTextD1b
   GUIDisplayText 9,9,122,GUIGameOptnsTextD1c
-%ifndef __MSDOS__
   GUIDisplayText 9,9,132,GUIGameOptnsTextD1d
-%endif
 
   GUIDisplayTextY 9,119,93,GUIGameOptnsTextD2
   GUIDisplayText 9,122,102,GUIGameOptnsTextD2a
@@ -3518,9 +3346,7 @@ DisplayGameOptns:        ; Misc Key Window
   DDrawBox 9,77,99,[KeyUsePlayer1234]
   DDrawBox 9,77,109,[KeyResetAll]
   DDrawBox 9,77,119,[KeyDisplayFPS]
-%ifndef __MSDOS__
   DDrawBox 9,77,129,[KeyDisplayBatt]
-%endif
 
   DDrawBox 9,190,99,[KeyNewGfxSwt]
   DDrawBox 9,190,109,[KeyWinDisble]
@@ -3769,9 +3595,7 @@ DisplayGUIAbout:          ; Displays the About Box
 
 SECTION .data
 GUIGUIAboutTextA1 db 'ZSNES V',ZVERSION,'             ',0 ;Need room for date
-%ifdef __MSDOS__
-GUIGUIAboutTextA2 db 'DOS VERSION',0
-%elifdef __WIN32__
+%ifdef __WIN32__
 GUIGUIAboutTextA2 db 'WIN VERSION',0
 %elifdef __UNIXSDL__
 GUIGUIAboutTextA2 db 'SDL VERSION',0
@@ -4939,9 +4763,7 @@ GUIPathsTab2Ptr dd SnapPath,SPCPath,CHTPath,ComboPath,INPPath
 GUIPathsTab3Ptr dd BSXPath,STPath,GNextPath,SGPath
 GUIPathsTab4Ptr dd FEOEZPath,SJNSPath,MDHPath,SPL4Path
 GUIMovieTextPtr dd GUIMovieForcedText
-%ifndef __MSDOS__
 GUICustomResTextPtr dd GUICustomX,GUICustomY
-%endif
 
 SECTION .text
 

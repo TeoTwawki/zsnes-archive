@@ -281,19 +281,6 @@ GUIHLine:
 .nodraw
   ret
 
-%macro GUIPal 4
-  mov dx,03C8h
-  mov al,%1
-  out dx,al
-  inc dx
-  mov al,%2
-  out dx,al
-  mov al,%3
-  out dx,al
-  mov al,%4
-  out dx,al
-%endmacro
-
 GUIDrawShadow:
 .loop
   push edi
@@ -442,12 +429,10 @@ GUIOutputStringwinl:
   mov ecx,[cloadmaxlen]
 .more
   mov al,[edi]
-%ifndef __MSDOS__
   cmp al,'%'
   jne .noperc
   call ConvertPercValue
 .noperc
-%endif
   or al,al
   jz .nomore
   mov al,[ASCII2Font+eax]
@@ -472,7 +457,6 @@ GUIOutputStringwinl:
 .nomore
   ret
 
-%ifndef __MSDOS__
 ConvertPercValue:
   mov al,[edi+2]
   cmp al,'a'
@@ -524,7 +508,6 @@ ConvertPercValue:
 .noperc
   movzx eax,byte[edi]
   ret
-%endif
 
 OutputUnder:
   cmp edx,-8
