@@ -483,7 +483,6 @@ ifeq (${ENV},msvc)
 else
 	g++ -O3 -s -o $@ parsegen.cpp -lz
 endif
-endif
 
 ${ZIP_D}/unzip${OE}: ${ZIP_D}/unzip.c ${ZIP_D}/zunzip.h
 ${ZIP_D}/zpng${OE}: ${ZIP_D}/zpng.c numconv.h zpath.h ${JMA_D}/zsnesjma.h \
