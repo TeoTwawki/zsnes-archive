@@ -21,24 +21,24 @@
 #
 # PLATFORM=platform_name  Chose target platform and how you're creating it.
 #                         Valid options are:
-#                         dos, dos-cross, msvc, win32, win32-cross, win32-unix-shell
+#                         msvc, win32, win32-cross, win32-unix-shell
 #
 # DEBUG=yes               For debugging with GDB or the like.
 #
 # DEBUGGER=no             To build ZSNES without the debugger.
 #
-# RELEASEGRADE=yes        For high assembly optimization for releases, will take at least half an hour.
+# RELEASEGRADE=yes        For high assembly optimization for releases, will take
+#                         at least half an hour.
 #
 # clean                   Cleans object and executable files.
 #
 #
 # --Not for MSVC--
-# CPU=cpu-type            Optimize for a particular CPU, find a list of cpu types in the GCC manual.
-
+# CPU=cpu-type            Optimize for a particular CPU, find a list of cpu
+#                         types in the GCC manual.
 
 ENV=$(PLATFORM)
 ifneq (${ENV},) #end if is at the bottom of the file
-
 
 DELETECOMMAND=rm -f
 DELPRE=rm -f
@@ -163,7 +163,6 @@ endif
 
 CHIP_D=chips
 CPU_D=cpu
-DOS_D=dos
 EFF_D=effects
 GUI_D=gui
 JMA_D=jma
@@ -297,7 +296,7 @@ zsnes: ${PSR} ${OBJFIX} ${OBJS}
 ifneq (${ENV},msvc)
 	${LINK} ${STRIP} -o ${EXE} ${OBJS} ${LIBS}
 else
-	 @echo /Fezsnesw.exe *.obj ${CPU_D}\*.obj ${VID_D}\*.obj ${CHIP_D}\*.obj ${EFF_D}\*.obj ${DOS_D}\*.obj ${WIN_D}\*.obj ${GUI_D}\*.obj > link.vc
+	 @echo /Fezsnesw.exe *.obj ${CPU_D}\*.obj ${VID_D}\*.obj ${CHIP_D}\*.obj ${EFF_D}\*.obj ${WIN_D}\*.obj ${GUI_D}\*.obj > link.vc
 	 @echo ${ZIP_D}\*.obj ${JMA_D}\*.obj ${NET_D}\*.obj ${MMLIB_D}\*.obj ${SPC_D}\*.obj ${DEBUGGER_D}\*.obj >> link.vc
 	 @echo ${MSVCLIBS} >> link.vc
 	 cl /nologo @link.vc ${WIN_D}/zsnes.res /link /SUBSYSTEM:WINDOWS /NODEFAULTLIB:LIBCMTD.LIB /NODEFAULTLIB:LIBC.LIB /NODEFAULTLIB:LIBCMT.LIB
@@ -329,7 +328,7 @@ zloader${OE}: zloader.c asm_call.h cfg${OE} input${OE} zloader.h zpath.h \
 zmovie${OE}: zmovie.c asm_call.h cfg${OE} gblvars.h input${OE} md${OE} \
 	numconv.h zmovie.h zpath.h ${JMA_D}/zsnesjma.h \
 	zdir.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h
-zpath${OE}: zpath.c cfg${OE} zpath.h ${DOS_D}/lib.h ${JMA_D}/zsnesjma.h \
+zpath${OE}: zpath.c cfg${OE} zpath.h ${JMA_D}/zsnesjma.h \
 	${WIN_D}/lib.h ${WIN_D}/safelib.h ${ZIP_D}/zunzip.h ${CONFLOC}
 zstate${OE}: zstate.c asm_call.h cfg${OE} gblvars.h input${OE} numconv.h \
 	zmovie.h zpath.h ${CHIP_D}/dsp4emu.h ${JMA_D}/zsnesjma.h ${ZIP_D}/zunzip.h
@@ -381,16 +380,6 @@ ${CPU_D}/table${OE}: ${CPU_D}/table.asm macros.mac ${CPU_D}/65816d.inc \
 ${CPU_D}/tablec${OE}: ${CPU_D}/tablec.asm macros.mac ${CPU_D}/65816dc.inc \
 	${CPU_D}/address.inc ${CPU_D}/addrni.inc ${CPU_D}/e65816c.inc
 
-${DOS_D}/dosintrf${OE}: ${DOS_D}/dosintrf.asm macros.mac
-${DOS_D}/gppro${OE}: ${DOS_D}/gppro.asm macros.mac
-${DOS_D}/initvid${OE}: ${DOS_D}/initvid.asm macros.mac ${DOS_D}/vga.inc
-${DOS_D}/joy${OE}: ${DOS_D}/joy.asm macros.mac
-${DOS_D}/lib${OE}: ${DOS_D}/lib.c
-${DOS_D}/sound${OE}: ${DOS_D}/sound.c macros.mac
-${DOS_D}/sw${OE}: ${DOS_D}/sw.asm macros.mac
-${DOS_D}/vesa12${OE}: ${DOS_D}/vesa12.asm macros.mac
-${DOS_D}/vesa2${OE}: ${DOS_D}/vesa2.asm macros.mac
-
 ${EFF_D}/burn${OE}: ${EFF_D}/burn.c
 ${EFF_D}/smoke${OE}: ${EFF_D}/smoke.c
 ${EFF_D}/water${OE}: ${EFF_D}/water.c ${EFF_D}/fixsin.h
@@ -399,7 +388,7 @@ ${GUI_D}/gui${OE}: ${GUI_D}/gui.asm macros.mac ${GUI_D}/guicheat.inc \
 	${GUI_D}/guicombo.inc ${GUI_D}/guikeys.inc ${GUI_D}/guimisc.inc \
 	${GUI_D}/guimouse.inc ${GUI_D}/guitools.inc ${GUI_D}/guiwindp.inc
 ${GUI_D}/guifuncs${OE}: ${GUI_D}/guifuncs.c asm_call.h cfg${OE} input${OE} \
-	md${OE} zloader.h zpath.h ${DOS_D}/lib.h ${JMA_D}/zsnesjma.h \
+	md${OE} zloader.h zpath.h ${JMA_D}/zsnesjma.h \
 	${WIN_D}/lib.h ${ZIP_D}/zunzip.h
 ${GUI_D}/menu${OE}: ${GUI_D}/menu.asm macros.mac
 
@@ -492,9 +481,6 @@ ifeq (${ENV},msvc)
 	cl /nologo /EHsc /Fe$@ parsegen.cpp zlib.lib
 	${DELETECOMMAND} parsegen.obj
 else
-ifeq (${ENV},dos)
-	gpp -O3 -s -o $@ parsegen.cpp -lz
-else
 	g++ -O3 -s -o $@ parsegen.cpp -lz
 endif
 endif
@@ -525,9 +511,8 @@ ifneq (${ENV},)
 	${DELPRE} ${CPU_D}${SLASH}*${OE}${SEP} ${GUI_D}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${JMA_D}${SLASH}*${OE}${SEP} ${MMLIB_D}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${EFF_D}${SLASH}*${OE}${SEP} ${ZIP_D}${SLASH}*${OE}${DELSUF}
-	${DELPRE} ${DOS_D}${SLASH}*${OE}${SEP} ${WIN_D}${SLASH}*${OE}${DELSUF}
+	${DELPRE} ${SPC_D}${SLASH}*${OE}${SEP} ${WIN_D}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${CHIP_D}${SLASH}*${OE}${SEP} ${VID_D}${SLASH}*${OE}${DELSUF}
-	${DELPRE} ${SPC_D}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${DEBUGGER_D}${SLASH}*${OE}${DELSUF}
 	${DELPRE} ${DEBUGGER_D}${SLASH}ui_*.h${DELSUF}
 	${DELPRE} ${DEBUGGER_D}${SLASH}moc_*.cpp${DELSUF}
