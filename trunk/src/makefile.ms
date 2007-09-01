@@ -434,7 +434,7 @@ ${VID_D}/m716text${OE}: ${VID_D}/m716text.asm macros.mac \
 	${VID_D}/mode7.mac
 ${VID_D}/makev16b${OE}: ${VID_D}/makev16b.asm macros.mac ${VID_D}/vidmacro.mac
 ${VID_D}/makev16t${OE}: ${VID_D}/makev16t.asm macros.mac ${VID_D}/vidmacro.mac
-${VID_D}/makevid${OE}: ${VID_D}/makevid.asm macros.mac ${VID_D}/vidmacro.mac
+${VID_D}/makevid${OE}: ${VID_D}/makevid.asm macros.mac
 ${VID_D}/mode716${OE}: ${VID_D}/mode716.asm macros.mac ${VID_D}/mode716.mac
 ${VID_D}/mode716b${OE}: ${VID_D}/mode716b.asm macros.mac ${VID_D}/mode7.mac
 ${VID_D}/mode716d${OE}: ${VID_D}/mode716d.asm macros.mac ${VID_D}/mode7.mac
@@ -442,8 +442,8 @@ ${VID_D}/mode716e${OE}: ${VID_D}/mode716e.asm macros.mac ${VID_D}/mode7.mac
 ${VID_D}/mode716t${OE}: ${VID_D}/mode716t.asm macros.mac ${VID_D}/mode7.mac
 ${VID_D}/mv16tms${OE}: ${VID_D}/mv16tms.asm macros.mac ${VID_D}/vidmacro.mac
 ${VID_D}/newg162${OE}: ${VID_D}/newg162.asm macros.mac ${VID_D}/newg162.mac \
-	${VID_D}/newg16wn.mac ${VID_D}/newgfx16.mac ${VID_D}/vidmacro.mac
-${VID_D}/newgfx${OE}: ${VID_D}/newgfx.asm macros.mac ${VID_D}/vidmacro.mac
+	${VID_D}/newg16wn.mac ${VID_D}/newgfx16.mac
+${VID_D}/newgfx${OE}: ${VID_D}/newgfx.asm macros.mac
 ${VID_D}/newgfx16${OE}: ${VID_D}/newgfx16.asm macros.mac \
 	${VID_D}/newg162.mac ${VID_D}/newgfx16.mac ${VID_D}/vidmacro.mac
 ${VID_D}/ntsc${OE}: ${VID_D}/ntsc.c ${VID_D}/ntsc.h ${NTSC_D}/snes_ntsc.c \
