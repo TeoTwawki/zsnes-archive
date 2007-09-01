@@ -2633,7 +2633,7 @@ extern uint32_t xa, xdb, xpb, xs, xd, xx, xy, scrndis;
 extern uint16_t VIRQLoc, resolutn, xpc;
 //extern uint8_t spcextraram[64], SPCROM[64];
 extern uint32_t tableD[256];
-uint8_t SPCSkipXtraROM, bgfixer2 = 0, disableeffects = 0;
+uint8_t SPCSkipXtraROM, disableeffects = 0;
 //This is saved in states
 uint8_t cycpl = 0;          // cycles per scanline
 uint8_t cycphb = 0;         // cycles per hblank
@@ -2656,8 +2656,7 @@ void SPC7110init();
 void init65816()
 {
     uint_fast8_t i;
-    osm2dis = 0;
-    bgfixer2 = 0;
+
     if(SA1Enable)
     {
       SA1Reset();
@@ -2666,8 +2665,6 @@ void init65816()
 
     if(C4Enable)
     {
-      osm2dis = 1;
-      bgfixer2 = 1;
       InitC4();
     }
 
@@ -2754,7 +2751,7 @@ void init65816()
     clearvidsound();
 
     prevoamptr = 0xFF;
-    disableeffects = 0;
+    disableeffects = osm2dis = 0;
     opexec268 = opexec268b;
     opexec358 = opexec358b;
     opexec268cph = opexec268cphb;
