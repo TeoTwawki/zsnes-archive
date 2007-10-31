@@ -43,12 +43,6 @@ typedef int ssize_t;
 #define __WIN32__
 #endif
 
-#ifdef __WIN32__
-#define SLASH_STR "\\"
-#else
-#define SLASH_STR "/"
-#endif
-
 string gcc = "gcc";
 string cflags;
 
