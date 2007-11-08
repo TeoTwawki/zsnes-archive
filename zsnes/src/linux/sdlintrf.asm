@@ -163,9 +163,6 @@ NEWSYM InitPreGame   ; Executes before starting/continuing a game
     mov byte[pressed+1],2
     pushad
     call Start60HZ
-%ifdef __OPENGL__
-    call drawscreenwin
-%endif
     call initwinvideo
     popad
 
@@ -269,7 +266,7 @@ NEWSYM deinitvideo
 SECTION .data
 NEWSYM converta, dd 0
 %ifdef __OPENGL__
-NEWSYM blinit, db 1
+NEWSYM blinit, db 0
 %endif
 
 SECTION .text
@@ -375,13 +372,11 @@ NEWSYM GUIDSIZE,  db 0,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ; D Modes
 NEWSYM GUIKEEP43, db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1 ; Keep 4:3 Ratio
 NEWSYM GUIM7VID,  db 0,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ; Hires Mode 7
 NEWSYM GUIHQ2X,   db 0,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ; Hq2x Filter
-NEWSYM GUIHQ3X,   db 0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; (Hq3x Filter)
-NEWSYM GUIHQ4X,   db 0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; (Hq4x Filter)
+NEWSYM GUIHQ3X,   db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; (Hq3x Filter)
+NEWSYM GUIHQ4X,   db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; (Hq4x Filter)
 NEWSYM GUINTVID,  db 0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; NTSC Filter
 NEWSYM GUIRESIZE, db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0 ; SDL Resizable
-%ifdef __OPENGL__
 NEWSYM GUIBIFIL,  db 0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ; SDL Bilinear Filter
-%endif
 
 SECTION .text
 
@@ -415,6 +410,7 @@ SECTION .text
 ;   convert it back when writing to it back.
 
 NEWSYM UpdateDevices                    ; One-time input device init
+; Stub please fix
         ret
 
 NEWSYM JoyRead
@@ -557,12 +553,15 @@ NEWSYM Get_MouseData         ; Returns both pressed and coordinates
     ret
 
 NEWSYM Set_MouseXMax
+; Stub please fix
     ret
 
 NEWSYM Set_MouseYMax
+; Stub please fix
     ret
 
 NEWSYM Set_MousePosition
+; Stub please fix
     ret
 
 NEWSYM Get_MousePositionDisplacement
@@ -614,6 +613,7 @@ NEWSYM StartSound
     ret
 
 NEWSYM delay
+; Stub please fix
    ret
 
 NEWSYM Check60hz

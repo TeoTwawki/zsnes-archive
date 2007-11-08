@@ -239,7 +239,7 @@ AC_MSG_RESULT($debug)
 if test x$debug = xyes; then
 dnl - It is easier to debug zsnes with no optimization enabled.
   ZSNESEXE="zsnesd"
-  CFLAGS+=" -Wall -W -DDEBUG -O0 -fomit-frame-pointer -gstabs3"
+  CFLAGS+=" -Wall -W -DDEBUG -O0 -fomit-frame-pointer -ggdb3"
   NFLAGS+=" -DDEBUG -g -F stabs -s -O0"
 else
   ZSNESEXE="zsnes"
