@@ -19,7 +19,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "gblhdr.h"
+#include "../gblhdr.h"
 
 #include <sys/param.h>
 #include <sys/wait.h>
@@ -27,6 +27,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <paths.h>
 #include <grp.h>
 #include <pwd.h>
+
+#include <stdbool.h>
 
 #ifndef OPEN_MAX
 #define OPEN_MAX 256
@@ -36,13 +38,32 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "../argv.h"
 
-//C++ style code in C
-#define bool unsigned char
-#define true 1
-#define false 0
-
-
 //Introducing secure forking ;) -Nach
+
+#ifdef __linux__
+static int z_setreuid(uid_t uid)
+{
+  return(setreuid(uid, uid));
+}
+
+static int z_setregid(gid_t gid)
+{
+  return(setregid(gid, gid));
+}
+#else
+static int z_setreuid(uid_t uid)
+{
+  seteuid(uid);
+  return(setuid(uid));
+}
+
+static int z_setregid(gid_t gid)
+{
+  setegid(gid);
+  return(setgid(gid));
+}
+#endif
+
 
 //Taken from the secure programming cookbook, somewhat modified
 static bool spc_drop_privileges()
@@ -50,63 +71,39 @@ static bool spc_drop_privileges()
   gid_t newgid = getgid(), oldgid = getegid();
   uid_t newuid = getuid(), olduid = geteuid();
 
-  char *name =  getlogin();
+  char *name = getlogin();
   struct passwd *userinfo;
 
-  if (!olduid && name && (userinfo = getpwnam(name)) && userinfo->pw_uid)
+  if (name) { userinfo = getpwnam(name); }
+
+  if (!olduid && !newuid && userinfo && userinfo->pw_uid) //If currently using su to root or sudo
   {
-    setgroups(1, &userinfo->pw_gid);
-
-#if !defined(linux)
-    setegid(userinfo->pw_gid);
-    if (setgid(userinfo->pw_gid) == -1) { return(false); }
-#else
-    if (setregid(userinfo->pw_gid, userinfo->pw_gid) == -1) { return(false); }
-#endif
-
-#if !defined(linux)
-    seteuid(userinfo->pw_uid);
-    if (setuid(userinfo->pw_uid) == -1) { return(false); }
-#else
-    if (setreuid(userinfo->pw_uid, userinfo->pw_uid) == -1) { return(false); }
-#endif
-
-    if ((setegid(oldgid) != -1) || (getegid() != userinfo->pw_gid)) { return(false); }
-    if ((seteuid(olduid) != -1) || (geteuid() != userinfo->pw_uid)) { return(false); }
+    newuid = userinfo->pw_uid;
   }
-  else
+
+  if (!oldgid && !newgid && userinfo && userinfo->pw_gid) //Same thing, but now check the group
   {
-    //If root privileges are to be dropped, be sure to pare down the ancillary
-    //groups for the process before doing anything else because the setgroups()
-    //system call requires root privileges.  Drop ancillary groups regardless of
-    //whether privileges are being dropped temporarily or permanently.
-
-    if (!olduid) setgroups(1, &newgid);
-
-    if (newgid != oldgid)
-    {
-#if !defined(linux)
-      setegid(newgid);
-      if (setgid(newgid) == -1) { return(false); }
-#else
-      if (setregid(newgid, newgid) == -1) { return(false); }
-#endif
-    }
-
-    if (newuid != olduid)
-    {
-#if !defined(linux)
-      seteuid(newuid);
-      if (setuid(newuid) == -1) { return(false); }
-#else
-      if (setreuid(newuid, newuid) == -1) { return(false); }
-#endif
-    }
-
-    //verify that the changes were successful
-    if (newgid != oldgid && (setegid(oldgid) != -1 || getegid() != newgid)) { return(false); }
-    if (newuid != olduid && (seteuid(olduid) != -1 || geteuid() != newuid)) { return(false); }
+    newgid = userinfo->pw_gid;
   }
+
+  //If the above failed, we check for root via +s as a mode on the binary
+
+  //If root privileges are to be dropped, be sure to pare down the ancillary
+  //groups for the process before doing anything else because the setgroups()
+  //system call requires root privileges.  Drop ancillary groups regardless of
+  //whether privileges are being dropped temporarily or permanently.
+
+  if (!olduid) { setgroups(1, &newgid); }
+
+  if (((newgid != oldgid) && (z_setregid(newgid) == -1)) || ((newuid != olduid) && (z_setreuid(newuid) == -1)))
+  {
+    return(false);
+  }
+
+  //verify that the changes were successful
+  if (newgid != oldgid && (setegid(oldgid) != -1 || getegid() != newgid)) { return(false); }
+  if (newuid != olduid && (seteuid(olduid) != -1 || geteuid() != newuid)) { return(false); }
+
   return(true);
 }
 
