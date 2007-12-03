@@ -20,7 +20,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __PORTABLE_H
 
 #include <string.h>
+#ifdef _MSC_VER
+#include "pstdint.h"
+#else
 #include <stdint.h>
+#endif
 
 typedef int8_t INT8;
 typedef uint8_t UINT8;
