@@ -87,8 +87,8 @@ ifeq (${ENV},win32)
 endif
 
 ifeq (${ENV},msvc)
-  CFLAGSORIG=/nologo /Ox /G6 /c /EHsc
-  MSVCLIBS=zlib.lib libpng.lib wsock32.lib user32.lib gdi32.lib shell32.lib winmm.lib dinput8.lib dxguid.lib
+  CFLAGSORIG=/nologo /Ox /Oy- /c /EHsc
+  MSVCLIBS=zlib.lib libpng.lib wsock32.lib user32.lib gdi32.lib shell32.lib winmm.lib dinput8.lib dxguid.lib /MD
   DRESOBJ=${WINDIR}/zsnes.res
   OS=__WIN32__
 endif
@@ -491,7 +491,7 @@ ${OBJFIX}: objfix.c
 endif
 ${PSR}: parsegen.cpp
 ifeq (${ENV},msvc)
-	cl /nologo /EHsc /Fe$@ parsegen.cpp zlib.lib
+	cl /nologo /EHsc /Fe$@ parsegen.cpp zlib.lib /MD
 	${DELETECOMMAND} parsegen.obj
 else
 ifeq (${ENV},dos)
