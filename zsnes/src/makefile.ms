@@ -87,7 +87,7 @@ ifeq (${ENV},win32)
 endif
 
 ifeq (${ENV},msvc)
-  CFLAGSORIG=/nologo /Ox /Oy- /GA /c /EHsc "/I${DXSDK_DIR}include" /MD
+  CFLAGSORIG=/nologo /Ox /Oy- /GA /c /EHsc /MD "/I${DXSDK_DIR}include"
   MSVCLIBS=zlib.lib libpng.lib wsock32.lib user32.lib gdi32.lib shell32.lib winmm.lib "${DXSDK_DIR}lib\x86\dinput8.lib" "${DXSDK_DIR}lib\x86\dxguid.lib"
   DRESOBJ=${WINDIR}/zsnes.res
   OS=__WIN32__
