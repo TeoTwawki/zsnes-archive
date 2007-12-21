@@ -28,6 +28,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <signal.h>
 #endif
 
+#ifdef __OSS__
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/soundcard.h>
+#include <sys/ioctl.h>
+#endif
+
 #include "../asm_call.h"
 #include "../cfg.h"
 
@@ -39,6 +46,11 @@ static ao_device *audio_device = 0;
 static volatile unsigned int samples_waiting = 0;
 #endif
 
+#ifdef __OSS__
+typedef int adev_t;
+static adev_t dev;
+#endif
+
 unsigned char *sdl_audio_buffer = 0;
 int sdl_audio_buffer_len = 0, sdl_audio_buffer_fill = 0;
 int sdl_audio_buffer_head = 0, sdl_audio_buffer_tail = 0;
@@ -47,6 +59,8 @@ unsigned char sound_sdl = false;
 int SoundEnabled = 1;
 unsigned char PrevStereoSound;
 unsigned int PrevSoundQuality;
+
+void (*SoundWrite)() = 0;
 
 #define SAMPLE_NTSC_HI_SCALE 995ULL
 #define SAMPLE_NTSC_LO 59649ULL
@@ -114,7 +128,7 @@ static void SoundWriteSamples_ao(unsigned int samples)
   ao_play(audio_device, (char *)stemp, samples*2);
 }
 
-void SoundWrite_ao()
+static void SoundWrite_ao()
 {
   unsigned int samples = 0;
 
@@ -211,7 +225,109 @@ static int SoundInit_ao()
 
 #endif
 
-void SoundWrite_sdl()
+#ifdef __OSS__
+
+static void SoundWriteSamples_oss(unsigned int samples)
+{
+  extern unsigned int BufferSizeB, BufferSizeW;
+  extern int DSPBuffer[1280];
+  void ProcessSoundBuffer();
+  short stemp[1280];
+
+  int *d = DSPBuffer, *end_d = 0;
+  short *p = stemp;
+
+  while (samples > 1280)
+  {
+    SoundWriteSamples_oss(1280);
+    samples -= 1280;
+  }
+
+  //printf("samples %d\n", samples);
+
+  BufferSizeB = samples;
+  BufferSizeW = samples<<1;
+
+  asm_call(ProcessSoundBuffer);
+
+  end_d = DSPBuffer+samples;
+  for (; d < end_d; d++, p++)
+  {
+    if ((unsigned int)(*d + 0x7FFF) < 0xFFFF) { *p = *d; continue; }
+    if (*d > 0x7FFF) { *p = 0x7FFF; }
+    else { *p = 0x8001; }
+  }
+
+  write(dev, stemp, samples*2);
+}
+
+static void SoundWrite_oss()
+{
+  unsigned int samples = (unsigned int)((sample_control.balance/sample_control.lo) << StereoSound);
+  sample_control.balance %= sample_control.lo;
+  sample_control.balance += sample_control.hi;
+  SoundWriteSamples_oss(samples);
+}
+
+static int SoundInit_oss()
+{
+  bool success = true;
+  char *devname = "/dev/dsp";
+  int cooked = 1;
+  int rate = freqtab[SoundQuality = ((SoundQuality > 6) ? 1 : SoundQuality)];
+  int channels = StereoSound+1;
+  int format = AFMT_S16_LE;
+
+  if ((dev = open(devname, O_WRONLY, O_NONBLOCK)) > 0)
+  {
+#if SOUND_VERSION >= 0x040000
+    if (ioctl(dev, SNDCTL_DSP_COOKEDMODE, &cooked) == -1)
+    {
+      success = false;
+      perror("Cooked");
+    }
+#endif
+
+    if (ioctl(dev, SNDCTL_DSP_CHANNELS, &channels) == -1)
+    {
+      success = false;
+      perror("Channels");
+    }
+
+    if (ioctl(dev, SNDCTL_DSP_SETFMT, &format) == -1)
+    {
+      success = false;
+      perror("Format");
+    }
+
+    if (ioctl(dev, SNDCTL_DSP_SPEED, &rate) == -1)
+    {
+      success = false;
+      perror("Rate");
+    }
+  }
+  else
+  {
+    success = false;
+    perror(devname);
+  }
+
+  if (success)
+  {
+    InitSampleControl();
+    printf("\nAudio Opened.\nDriver: %s\nChannels: %u\nRate: %u\n\n", "Custom OSS", channels, rate);
+    return(true);
+  }
+  close(dev);
+  SoundEnabled = 0;
+  puts("Audio Open Failed");
+  return(false);
+}
+
+#endif
+
+
+static void SoundWrite_sdl()
 {
   extern int DSPBuffer[];
   extern unsigned char DSPDisable;
@@ -320,7 +436,6 @@ static int SoundInit_sdl()
   return(true);
 }
 
-
 int InitSound()
 {
   sound_sdl = false;
@@ -332,12 +447,19 @@ int InitSound()
   PrevSoundQuality = SoundQuality;
   PrevStereoSound = StereoSound;
 
+  #ifdef __OSS__
+  SoundWrite = SoundWrite_oss;
+  return(SoundInit_oss());
+  #endif
+
   #ifdef __LIBAO__
   if (strcmp(libAoDriver, "sdl") && !(!strcmp(libAoDriver, "auto") && !strcmp(ao_driver_info(ao_default_driver_id())->name, "null")))
   {
+    SoundWrite = SoundWrite_ao;
     return(SoundInit_ao());
   }
   #endif
+  SoundWrite = SoundWrite_sdl;
   return(SoundInit_sdl());
 }
 
@@ -351,6 +473,9 @@ void DeinitSound()
     pthread_cond_destroy(&audio_wait);
     ao_close(audio_device);
   }
+  #endif
+  #ifdef __OSS__
+  if (dev > 0) { close(dev); }
   #endif
   SDL_CloseAudio();
   if (sdl_audio_buffer) { free(sdl_audio_buffer); }

@@ -1412,7 +1412,7 @@ void UpdateVFrame()
 
   if (sound_sdl)
   {
-    SoundWrite_sdl();
+    SoundWrite();
   }
 }
 
@@ -1439,10 +1439,10 @@ void clearwin()
 
 void drawscreenwin()
 {
-#ifdef __LIBAO__
+#if defined(__LIBAO__) || defined(__OSS__)
   if (!sound_sdl && !GUIOn2 && !GUIOn && !EMUPause && !RawDumpInProgress)
   {
-    SoundWrite_ao();
+    SoundWrite();
   }
 #endif
 
