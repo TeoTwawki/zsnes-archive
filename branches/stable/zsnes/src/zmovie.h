@@ -32,7 +32,10 @@ void MoviePlay();
 void MovieStop();
 void MovieAppend();
 
+bool MovieInProgress();
+
 extern unsigned char MovieProcessing;
+extern bool RawDumpInProgress;
 
 enum MovieStatus { MOVIE_OFF = 0, MOVIE_PLAYBACK, MOVIE_RECORD, MOVIE_OLD_PLAY, MOVIE_ENDING_DUMPING, MOVIE_DUMPING_NEW, MOVIE_DUMPING_OLD };
 #define SetMovieMode(mode) (MovieProcessing = (unsigned char)mode)

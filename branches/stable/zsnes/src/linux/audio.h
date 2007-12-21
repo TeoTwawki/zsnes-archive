@@ -26,10 +26,7 @@ void InitSampleControl();
 int InitSound();
 void DeinitSound();
 
-#ifdef __LIBAO__
-void SoundWrite_ao();
-#endif
-void SoundWrite_sdl();
+extern void (*SoundWrite)();
 
 extern int SoundEnabled;
 extern unsigned char PrevStereoSound;
