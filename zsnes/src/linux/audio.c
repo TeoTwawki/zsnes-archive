@@ -32,6 +32,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/soundcard.h>
+//#include "/usr/lib/oss/include/sys/soundcard.h"
 #include <sys/ioctl.h>
 #endif
 
@@ -191,13 +192,13 @@ static int SoundInit_ao()
   }
   else
   {
-    if (pthread_create(&audio_thread, 0, SoundThread_ao, 0))
-    {
-      puts("pthread_create() failed.");
-    }
-    else if (pthread_mutex_init(&audio_mutex, 0))
+    if (pthread_mutex_init(&audio_mutex, 0))
     {
       puts("pthread_mutex_init() failed.");
+    }
+    else if (pthread_create(&audio_thread, 0, SoundThread_ao, 0))
+    {
+      puts("pthread_create() failed.");
     }
     else if (pthread_cond_init(&audio_wait, 0))
     {
@@ -274,6 +275,7 @@ static int SoundInit_oss()
   bool success = true;
   char *devname = "/dev/dsp";
   int cooked = 1;
+  int policy = 5;
   int rate = freqtab[SoundQuality = ((SoundQuality > 6) ? 1 : SoundQuality)];
   int channels = StereoSound+1;
   int format = AFMT_S16_LE;
@@ -281,11 +283,8 @@ static int SoundInit_oss()
   if ((dev = open(devname, O_WRONLY, O_NONBLOCK)) > 0)
   {
 #if SOUND_VERSION >= 0x040000
-    if (ioctl(dev, SNDCTL_DSP_COOKEDMODE, &cooked) == -1)
-    {
-      success = false;
-      perror("Cooked");
-    }
+    ioctl(dev, SNDCTL_DSP_COOKEDMODE, &cooked);
+    ioctl(dev, SNDCTL_DSP_POLICY, &policy);
 #endif
 
     if (ioctl(dev, SNDCTL_DSP_CHANNELS, &channels) == -1)
