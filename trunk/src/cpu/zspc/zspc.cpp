@@ -78,15 +78,18 @@ void zspc_set_bass( int bass )
 
 zspc_err_t zspc_init()
 {
-	zspc_err_t err = spc.init();
-	if ( err ) return err;
-
-	zspc_set_rate( 32000 );
-
-	spc.init_rom( spc_rom );
-	zspc_reset();
-
-	return 0;
+    zspc_err_t err = spc.init();
+    if ( err ) return err;
+ 
+    zspc_set_rate( 32000 );
+ 
+    static unsigned char boot [SNES_SPC::rom_size];
+    if ( !boot [0] )
+        assemble_bootrom( boot );
+    spc.init_rom( boot );
+    zspc_reset();
+ 
+    return 0;
 }
 
 zspc_err_t zspc_set_rate( int rate )
