@@ -196,7 +196,7 @@ CPUOBJ=${CPU_D}/dma${OE} ${CPU_D}/execute${OE} ${CPU_D}/executec${OE}\
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
 
-GUIOBJ=${GUI_D}/guiold${OE} ${GUI_D}/guifuncs${OE} ${GUI_D}/menu${OE}
+GUIOBJ=${GUI_D}/gui${OE} ${GUI_D}/guiold${OE} ${GUI_D}/guifuncs${OE} ${GUI_D}/menu${OE}
 
 ifneq (${JMA},no)
 JMAOBJ=${JMA_D}/7zlzma${OE} ${JMA_D}/crc32${OE} ${JMA_D}/iiostrm${OE}\
@@ -384,7 +384,8 @@ ${EFF_D}/burn${OE}: ${EFF_D}/burn.c
 ${EFF_D}/smoke${OE}: ${EFF_D}/smoke.c
 ${EFF_D}/water${OE}: ${EFF_D}/water.c ${EFF_D}/fixsin.h
 
-${GUI_D}/gui${OE}: ${GUI_D}/gui.asm macros.mac ${GUI_D}/guicheat.inc \
+${GUI_D}/gui${OE}: ${GUI_D}/gui.cpp
+${GUI_D}/guiold${OE}: ${GUI_D}/guiold.asm macros.mac ${GUI_D}/guicheat.inc \
 	${GUI_D}/guicombo.inc ${GUI_D}/guikeys.inc ${GUI_D}/guimisc.inc \
 	${GUI_D}/guimouse.inc ${GUI_D}/guitools.inc ${GUI_D}/guiwindp.inc
 ${GUI_D}/guifuncs${OE}: ${GUI_D}/guifuncs.c asm_call.h cfg${OE} input${OE} \
