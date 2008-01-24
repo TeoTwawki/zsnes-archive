@@ -28,6 +28,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 #include "snes_spm.cpp"
 #include "snes_sps.cpp"
 
+extern "C" {
+#include "spc_bootrom.c"
+}
+
 uint32_t zspc_time;
 
 static SNES_SPC         spc;
@@ -54,7 +58,7 @@ static void flush_to_resampler()
 	int count = spc.sample_count();
 	if ( count > resampler_max_write() )
 	{
-		assert( false ); // fails if too much sound was buffered
+		//assert( false ); // fails if too much sound was buffered
 		count = resampler_max_write();
 	}
 	filter.run( resampler_buffer(), count );
