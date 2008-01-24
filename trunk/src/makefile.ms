@@ -196,7 +196,7 @@ CPUOBJ=${CPU_D}/dma${OE} ${CPU_D}/execute${OE} ${CPU_D}/executec${OE}\
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
 
-GUIOBJ=${GUI_D}/gui${OE} ${GUI_D}/guifuncs${OE} ${GUI_D}/menu${OE}
+GUIOBJ=${GUI_D}/guiold${OE} ${GUI_D}/guifuncs${OE} ${GUI_D}/menu${OE}
 
 ifneq (${JMA},no)
 JMAOBJ=${JMA_D}/7zlzma${OE} ${JMA_D}/crc32${OE} ${JMA_D}/iiostrm${OE}\
