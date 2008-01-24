@@ -53,7 +53,8 @@ DEBUG_QO=@DEBUG_QF@
 
 EFF_CO=$(EFF_D)/burn.o $(EFF_D)/smoke.o $(EFF_D)/water.o
 
-GUI_AO=$(GUI_D)/gui.o $(GUI_D)/menu.o
+GUI_AO=$(GUI_D)/guiold.o $(GUI_D)/menu.o
+GUI_CO=$(GUI_D)/gui.o
 GUI_CO=$(GUI_D)/guifuncs.o
 
 JMA_CO=@JMA_F@
