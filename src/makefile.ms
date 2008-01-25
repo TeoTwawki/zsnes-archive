@@ -239,12 +239,14 @@ WINVIDOBJ=${VID_D}/sw_draw${OE} ${VID_D}/copyvwin${OE} ${VID_D}/ntsc${OE}\
 	${VID_D}/hq3x16${OE} ${VID_D}/hq3x32${OE}\
 	${VID_D}/hq4x16${OE} ${VID_D}/hq4x32${OE}
 
-ifeq (${QTD},yes)
+#ifeq (${QTD},yes)
   CXXFLAGS+=-I"$(QT_BASE)${SLASH}include" -I"$(QT_BASE)${SLASH}include${SLASH}QtCore" -I"$(QT_BASE)${SLASH}include${SLASH}QtGui" -DWIN32
-  DEBUGGEROBJ=${DEBUGGER_D}/load${OE} ${DEBUGGER_D}/ui${OE} ${DEBUGGER_D}/moc_ui${OE} ${DEBUGGER_D}/moc_zthread${OE} ${DEBUGGER_D}/zthread${OE}
+#  DEBUGGEROBJ=${DEBUGGER_D}/load${OE} ${DEBUGGER_D}/ui${OE} ${DEBUGGER_D}/moc_ui${OE} ${DEBUGGER_D}/moc_zthread${OE} ${DEBUGGER_D}/zthread${OE}
   LIBS+= -lQtCore4 -lQtGui4
   MSVCLIBS+= ${QT_BASE}${SLASH}lib${SLASH}qtcore.lib ${QT_BASE}${SLASH}lib${SLASH}qtgui.lib advapi32.lib imm32.lib winspool.lib comdlg32.lib
-endif
+#endif
+
+GUIOBJ+= ${GUI_D}/moc_gui${OE}
 
 OBJS+=${WINOBJ} ${WINVIDOBJ} ${NETOBJ} ${DEBUGGEROBJ}
 endif
@@ -492,6 +494,12 @@ ${DEBUGGER_D}/moc_zthread${OE}: ${DEBUGGER_D}/moc_zthread.cpp ${DEBUGGER_D}/zthr
 ${DEBUGGER_D}/moc_zthread.cpp: ${DEBUGGER_D}/zthread.h
 ${DEBUGGER_D}/ui${OE}: ${DEBUGGER_D}/ui.cpp ${DEBUGGER_D}/ui.h ${DEBUGGER_D}/ui_debugger.h
 ${DEBUGGER_D}/zthread.cpp${OE}: ${DEBUGGER_D}/load.h ${DEBUGGER_D}/zthread.h
+
+
+${GUI_D}/gui.cpp: ${GUI_D}/ui_zsnes.h
+${GUI_D}/moc_gui.cpp: ${GUI_D}/gui.h
+${GUI_D}/moc_gui${OE}: ${GUI_D}/moc_gui.cpp ${GUI_D}/gui.h
+
 
 else  #else no ENV specified
 	@echo Please specify which platform to compile for with PLATFORM=platform_name
