@@ -54,8 +54,8 @@ DEBUG_QO=@DEBUG_QF@
 EFF_CO=$(EFF_D)/burn.o $(EFF_D)/smoke.o $(EFF_D)/water.o
 
 GUI_AO=$(GUI_D)/guiold.o $(GUI_D)/menu.o
-GUI_CO=$(GUI_D)/gui.o
-GUI_CO=$(GUI_D)/guifuncs.o
+GUI_CO=$(GUI_D)/gui.o $(GUI_D)/guifuncs.o $(GUI_D)/moc_gui.o
+GUI_QO=$(GUI_D)/moc_gui.cpp $(GUI_D)/ui_zsnes.h
 
 JMA_CO=@JMA_F@
 
@@ -88,7 +88,7 @@ ZIP_CO=$(ZIP_D)/unzip.o $(ZIP_D)/zpng.o
 Z_AOBJS=$(MAIN_AO) $(CHIP_AO) $(CPU_AO) $(GUI_AO) $(PORT_AO) $(VID_AO)
 Z_COBJS=$(MAIN_CO) $(CHIP_CO) $(CPU_CO) $(DEBUG_CO) $(EFF_CO) $(GUI_CO)\
 	$(JMA_CO) $(MMLIB_CO) $(NET_CO) $(PORT_CO) $(VID_CO) $(ZIP_CO)
-Z_QOBJS=$(DEBUG_QO)
+Z_QOBJS=$(DEBUG_QO) $(GUI_QO)
 Z_OBJS=$(Z_AOBJS) $(Z_COBJS)
 
 .PHONY: default main tools all install clean cclean tclean distclean
