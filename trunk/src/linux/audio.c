@@ -34,8 +34,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifdef __LIBAO__
 static pthread_t audio_thread;
-static pthread_mutex_t audio_mutex;
-static pthread_cond_t audio_wait;
+static pthread_mutex_t audio_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t audio_wait = PTHREAD_COND_INITIALIZER;
 static ao_device *audio_device = 0;
 static volatile size_t samples_waiting = false;
 #endif
@@ -119,14 +119,6 @@ static int SoundInit_ao()
     if (pthread_create(&audio_thread, 0, SoundThread_ao, 0))
     {
       puts("pthread_create() failed.");
-    }
-    else if (pthread_mutex_init(&audio_mutex, 0))
-    {
-      puts("pthread_mutex_init() failed.");
-    }
-    else if (pthread_cond_init(&audio_wait, 0))
-    {
-      puts("pthread_cond_init() failed.");
     }
   }
 
