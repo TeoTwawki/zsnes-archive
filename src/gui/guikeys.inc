@@ -872,6 +872,8 @@ GUIOptionKeys:
   pushad
   call CheckScreenSaver
   popad
+%else
+  GUIKeyCheckbox DisableScreenSaver,'D'
 %endif
 .notbasic
 
