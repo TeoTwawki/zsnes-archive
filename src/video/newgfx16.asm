@@ -323,7 +323,6 @@ section .text
     jnz %%nbgm
     xor bl,bl
 %%nbgm
-    jmp %%skip
     mov cl,bl
     or cl,bh
     and cl,0Ah
