@@ -116,7 +116,7 @@ if test x$ZCONF != x; then
 fi
 
 dnl - Library checks (requisites marked *, others optionnal):
-dnl - libSDL*, zlib*, libpng, Qt, libao, OpenGL, JMAlib
+dnl - libSDL*, zlib*, libpng, Qt*, libao, OpenGL, JMAlib
 
 dnl - libsdl stuff
 AM_PATH_SDL(1.2.0, , [AC_MSG_ERROR(SDL >= 1.2.0 is required)])
@@ -138,6 +138,9 @@ else
   CFLAGS+=" $LIBPNG_CFLAGS"
   LDFLAGS+=" $LIBPNG_LIBS"
 fi
+
+dnl - Qt stuff
+AM_CHECK_QT()
 
 dnl - libao stuff
 AC_ARG_ENABLE(libao,
@@ -213,7 +216,6 @@ else
   PSRFLAGS+=" -DNO_DEBUGGER -DQT_DEBUGGER"
   DEBUG_CF="\$(DEBUG_D)/load.o \$(DEBUG_D)/moc_ui.o \$(DEBUG_D)/moc_zthread.o \$(DEBUG_D)/ui.o \$(DEBUG_D)/zthread.o"
   DEBUG_QF="\$(DEBUG_D)/moc_ui.cpp \$(DEBUG_D)/moc_zthread.cpp \$(DEBUG_D)/ui_debugger.h"
-  AM_CHECK_QT()
 fi
 
 dnl - jma stuff
