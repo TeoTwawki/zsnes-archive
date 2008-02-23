@@ -8,7 +8,7 @@ public:
     ZSNESMainForm(QMainWindow *parent = 0);
 
 private slots:
- 
+
 private:
     Ui::ZSNESMainForm ui;
- }; 
+ };
