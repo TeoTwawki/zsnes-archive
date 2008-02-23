@@ -66,7 +66,7 @@ static int assemble( const char* const* const source, unsigned char* const out )
 				labels [(*in - '0') & 0x0F] = addr;
 				in += 3;
 			}
-			
+
 			for ( instr = instrs; instr->str; instr++ )
 			{
 				int data = 1;
@@ -89,7 +89,7 @@ static int assemble( const char* const* const source, unsigned char* const out )
 						break;
 					}
 				}
-				
+
 				if ( instr->str [i] == in [i] )
 				{
 					out [addr++] = instr->n;
