@@ -448,8 +448,9 @@ NEWSYM hdmastartsc, db 0
 NEWSYM hdmarestart, db 0
 NEWSYM hdmadelay, db 0
 NEWSYM nohdmaframe, db 0           ; no hdma for current frame
+NEWSYM rtoflags, db 0
 
-NEWSYM tempdat, times 474 db 0     ; expandable area
+NEWSYM tempdat, times 473 db 0     ; expandable area
 
 num2writeppureg equ $-sndrot
 ; pharos equ hack *sigh*
@@ -768,6 +769,7 @@ reg213Dr:
 ; PPU Status Flag & Version number (OBJ over flags)
 reg213Er:
     mov al,01h
+    or al,[rtoflags]
     ret
 
 ; PPU Status Flag & Version number (NTSC/PAL/EXTRN Latch flag)

@@ -53,6 +53,7 @@ EXTSYM MovieInsertChapter,MovieSeekAhead,ResetDuringMovie,EMUPauseKey
 EXTSYM INCRFrameKey,MovieWaiting,NoInputRead,AllocatedRewindStates
 EXTSYM PauseFrameMode,RestorePauseFrame,BackupPauseFrame
 EXTSYM KeyRewind,statesaver,UpdateDPage
+EXTSYM rtoflags,sprcnt,sprstart,sprtilecnt,sprend,sprendx
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron,startdebugger
@@ -506,6 +507,11 @@ Donextlinecache:
 .next
     mov byte[sprlefttot+ecx],0
     mov dword[sprleftpr+ecx*4],0
+    mov byte[sprcnt+ecx],0
+    mov byte[sprstart+ecx],0
+    mov byte[sprtilecnt+ecx],0
+    mov byte[sprend+ecx],0
+    mov word[sprendx+ecx*2],0
     inc cl
     jnz .next
     call processsprites
@@ -597,6 +603,10 @@ NEWSYM NoHDMALine, db 0
 SECTION .text
 
 NEWSYM cpuover
+    cmp word[curypos],0
+    jne .nortoreset
+    mov byte[rtoflags],0
+.nortoreset
     pushad
     xor eax,eax
     mov eax,65
@@ -798,6 +808,18 @@ NEWSYM cpuover
 .returnfromsfx
 ;    inc dword[numinst]          ;Temporary
     inc word[curypos]
+    xor eax,eax
+    mov ax,[curypos]
+    cmp ax,[resolutn]
+    ja .norangeover
+    cmp byte[sprtilecnt+eax],34
+    jbe .notimeover
+    or byte[rtoflags],80h
+.notimeover
+    cmp byte[sprcnt+eax],32
+    jbe .norangeover
+    or byte[rtoflags],40h
+.norangeover
     add dh,[cycpl]
     mov ax,[totlines]
     cmp word[curypos],ax
