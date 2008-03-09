@@ -1506,7 +1506,7 @@ SECTION .text
     cmp cx,-8
     jle near .next
     cmp cx,256
-    jge .next
+    jge near .next
 .spec
     add cx,8
 .reprocessspriteb
@@ -1560,7 +1560,7 @@ SECTION .text
     cmp cx,-8
     jle near .nextb
     cmp cx,256
-    jge .nextb
+    jge near .nextb
 .specb
     add cx,8
 .reprocessspriteflipyb
