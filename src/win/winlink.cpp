@@ -2666,7 +2666,14 @@ void CheckTimers()
 WriteLine();
     if (KeyboardInput && InputEn == 1)
     {
-      KeyboardInput->GetDeviceState(256, keys2);
+      if (FAILED(KeyboardInput->GetDeviceState(256, keys2)))
+      {
+        KeyboardInput->Acquire();
+        if (FAILED(KeyboardInput->GetDeviceState(256, keys2)))
+        {
+          return;
+        }
+      }
     }
     else
     {
