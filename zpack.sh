@@ -19,7 +19,7 @@ mkdir -p zsnes-${VER_MASHED}/Win/docs
 cp $DPMI_EXE zsnes-${VER_MASHED}/DOS
 cp $WIN_EXE zsnes-${VER_MASHED}/Win
 cd zsnes-$VER_MASHED
-svn export https://svn.bountysource.com/zsnes/trunk zsnes_${VER_DASH}
+svn export https://svn.zsnes.com.com/rep/zsnes/trunk zsnes_${VER_DASH}
 svn export https://zsnes-docs.svn.sourceforge.net/svnroot/zsnes-docs/trunk/zsnes-docs zdocs
 cp zdocs/manpage/zsnes.1 zsnes_${VER_DASH}/src/linux
 unix2dos zdocs/text/*.txt
