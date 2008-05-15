@@ -42,7 +42,7 @@ tar -cf zsnes${VER_MASHED}src.tar zsnes_$VER_DASH
 bzip2 --best zsnes${VER_MASHED}src.tar
 cd zsnes_${VER_DASH}/src
 dchroot -d "make -f makefile.ms PLATFORM=dos-cross RELEASE=yes"
-upx --best zsnes.exe
+upx --best --lzma zsnes.exe
 mv zsnes.exe ../../DOS
 cd ../../DOS
 advzip -4 -a ../zsnes${VER_MASHED}.zip *
@@ -55,36 +55,60 @@ mkdir i586
 cp linux/zsnes.1 linux/zsnes.desktop i586
 cp -r icons i586
 cp -r ../docs/readme.htm ../docs/readme.txt ../docs/readme.chm i586
+cp -r i586 amdfam10
 cp -r i586 athlon64
+cp -r i586 athlon64-sse3
+cp -r i586 core2
 cp -r i586 pentium-m
 cp -r i586 pentium4
 dchroot -d "./configure --enable-release --enable-libao force_arch=i586"
 dchroot -d "make"
-upx --best zsnes
+upx --best --lzma zsnes
 mv zsnes i586
+make cclean
+dchroot -d "./configure --enable-release --enable-libao force_arch=amdfam10"
+dchroot -d "make"
+upx --best --lzma zsnes
+mv zsnes amdfam10
 make cclean
 dchroot -d "./configure --enable-release --enable-libao force_arch=athlon64"
 dchroot -d "make"
-upx --best zsnes
+upx --best --lzma zsnes
 mv zsnes athlon64
+make cclean
+dchroot -d "./configure --enable-release --enable-libao force_arch=athlon64-sse3"
+dchroot -d "make"
+upx --best --lzma zsnes
+mv zsnes athlon64-sse3
+make cclean
+dchroot -d "./configure --enable-release --enable-libao force_arch=core2"
+dchroot -d "make"
+upx --best --lzma zsnes
+mv zsnes core2
 make cclean
 dchroot -d "./configure --enable-release --enable-libao force_arch=pentium-m"
 dchroot -d "make"
-upx --best zsnes
+upx --best --lzma zsnes
 mv zsnes pentium-m
 make cclean
 dchroot -d "./configure --enable-release --enable-libao force_arch=pentium4"
 dchroot -d "make"
-upx --best zsnes
+upx --best --lzma zsnes
 mv zsnes pentium4
 
 tar -cf ../../zsnes-${VER_DOT}-i586.tar i586
+tar -cf ../../zsnes-${VER_DOT}-amdfam10.tar amdfam10
 tar -cf ../../zsnes-${VER_DOT}-athlon64.tar athlon64
+tar -cf ../../zsnes-${VER_DOT}-athlon64-sse3.tar athlon64-sse3
+tar -cf ../../zsnes-${VER_DOT}-core2.tar core2
 tar -cf ../../zsnes-${VER_DOT}-pentium-m.tar pentium-m
 tar -cf ../../zsnes-${VER_DOT}-pentium4.tar pentium4
 cd ../..
 gzip -9 zsnes-${VER_DOT}-i586.tar
+gzip -9 zsnes-${VER_DOT}-amdfam10.tar
 gzip -9 zsnes-${VER_DOT}-athlon64.tar
+gzip -9 zsnes-${VER_DOT}-athlon64-sse3.tar
+gzip -9 zsnes-${VER_DOT}-core2.tar
 gzip -9 zsnes-${VER_DOT}-pentium-m.tar
 gzip -9 zsnes-${VER_DOT}-pentium4.tar
 
