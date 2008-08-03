@@ -3223,7 +3223,6 @@ DisplayGUIPathsClick:
   GUIPTabClick 0,51,1,GUIPathTabs
   GUIPTabClick 52,86,2,GUIPathTabs
   GUIPTabClick 87,157,3,GUIPathTabs
-  GUIPTabClick 158,219,4,GUIPathTabs
 
   cmp dword[GUIPathTabs],1
   jne near .notgeneral
@@ -3255,15 +3254,6 @@ DisplayGUIPathsClick:
   GUITextBoxInputNach 8,111,237,121,2,1024,init_save_paths      ;GNextPath
   GUITextBoxInputNach 8,146,237,156,3,1024,init_save_paths      ;SGPath
 .notbc
-
-  cmp dword[GUIPathTabs],4
-  jne near .notgfxpacks
-
-  GUITextBoxInputNach 8,41,237,51,0,1024,init_save_paths        ;FEOEZPath
-  GUITextBoxInputNach 8,76,237,86,1,1024,init_save_paths        ;SJNSPath
-  GUITextBoxInputNach 8,111,237,121,2,1024,init_save_paths      ;MDHPath
-  GUITextBoxInputNach 8,146,237,156,3,1024,init_save_paths      ;SPL4Path
-.notgfxpacks
   ret
 
 DisplayGUISaveClick:

@@ -514,6 +514,11 @@ SDRatio db 0
 EmuSpeed db 29
 
 @
+@ SPC7110 Cache (0 = No, 1 = YES)
+@ Good for slower PCs. However not good if less than 32MB of RAM free.
+SPC7110Cache db 1
+
+@
 @  ----
 @ -- Paths --
 @  ----
@@ -544,11 +549,6 @@ BSXPath times 1024 db ""
 STPath times 1024 db ""
 GNextPath times 1024 db ""
 SGPath times 1024 db ""
-@ SPC7110 graphic packs
-FEOEZPath times 1024 db ""
-SJNSPath times 1024 db ""
-MDHPath times 1024 db ""
-SPL4Path times 1024 db ""
 
 @
 @ Relative Path Base (0 = Config dir, 1 = ROM Dir)
