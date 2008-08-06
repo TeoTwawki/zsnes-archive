@@ -22,7 +22,7 @@
 %include "macros.mac"
 
 EXTSYM StartDrawNewGfx16b,cfield,curypos,resolutn,sprleftpr,res480,winboundary
-EXTSYM WindowRedraw,winlogicaval,scanlines,winbg1enval
+EXTSYM WindowRedraw,scanlines,winbg1enval
 
 %macro Process1DualWindow 0
     test ch,1
@@ -75,7 +75,7 @@ NEWSYM BuildWindow
     je .ns2
     push edx
     push ecx
-    mov edx,[winlogicaval+eax*2]
+    mov edx,[nglogicval]
     shl edx,16
     mov dl,[winbg1enval+ebx]
     cmp edx,[pwinen]
@@ -102,7 +102,7 @@ NEWSYM BuildWindow
     mov byte[WindowRedraw],0
     push edx
     push ecx
-    mov edx,[winlogicaval+eax*2]
+    mov edx,[nglogicval]
     shl edx,16
     mov dl,[winbg1enval+ebx]
 .notsimilar
