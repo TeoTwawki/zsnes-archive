@@ -27,10 +27,10 @@ EXTSYM WindowRedraw,scanlines,winbg1enval
 %macro Process1DualWindow 0
     test ch,1
     jnz %%outside
-    inc ebx
     cmp edx,ebx
     jb %%noclip
     ; Process Inside window
+    inc ebx
     mov [esi],ebx
     sub edx,ebx
     add edx,2
@@ -132,10 +132,10 @@ NEWSYM BuildWindow
 .wina
     test ch,1
     jnz .outside
-    inc ebx
     cmp edx,ebx
     jb .noclip
     ; Process Inside window
+    inc ebx
     mov [esi],ebx
     mov [esi+64],ebx
     sub edx,ebx
