@@ -1929,7 +1929,7 @@ section .text
     test dh,20h
     jnz near .16x32flipx
     test dh,40h
-    jnz .16x32flipy
+    jnz near .16x32flipy
     and dh,07h
     mov byte[.numleft2do],8
     shl dh,4
@@ -1956,7 +1956,7 @@ section .text
     jmp .returnfromptr
 .16x32flipx
     test dh,40h
-    jnz .16x32flipyx
+    jnz near .16x32flipyx
     and dh,07h
     mov byte[.numleft2do],8
     shl dh,4
