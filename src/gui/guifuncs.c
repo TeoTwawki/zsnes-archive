@@ -30,6 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../win/lib.h"
 #endif
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -714,7 +715,7 @@ extern unsigned int GUIcurrentcheatcursloc;
 void CheatCodeLoad()
 {
   FILE *fp = 0;
-  unsigned int cheat_file_size, i, j, k;
+  unsigned int cheat_file_size, i, j;
 
   setextension(ZSaveName, "cht");
   GUICBHold = 0;
@@ -739,9 +740,9 @@ void CheatCodeLoad()
         i-=28;
         j-=18;
 
-        for (k=6;k>0;k--) cheatdata[i+k-1]=cheatdata[j+k-1];
-        for (k=12;k>0;k--) cheatdata[i+k+7]=cheatdata[j+k+5];
-        for (k=8;k>0;k--) cheatdata[i+k+19] = 0;
+        memset(&cheatdata[i+20], 0, 8);
+        memmove(&cheatdata[i+8], &cheatdata[j+6], 12);
+        memmove(&cheatdata[i], &cheatdata[j], 6);
       } while(i>0);
     }
 
