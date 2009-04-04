@@ -450,7 +450,7 @@ ${VID_D}/newg162${OE}: ${VID_D}/newg162.asm macros.mac ${VID_D}/newg162.mac \
 	${VID_D}/newg16wn.mac ${VID_D}/newgfx16.mac
 ${VID_D}/newgfx${OE}: ${VID_D}/newgfx.asm macros.mac
 ${VID_D}/newgfx16${OE}: ${VID_D}/newgfx16.asm macros.mac \
-	${VID_D}/newg162.mac ${VID_D}/newgfx16.mac ${VID_D}/vidmacro.mac
+	${VID_D}/newgfx16.mac ${VID_D}/vidmacro.mac
 ${VID_D}/ntsc${OE}: ${VID_D}/ntsc.c ${VID_D}/ntsc.h ${NTSC_D}/snes_ntsc.c \
 	${NTSC_D}/snes_ntsc.h ${NTSC_D}/snes_ntsc_config.h ${NTSC_D}/snes_ntsc_impl.h
 ${VID_D}/procvid${OE}: ${VID_D}/procvid.asm macros.mac
