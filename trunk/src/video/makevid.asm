@@ -22,10 +22,10 @@
 %include "macros.mac"
 
 EXTSYM disableeffects,winl1,winl2,winbgdata,winr1,winr2,winspdata,winlogica
-EXTSYM winenabm,winobjen,winlogicb,scrndis,scrnon,bgmode,bgtilesz,winenabs
+EXTSYM winenabm,winobjen,winlogicb,scrndis,scrnon,bgmode,bgtilesz
 EXTSYM bg1objptr,bg1ptr,bg1ptrb,bg1ptrc,bg1ptrd,bg1scrolx,bg1scroly,cachebg1
-EXTSYM curbgofs1,curcolbg1,vcache2b,vcache4b,vcache8b,bg3highst,colormodeofs
-EXTSYM drawline16b,curypos,mosaicon,mosaicsz,cachetile2b,cachetile4b,cachetile8b
+EXTSYM curbgofs1,curcolbg1,vcache2b,vcache4b,vcache8b,colormodeofs
+EXTSYM curypos,mosaicon,mosaicsz,cachetile2b,cachetile4b,cachetile8b
 EXTSYM vram,cachetile2b16x16,cachetile4b16x16,cachetile8b16x16
 
 SECTION .bss
@@ -1061,22 +1061,6 @@ ALIGN32
 SECTION .bss
 NEWSYM bg3high2, resd 1
 NEWSYM cwinenabm, resd 1
-SECTION .text
-
-NEWSYM drawline
-    mov al,[winenabs]
-    mov [cwinenabm],al
-
-    mov byte[bg3high2],0
-    cmp byte[bgmode],1
-    jne .nohigh
-    mov al,[bg3highst]
-    mov [bg3high2],al
-.nohigh
-    jmp drawline16b
-
-ALIGN32
-SECTION .bss
 NEWSYM tempbuffer, resd 33
 NEWSYM currentobjptr, resd 1
 NEWSYM curmosaicsz,   resd 1
