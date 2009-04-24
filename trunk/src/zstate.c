@@ -698,6 +698,8 @@ void zst_determine_newest()
 
 void zst_init()
 {
+  newestfiledate = 0;
+
   if (LatestSave)
   {
     for (current_zst = 0; current_zst < 100; current_zst++)
