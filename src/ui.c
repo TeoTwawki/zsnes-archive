@@ -41,7 +41,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 extern unsigned int xa, MessageOn, maxromspace;
 extern unsigned char FPSOn, spcon, device1, device2;
-extern char *Msgptr, CSStatus[], CSStatus2[], CSStatus3[];
+extern char *Msgptr, CSStatus[], CSStatus2[], CSStatus3[], CSStatus4[];
 
 unsigned short selc0040, selcA000, selcB800;
 
@@ -398,6 +398,7 @@ void DisplayBatteryStatus()
 
   *CSStatus2 = 0;
   *CSStatus3 = 0;
+  *CSStatus4 = 0;
 
   switch (CheckBattery())
   {
@@ -500,6 +501,7 @@ void MultiMouseInit()
     strcpy(CSStatus, "Dual mice not detected");
     strcpy(CSStatus2, "");
     strcpy(CSStatus3, "");
+    strcpy(CSStatus4, "");
     Msgptr = CSStatus;
     MessageOn = 100;
 
