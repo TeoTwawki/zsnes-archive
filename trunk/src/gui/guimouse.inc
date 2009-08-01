@@ -2248,53 +2248,6 @@ DisplayGUIVideoClick:
   GUIClickCButton 128,55,byte[hqFilter]
 .noradiobuttons
 
-  xor ebx,ebx                             ; GL Scanlines
-  mov bl,[cvidmode]
-  cmp byte[GUIBIFIL+ebx],0
-  je .noglscanlines
-
-  cmp eax,23                     ; X-Range for click-area
-  jl near .nobar
-  cmp eax,23+100
-  jg near .nobar
-  sub al,23
-  cmp edx,88                     ; Y-Range for click-area
-  jl near .nobar
-  cmp edx,92
-  jg near .barnotselected
-  mov [sl_intensity],al
-  mov byte[GUIHold],8            ; Lock mouse to bar when clicked
-  mov eax,[GUIwinposy+5*4]
-  add eax,90
-  mov [GUIHoldYlim],eax
-.barnotselected
-  mov eax,[GUIwinposx+5*4]
-  add eax,23
-  mov [GUIHoldXlimL],eax
-  add eax,100
-  mov [GUIHoldXlimR],eax
-.nobar
-  jmp near .noswscanlines
-.noglscanlines
-  xor ebx,ebx                             ; Scanlines
-  mov bl,[cvidmode]
-  cmp byte[GUIDSIZE+ebx],0
-  je near .nocheckboxb
-  FilterExcl 168,87,En2xSaI,hqFilter,NTSCFilter
-  GUIPButtonHole 18,87,byte[scanlines],0
-  GUIPButtonHole 168,87,byte[scanlines],1
-.nocheckboxb
-  xor ebx,ebx
-  mov bl,[cvidmode]
-  cmp byte[GUIDSIZE+ebx],0
-  je near .nohsline
-  FilterExcl 68,87,En2xSaI,hqFilter,NTSCFilter
-  FilterExcl 118,87,En2xSaI,hqFilter,NTSCFilter
-  GUIPButtonHole 68,87,byte[scanlines],2
-  GUIPButtonHole 118,87,byte[scanlines],3
-.nohsline
-.noswscanlines
-
   GUIClickCButton 18,115,byte[GrayscaleMode]  ; Grayscale
 
   xor ebx,ebx                             ; Hires Mode7
@@ -2328,6 +2281,50 @@ DisplayGUIVideoClick:
   je near .nocheckboxk43
   GUIClickCButtonK 18,175,byte[Keep4_3Ratio],initwinvideo
 .nocheckboxk43
+
+  xor ebx,ebx                             ; GL Scanlines
+  mov bl,[cvidmode]
+  cmp byte[GUIBIFIL+ebx],0
+  je .noglscanlines
+
+  mov eax,[GUImouseposx]    ; update mouse location
+  sub eax,[GUIwinposx+5*4]
+  mov edx,[GUImouseposy]
+  sub edx,[GUIwinposy+5*4]
+
+  GUIClickArea 23,88,23+100,92,.nobar
+  sub al,23
+  mov [sl_intensity],al
+  mov byte[GUIHold],8            ; Lock mouse to bar when clicked
+  mov eax,[GUIwinposy+5*4]
+  add eax,90
+  mov [GUIHoldYlim],eax
+  mov eax,[GUIwinposx+5*4]
+  add eax,23
+  mov [GUIHoldXlimL],eax
+  add eax,100
+  mov [GUIHoldXlimR],eax
+.nobar
+  jmp near .noswscanlines
+.noglscanlines
+  xor ebx,ebx                             ; Scanlines
+  mov bl,[cvidmode]
+  cmp byte[GUIDSIZE+ebx],0
+  je near .nocheckboxb
+  FilterExcl 168,87,En2xSaI,hqFilter,NTSCFilter
+  GUIPButtonHole 18,87,byte[scanlines],0
+  GUIPButtonHole 168,87,byte[scanlines],1
+.nocheckboxb
+  xor ebx,ebx
+  mov bl,[cvidmode]
+  cmp byte[GUIDSIZE+ebx],0
+  je near .nohsline
+  FilterExcl 68,87,En2xSaI,hqFilter,NTSCFilter
+  FilterExcl 118,87,En2xSaI,hqFilter,NTSCFilter
+  GUIPButtonHole 68,87,byte[scanlines],2
+  GUIPButtonHole 118,87,byte[scanlines],3
+.nohsline
+.noswscanlines
 
 .notfilterstab
 
