@@ -21,6 +21,8 @@
 
 ; Movie, Joystick setting (display) routines, SNES Reset Function
 
+EXTSYM zspc_soft_reset
+
 SECTION .bss
 NEWSYM MovieRecordWinVal, resb 1
 NEWSYM MovieProcessing, resb 1
@@ -262,7 +264,7 @@ NEWSYM GUIDoReset
     call init65816
     pushad
     call procexecloop
-    ;call dsp_reset
+    call zspc_soft_reset
     popad
 
     ;xor eax,eax
