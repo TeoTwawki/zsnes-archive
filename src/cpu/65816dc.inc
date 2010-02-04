@@ -20,6 +20,7 @@
 
 
 EXTSYM flagnz,flago,flagc,cpucycle,doirqnext,dmadata
+EXTSYM cycles_ctr
 
 ;*******************************************************
 ; Flag Setting Macros
@@ -29,10 +30,13 @@ EXTSYM flagnz,flago,flagc,cpucycle,doirqnext,dmadata
     xor ebx,ebx
     mov bl,[esi]
     inc esi
-    sub dh,[cpucycle+ebx]
+    movzx eax,byte[cpucycle+ebx]
+    add [cycles_ctr],eax
+    sub dh,al
     jc %%cpuover
     jmp dword [edi+ebx*4]
 %%cpuover
+    sub [cycles_ctr],eax
     ret
 %endmacro
 

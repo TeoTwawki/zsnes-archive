@@ -1221,77 +1221,46 @@ reg2133w:
     mov word[resolutn],239
     ret
 
+%macro soundRegWrite 1
+    cmp dword[cycles_ctr],0
+    je .no
+    pushad
+    mov edx,[cycles_ctr]
+    mov eax,635 ;65
+    mul edx
+    mov dword[cycles_ctr],0
+    xor edx,edx
+    mov ebp,1200 ;185
+    div ebp
+    add [zspc_time],eax
+    popad
+.no
+    mov byte[zspc_port],%1
+    mov [zspc_data],al
+    pushad
+    call zspc_write_port
+    popad
+%endmacro
+
 ; Sound Register #1
 reg2140w:
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   ;add [zspc_time],eax
-   popad
-mov byte[zspc_port],0
-mov [zspc_data],al
-pushad
-call zspc_write_port
-popad
-ret
+    soundRegWrite 0
+    ret
 
 ; Sound Register #2
 reg2141w:
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   ;add [zspc_time],eax
-   popad
-mov byte[zspc_port],1
-mov [zspc_data],al
-pushad
-call zspc_write_port
-popad
-ret
+    soundRegWrite 1
+    ret
 
 ; Sound Register #3
 reg2142w:
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   ;add [zspc_time],eax
-   popad
-mov byte[zspc_port],2
-mov [zspc_data],al
-pushad
-call zspc_write_port
-popad
-ret
+    soundRegWrite 2
+    ret
 
 ; Sound Register #4
 reg2143w:
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   ;add [zspc_time],eax
-   popad
-mov byte[zspc_port],3
-mov [zspc_data],al
-pushad
-call zspc_write_port
-popad
-ret
+    soundRegWrite 3
+    ret
 
 ; Read/write WRAM register
 reg2180w:

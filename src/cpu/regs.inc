@@ -21,7 +21,7 @@
 EXTSYM SFXEnable,regptr,initsfxregsr,initSA1regs,SA1Enable,initSDD1regs
 EXTSYM SPC7110Enable,initSPC7110regs,RTCEnable,RTCReset,curypos,cycpl
 EXTSYM pdh,vram,romispal,JoyEOrig,JoyENow,device2,cycphb,joycontren,totlines
-EXTSYM zspc_read_port,zspc_data,zspc_port,zspc_write_port
+EXTSYM zspc_read_port,zspc_data,zspc_port,zspc_write_port,cycles_ctr,zspc_time
 
 %ifndef NO_DEBUGGER
 EXTSYM debuggeron
@@ -784,77 +784,46 @@ reg213Fr:
     or al,[extlatch]
     ret
 
+%macro soundRegRead 1
+    cmp dword[cycles_ctr],0
+    je .no
+    pushad
+    mov edx,[cycles_ctr]
+    mov eax,635 ;65
+    mul edx
+    mov dword[cycles_ctr],0
+    xor edx,edx
+    mov ebp,1200 ;185
+    div ebp
+    add [zspc_time],eax
+    popad
+.no
+    mov byte[zspc_port],%1
+    pushad
+    call zspc_read_port
+    popad
+    mov al,[zspc_data]
+%endmacro
+
 ; Sound Reg #1
 reg2140r:
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   ;add [zspc_time],eax
-   popad
-   mov byte[zspc_port],0
-pushad
-call zspc_read_port
-popad
-mov al,[zspc_data]
-ret
+    soundRegRead 0
+    ret
 
 ; Sound Reg #2
 reg2141r:
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   ;add [zspc_time],eax
-   popad
-   mov byte[zspc_port],1
-pushad
-call zspc_read_port
-popad
-mov al,[zspc_data]
-ret
+    soundRegRead 1
+    ret
 
 ; Sound Reg #3
 reg2142r:
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   ;add [zspc_time],eax
-   popad
-   mov byte[zspc_port],2
-pushad
-call zspc_read_port
-popad
-mov al,[zspc_data]
-ret
+    soundRegRead 2
+    ret
 
 ; Sound Reg #4
 reg2143r:
-   pushad
-   xor eax,eax
-   mov eax,65
-   mul dh
-   xor edx,edx
-   mov ebp,185
-   div ebp
-   ;add [zspc_time],eax
-   popad
-   mov byte[zspc_port],3
-pushad
-call zspc_read_port
-popad
-mov al,[zspc_data]
-ret
+    soundRegRead 3
+    ret
 
 reg2144r:
     xor al,al

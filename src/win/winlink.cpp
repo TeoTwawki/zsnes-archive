@@ -35,6 +35,7 @@ extern "C"
 #include <dinput.h>
 #include <winuser.h>
 #include "resource.h"
+#include "../cpu/zspc/zspc.h"
 
 extern "C"
 {
@@ -3129,8 +3130,6 @@ WriteLine();
       CloseClipboard();
     }
   }
-
-  extern int zspc_time;
 
   void WriteLine()
   {
