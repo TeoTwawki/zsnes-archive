@@ -2466,8 +2466,8 @@ void GUIQuickLoadUpdate();
 
 void powercycle(bool sramload, bool romload)
 {
+  zspc_reset();
   clearmem2();
-  zspc_soft_reset();
   nmiprevaddrl = 0;
   nmiprevaddrh = 0;
   nmirept = 0;
@@ -2490,7 +2490,6 @@ void powercycle(bool sramload, bool romload)
     {
       if (DisplayInfo) { showinfogui(); }
       initsnes();
-      //zspc_init();
     }
 
     sramsavedis = 0;

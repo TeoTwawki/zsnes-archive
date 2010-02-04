@@ -303,6 +303,7 @@ NEWSYM reexecute
     mov byte[NoSoundReinit],0
     mov byte[csounddisable],0
     mov byte[NextNGDisplay],0
+    mov dword[cycles_ctr],0
 
     call splitflags
 
@@ -573,10 +574,13 @@ NEWSYM execloop
    mov edi,[tableadc+ebx*4]
    mov bl,[esi]
    inc esi
-   sub dh,[cpucycle+ebx]
+   movzx eax,byte[cpucycle+ebx]
+   add [cycles_ctr],eax
+   sub dh,al
    jc .cpuovers
    call dword near [edi+ebx*4]
 .cpuovers
+   sub [cycles_ctr],eax
    jmp cpuover
 
 SECTION .data
@@ -601,6 +605,7 @@ NEWSYM SFXProc,    dd 0
 NEWSYM EMUPause, db 0
 NEWSYM INCRFrame, db 0
 NEWSYM NoHDMALine, db 0
+NEWSYM cycles_ctr, dd 0
 SECTION .text
 
 NEWSYM cpuover
@@ -608,15 +613,6 @@ NEWSYM cpuover
     jne .nortoreset
     mov byte[rtoflags],0
 .nortoreset
-    pushad
-    xor eax,eax
-    mov eax,65
-    mul dh
-    xor edx,edx
-    mov ebp,120
-    div ebp
-    add [zspc_time],eax
-    popad
     dec esi
     cmp byte[HIRQNextExe],0
     je .nohirq
@@ -828,9 +824,19 @@ NEWSYM cpuover
     cmp byte[spcon],0
     je .nosound
     ;call updatetimer
-    ;pushad
-    ;call catchup
-    ;popad
+;    cmp dword[cycles_ctr],0
+;    je .nospcadd
+;    pushad
+;    mov edx,[cycles_ctr]
+;    mov eax,635 ;65
+;    mul edx
+;    mov dword[cycles_ctr],0
+;    xor edx,edx
+;    mov ebp,1200 ;120
+;    div ebp
+;    add [zspc_time],eax
+;    popad
+;.nospcadd
     ;pushad
     ;call zspc_flush_samples
     ;popad
@@ -940,6 +946,19 @@ NEWSYM cpuover
     jmp execloop.startagain
 
 .nmi
+    cmp dword[cycles_ctr],0
+    je .nospcaddnmi
+    pushad
+    mov edx,[cycles_ctr]
+    mov eax,635 ;65
+    mul edx
+    mov dword[cycles_ctr],0
+    xor edx,edx
+    mov ebp,1200 ;120
+    div ebp
+    add [zspc_time],eax
+    popad
+.nospcaddnmi
     mov byte[irqon],80h
     mov byte[doirqnext],0
     cmp byte[yesoutofmemory],1
@@ -1255,13 +1274,19 @@ NEWSYM cpuover
     inc esi
     jmp execloop.startagain
 .overy
-;    add dword[spc_scantime], 33
-;    push dword[spc_scantime]
-;    pop dword[spc_time]
-;    call catchup
-;    pushad
-;    call dsp_run_wrap
-;    popad
+    cmp dword[cycles_ctr],0
+    je .nospcadd2
+    pushad
+    mov edx,[cycles_ctr]
+    mov eax,635 ;65
+    mul edx
+    mov dword[cycles_ctr],0
+    xor edx,edx
+    mov ebp,1200 ;120
+    div ebp
+    add [zspc_time],eax
+    popad
+.nospcadd2
     pushad
     call zspc_flush_samples
     popad
@@ -1690,9 +1715,20 @@ NEWSYM execloopdeb
 NEWSYM execsingle
 
     xor ebx,ebx
+    mov dword[cycles_ctr],0
     test byte[curexecstate],2
     jz .nosoundb
 
+    pushad
+    mov bl,[esi]
+    mov dh,[cpucycle+ebx]
+    mov eax,65
+    mul dh
+    xor edx,edx
+    mov ebp,120
+    div ebp
+    add [zspc_time],eax
+    popad
 ;    catchupspc
 
 .skipallspc
