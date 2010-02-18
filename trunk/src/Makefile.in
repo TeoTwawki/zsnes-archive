@@ -47,7 +47,8 @@ CHIP_CO=$(CHIP_D)/7110emu.o $(CHIP_D)/c4emu.o $(CHIP_D)/dsp1emu.o\
 
 CPU_AO=$(CPU_D)/dma.o $(CPU_D)/execute.o $(CPU_D)/irq.o $(CPU_D)/memory.o\
 	$(CPU_D)/stable.o $(CPU_D)/table.o $(CPU_D)/tablec.o
-CPU_CO=$(CPU_D)/executec.o $(CPU_D)/memtable.o $(SPC_D)/zdsp.o $(SPC_D)/zspc.o
+CPU_CO=$(CPU_D)/executec.o $(CPU_D)/memtable.o $(SPC_D)/zdsp.o\
+	$(SPC_D)/zspc.o
 
 DEBUG_CO=@DEBUG_CF@
 DEBUG_QO=@DEBUG_QF@
@@ -71,7 +72,8 @@ NET_CO=
 
 PORT_AO=$(PORT_D)/sdlintrf.o
 PORT_CO=$(PORT_D)/audio.o $(PORT_D)/battery.o @GL_DRAW@ $(PORT_D)/lib.o\
-	$(PORT_D)/safelib.o $(PORT_D)/sdllink.o $(PORT_D)/sw_draw.o $(PORT_D)/x11.o
+	$(PORT_D)/safelib.o $(PORT_D)/sdllink.o $(PORT_D)/sw_draw.o\
+	$(PORT_D)/x11.o
 
 TOOL_CO=$(TOOL_D)/fileutil.o $(TOOL_D)/strutil.o
 
@@ -144,7 +146,7 @@ $(TOOL_D)/varrep: $(TOOL_D)/varrep.cpp $(TOOL_CO)
 
 include makefile.dep
 
-config.status: configure.in
+config.status: config.guess config.sub configure.in
 	./autogen.sh --recheck
 Makefile: config.status Makefile.in
 	./config.status
@@ -176,3 +178,4 @@ tclean:
 distclean: clean tclean
 	rm -f Makefile aclocal.m4 configure config.log \
 	config.status config.h $(TOOL_D)/depbuild
+
