@@ -198,7 +198,7 @@ CPUOBJ=${CPU_D}/dma${OE} ${CPU_D}/execute${OE} ${CPU_D}/executec${OE}\
 
 EFFECTSOBJ=${EFF_D}/burn${OE} ${EFF_D}/water${OE} ${EFF_D}/smoke${OE}
 
-GUIOBJ=${GUI_D}/gui${OE} ${GUI_D}/guiold${OE} ${GUI_D}/guifuncs${OE} ${GUI_D}/menu${OE}
+GUIOBJ=${GUI_D}/guiold${OE} ${GUI_D}/guifuncs${OE} ${GUI_D}/menu${OE}
 
 ifneq (${JMA},no)
 JMAOBJ=${JMA_D}/7zlzma${OE} ${JMA_D}/crc32${OE} ${JMA_D}/iiostrm${OE}\
@@ -241,14 +241,14 @@ WINVIDOBJ=${VID_D}/sw_draw${OE} ${VID_D}/copyvwin${OE} ${VID_D}/ntsc${OE}\
 	${VID_D}/hq3x16${OE} ${VID_D}/hq3x32${OE}\
 	${VID_D}/hq4x16${OE} ${VID_D}/hq4x32${OE}
 
-#ifeq (${QTD},yes)
+ifeq (${QTD},yes)
   CXXFLAGS+=-I"$(QT_BASE)${SLASH}include" -I"$(QT_BASE)${SLASH}include${SLASH}QtCore" -I"$(QT_BASE)${SLASH}include${SLASH}QtGui" -DWIN32
 #  DEBUGGEROBJ=${DEBUG_D}/load${OE} ${DEBUG_D}/ui${OE} ${DEBUG_D}/moc_ui${OE} ${DEBUG_D}/moc_zthread${OE} ${DEBUG_D}/zthread${OE}
   LIBS+= -L${QT_BASE}${SLASH}lib -lQtCore4 -lQtGui4
   MSVCLIBS+= ${QT_BASE}${SLASH}lib${SLASH}qtcore.lib ${QT_BASE}${SLASH}lib${SLASH}qtgui.lib advapi32.lib imm32.lib winspool.lib comdlg32.lib
-#endif
+endif
 
-GUIOBJ+= ${GUI_D}/moc_gui${OE}
+#GUIOBJ+= ${GUI_D}/gui${OE} ${GUI_D}/moc_gui${OE}
 
 OBJS+=${WINOBJ} ${WINVIDOBJ} ${NETOBJ} ${DEBUGGEROBJ}
 endif
@@ -462,7 +462,7 @@ ${VID_D}/mode716e${OE}: ${VID_D}/mode716e.asm macros.mac ${VID_D}/mode7.mac
 ${VID_D}/mode716t${OE}: ${VID_D}/mode716t.asm macros.mac ${VID_D}/mode7.mac
 ${VID_D}/mv16tms${OE}: ${VID_D}/mv16tms.asm macros.mac ${VID_D}/vidmacro.mac
 ${VID_D}/newg162${OE}: ${VID_D}/newg162.asm macros.mac ${VID_D}/newg162.mac \
-	${VID_D}/newg16wn.mac ${VID_D}/newgfx16.mac
+	${VID_D}/newg16wn.mac
 ${VID_D}/newgfx${OE}: ${VID_D}/newgfx.asm macros.mac
 ${VID_D}/newgfx16${OE}: ${VID_D}/newgfx16.asm macros.mac \
 	${VID_D}/newgfx16.mac ${VID_D}/vidmacro.mac
