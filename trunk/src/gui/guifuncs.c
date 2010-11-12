@@ -1603,7 +1603,7 @@ void GUIGenericJumpTo()
 void GUILoadKeysJumpTo()
 {
   char **base;
-  int start, end;
+  int start, end; //Make this unsigned?
 
   GUILoadTextA[GUILoadPos] = 0;
 
@@ -1640,7 +1640,7 @@ void GUILoadKeysJumpTo()
   {
     while (start <= end)
     {
-      int mid = (start+end)>>1;
+      int mid = start + ((end-start)>>1);
       int pos = strncasecmp(base[mid], GUILoadTextA, GUILoadPos);
       if (!pos)
       {
