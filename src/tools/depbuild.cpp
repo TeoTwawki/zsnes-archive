@@ -80,6 +80,7 @@ void fix_line(string &line, const char *filename)
 void dependency_calculate_c(const char *filename)
 {
   string command = cc + " " + cflags + " -M -MG " + filename;
+  cout << flush;
   FILE *fp = popen(command.c_str(), "r");
   if (fp)
   {
@@ -153,6 +154,7 @@ void dependency_calculate_moc(const char *filename)
 void dependency_calculate_asm(const char *filename)
 {
   string command = nasm + " " + nflags + " -M " + filename;
+  cout << flush;
   system(command.c_str());
 }
 
