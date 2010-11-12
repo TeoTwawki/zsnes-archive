@@ -45,7 +45,7 @@ EXTSYM drawtileng16x162b16b,drawtileng16x164b16b,drawtileng16x168b16b,winbg1en
 EXTSYM drawlineng2b16b,drawlineng4b16b,drawlineng8b16b,BuildWindow,winenabs
 EXTSYM drawlineng16x162b16b,drawlineng16x164b16b,drawlineng16x168b16b,winenabm
 EXTSYM disableeffects,winl1,winbg1enval,winbg1envalm,winlogica,winlogicaval
-EXTSYM winboundary,winobjen,winlogicb,nglogicval,ngwintable,winbg2enval,doveg
+EXTSYM winboundary,winlogicb,nglogicval,ngwintable,winbg2enval,doveg
 EXTSYM winbg3enval,winbg4enval,winbgobjenval,Mode7HiRes16b,res640,hiresstuff
 EXTSYM Mode7BackA,Mode7BackC,Mode7BackX0,Mode7BackSet,drawmode7win16b,ngwinen
 EXTSYM drawlineng16x84b16b,drawlineng16x82b16b,ofsmcyps,vram,ofsmcptr,ofsmady
