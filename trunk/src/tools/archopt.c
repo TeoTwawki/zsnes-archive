@@ -52,36 +52,38 @@ void cpuid_run()
 #define cpuid(in, a, b, c, d) z_in = in; cpuid_run(); a = z_a; b = z_b; c = z_c; d = z_d;
 #endif
 
-char *x86_flags[] =
-{          "fpu",        "vme",        "de",         "pse",        "tsc",    "msr",      "pae",         "mce",
-           "cx8",       "apic",           0,         "sep",       "mtrr",    "pge",      "mca",        "cmov",
-           "pat",      "pse36",        "pn",     "clflush",            0,    "dts",     "acpi",         "mmx",
-          "fxsr",        "sse",      "sse2",          "ss",         "ht",     "tm",     "ia64",         "pbe",
+static const char *x86_flags[] =
+{
+            "fpu",        "vme",        "de",         "pse",        "tsc",    "msr",      "pae",         "mce",
+            "cx8",       "apic",           0,         "sep",       "mtrr",    "pge",      "mca",        "cmov",
+            "pat",      "pse36",        "pn",     "clflush",            0,    "dts",     "acpi",         "mmx",
+           "fxsr",        "sse",      "sse2",          "ss",         "ht",     "tm",     "ia64",         "pbe",
 
-               0,            0,           0,             0,            0,        0,          0,             0,
-               0,            0,           0,     "syscall",            0,        0,          0,             0,
-               0,            0,           0,          "mp",         "nx",        0,   "mmxext",             0,
-               0,   "fxsr_opt",   "pdpe1gb",      "rdtscp",            0,     "lm", "3dnowext",       "3dnow",
+                0,            0,           0,             0,            0,        0,          0,             0,
+                0,            0,           0,     "syscall",            0,        0,          0,             0,
+                0,            0,           0,          "mp",         "nx",        0,   "mmxext",             0,
+                0,   "fxsr_opt",   "pdpe1gb",      "rdtscp",            0,     "lm", "3dnowext",       "3dnow",
 
-      "recovery",    "longrun",           0,        "lrti",            0,        0,          0,             0,
-               0,            0,           0,             0,            0,        0,          0,             0,
-               0,            0,           0,             0,            0,        0,          0,             0,
-               0,            0,           0,             0,            0,        0,          0,             0,
+       "recovery",    "longrun",           0,        "lrti",            0,        0,          0,             0,
+                0,            0,           0,             0,            0,        0,          0,             0,
+                0,            0,           0,             0,            0,        0,          0,             0,
+                0,            0,           0,             0,            0,        0,          0,             0,
 
-           "pni",            0,           0,     "monitor",     "ds_cpl",    "vmx",      "smx",         "est",
-           "tm2",      "ssse3",       "cid",             0,            0,   "cx16",     "xtpr",             0,
-               0,            0,       "dca",      "sse4_1",     "sse4_2",        0,          0,      "popcnt",
-               0,            0,           0,             0,            0,        0,          0,             0,
+            "pni",   "pclmuldq",    "dtes64",     "monitor",     "ds_cpl",    "vmx",      "smx",         "est",
+            "tm2",      "ssse3",       "cid",             0,        "fma",   "cx16",     "xtpr",        "pdcm",
+                0,            0,       "dca",      "sse4_1",     "sse4_2", "x2apic",    "movbe",      "popcnt",
+                0,        "aes",     "xsave",     "osxsave",        "avx",   "f16c",          0,         "raz",
 
-               0,            0,       "rng",      "rng_en",            0,        0,      "ace",      "ace_en",
-          "ace2",    "ace2_en",       "phe",      "phe_en",        "pmm", "pmm_en",          0,             0,
-               0,            0,           0,             0,            0,        0,          0,             0,
-               0,            0,           0,             0,            0,        0,          0,             0,
+                0,            0,       "rng",      "rng_en",            0,        0,      "ace",      "ace_en",
+           "ace2",    "ace2_en",       "phe",      "phe_en",        "pmm", "pmm_en",          0,             0,
+                0,            0,           0,             0,            0,        0,          0,             0,
+                0,            0,           0,             0,            0,        0,          0,             0,
 
-       "lahf_lm", "cmp_legacy",       "svm",     "extapic", "cr8_legacy",    "abm",    "sse4a", "misalignsse",
- "3dnowprefetch",       "osvw",       "ibs",        "sse5",     "skinit",    "wdt",          0,             0,
-               0,            0,           0,             0,            0,        0,          0,             0,
-               0,            0,           0,             0,            0,        0,          0,             0  };
+        "lahf_lm", "cmp_legacy",       "svm",     "extapic", "cr8_legacy",    "abm",    "sse4a", "misalignsse",
+  "3dnowprefetch",       "osvw",       "ibs",        " xop",     "skinit",    "wdt",          0,         "lwp",
+           "lma4",            0,           0,      "nodeid",            0,    "tbm", "topology",             0,
+                0,            0,           0,             0,            0,        0,          0,             0
+};
 
 void add_flags(char *flags, unsigned int reg, unsigned int offset)
 {
