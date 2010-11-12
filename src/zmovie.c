@@ -2364,7 +2364,6 @@ static void raw_audio_write(uint32_t samples)
   //fwrite(dsp_samples_buffer, 2, dsp_sample_count, raw_vid.ap);
 }
 
-#define PIXEL (vidbuffer[((y+1)*288) + x + 16])
 static void raw_video_write_frame()
 {
   if (raw_vid.vp)

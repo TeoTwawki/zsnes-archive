@@ -711,15 +711,15 @@ void SPC7110_deinit_decompression_state()
 
 static void get_lookup(uint32_t address)
 {
-  int low = 0,
-      high = decompression_state.lookup_used-1,
-      mid;
+  size_t low = 0,
+         high = decompression_state.lookup_used-1,
+         mid;
 
   decompression_state.table_current = 0;
 
   while (low <= high)
   {
-    mid = (low+high)>>1;
+    mid = low + ((high-low)>>1);
     if (decompression_state.lookup[mid].address < address)
     {
       low = mid+1;
