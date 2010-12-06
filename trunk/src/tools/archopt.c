@@ -141,7 +141,7 @@ int have_cpuid()
 int main(int argc, const char *const *const argv)
 {
   char model_name[512];
-  char flags[512];
+  char flags[1024];
   char cpu_family[512];
   char vendor_id[512];
   char model[512];
@@ -158,7 +158,7 @@ int main(int argc, const char *const *const argv)
 
   if ((fp = fopen("/proc/cpuinfo", "r")))
   {
-    char line[768], key[40], arg[512];
+    char line[2048], key[40], arg[512];
     const char *pattern = " %39[^:]: %511[ -~]"; // for sscanf
 
     while (fgets(line, sizeof(line), fp) && sscanf(line, pattern, key, arg) == 2)
