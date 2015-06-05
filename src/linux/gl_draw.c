@@ -162,7 +162,7 @@ extern uint64_t NumBytesPerLine;
 extern unsigned char *WinVidMemStart;
 extern unsigned char NGNoTransp;
 void copy640x480x16bwin();
-extern unsigned char SpecialLine[224];  /* 0 if lo-res, > 0 if hi-res */
+extern unsigned char SpecialLine[256];  /* 0 if lo-res, > 0 if hi-res */
 
 void gl_clearwin()
 {
