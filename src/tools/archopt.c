@@ -54,35 +54,41 @@ void cpuid_run()
 
 static const char *x86_flags[] =
 {
-            "fpu",        "vme",        "de",         "pse",        "tsc",    "msr",      "pae",         "mce",
-            "cx8",       "apic",           0,         "sep",       "mtrr",    "pge",      "mca",        "cmov",
-            "pat",      "pse36",        "pn",     "clflush",            0,    "dts",     "acpi",         "mmx",
-           "fxsr",        "sse",      "sse2",          "ss",         "ht",     "tm",     "ia64",         "pbe",
+                 "fpu",        "vme",        "de",         "pse",        "tsc",    "msr",      "pae",          "mce",
+                 "cx8",       "apic",           0,         "sep",       "mtrr",    "pge",      "mca",         "cmov",
+                 "pat",      "pse36",        "pn",     "clflush",            0,    "dts",     "acpi",          "mmx",
+                "fxsr",        "sse",      "sse2",          "ss",         "ht",     "tm",     "ia64",          "pbe",
 
-                0,            0,           0,             0,            0,        0,          0,             0,
-                0,            0,           0,     "syscall",            0,        0,          0,             0,
-                0,            0,           0,          "mp",         "nx",        0,   "mmxext",             0,
-                0,   "fxsr_opt",   "pdpe1gb",      "rdtscp",            0,     "lm", "3dnowext",       "3dnow",
+                    //The zeros in this segment are either undefined, or copies of the values in the above segment
+                     0,            0,           0,             0,            0,        0,          0,              0,
+                     0,            0,           0,     "syscall",            0,        0,          0,              0,
+                     0,            0,           0,          "mp",         "nx",        0,   "mmxext",              0,
+                     0,   "fxsr_opt",   "pdpe1gb",      "rdtscp",            0,     "lm", "3dnowext",        "3dnow",
 
-       "recovery",    "longrun",           0,        "lrti",            0,        0,          0,             0,
-                0,            0,           0,             0,            0,        0,          0,             0,
-                0,            0,           0,             0,            0,        0,          0,             0,
-                0,            0,           0,             0,            0,        0,          0,             0,
+            "recovery",    "longrun",           0,        "lrti",            0,        0,          0,              0,
+                     0,            0,           0,             0,            0,        0,          0,              0,
+                     0,            0,           0,             0,            0,        0,          0,              0,
+                     0,            0,           0,             0,            0,        0,          0,              0,
 
-            "pni",   "pclmuldq",    "dtes64",     "monitor",     "ds_cpl",    "vmx",      "smx",         "est",
-            "tm2",      "ssse3",       "cid",             0,        "fma",   "cx16",     "xtpr",        "pdcm",
-                0,            0,       "dca",      "sse4_1",     "sse4_2", "x2apic",    "movbe",      "popcnt",
-                0,        "aes",     "xsave",     "osxsave",        "avx",   "f16c",          0,         "raz",
+                 "pni",   "pclmuldq",    "dtes64",     "monitor",     "ds_cpl",    "vmx",      "smx",          "est",
+                 "tm2",      "ssse3",       "cid",             0,        "fma",   "cx16",     "xtpr",         "pdcm",
+                     0,       "pcid",       "dca",      "sse4_1",     "sse4_2", "x2apic",    "movbe",       "popcnt",
+  "tsc_deadline_timer",        "aes",     "xsave",     "osxsave",        "avx",   "f16c",   "rdrand",          "raz",
 
-                0,            0,       "rng",      "rng_en",            0,        0,      "ace",      "ace_en",
-           "ace2",    "ace2_en",       "phe",      "phe_en",        "pmm", "pmm_en",          0,             0,
-                0,            0,           0,             0,            0,        0,          0,             0,
-                0,            0,           0,             0,            0,        0,          0,             0,
+                 "ais",     "ais_en",       "rng",      "rng_en",         "lh",  "femms",      "ace",       "ace_en",
+                "ace2",    "ace2_en",       "phe",      "phe_en",        "pmm", "pmm_en",          0,              0,
+                     0,            0,           0,             0,            0,        0,          0,              0,
+                     0,            0,           0,             0,            0,        0,          0,              0,
 
-        "lahf_lm", "cmp_legacy",       "svm",     "extapic", "cr8_legacy",    "abm",    "sse4a", "misalignsse",
-  "3dnowprefetch",       "osvw",       "ibs",        " xop",     "skinit",    "wdt",          0,         "lwp",
-           "lma4",            0,           0,      "nodeid",            0,    "tbm", "topology",             0,
-                0,            0,           0,             0,            0,        0,          0,             0
+             "lahf_lm", "cmp_legacy",       "svm",     "extapic", "cr8_legacy",    "abm",    "sse4a",  "misalignsse",
+       "3dnowprefetch",       "osvw",       "ibs",         "xop",     "skinit",    "wdt",          0,          "lwp",
+                "fma4",        "tce",           0,      "nodeid",            0,    "tbm", "topology", "perfctr_core",
+          "perfctr_nb",            0,       "dbx",     "perftsc", "perfctr_l2",        0,          0,              0
+
+            "fsgsbase", "tsc_adjust",       "sgx",        "bmi1",        "hle",   "avx2",          0,         "smep",
+                "bmi2",       "erms",   "invpcid",         "rtm",        "pqm", "depfpp",      "mpx",          "pqe",
+             "avx512f",            0,    "rdseed",         "adx",       "smap",        0,          0,   "clflushopt",
+                     0,         "pt",  "avx512pf",    "avx512er",   "avx512cd",    "sha",          0,              0
 };
 
 void add_flags(char *flags, unsigned int reg, unsigned int offset)
