@@ -822,6 +822,7 @@ COPemulmode
     mov esi,IRAM
     sub esi,3000h
     mov [initaddrl],esi
+    and eax,07ff
     add esi,eax
     endloop
 %endmacro

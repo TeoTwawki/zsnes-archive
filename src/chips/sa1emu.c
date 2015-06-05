@@ -47,7 +47,7 @@ void SA1_DMA_CC2() {
     for(bit = 0; bit < 8; bit++) {
       output |= ((brf[bit] >> byte) & 1) << (7 - bit);
     }
-    SA1_IRAM[addr + ((byte & 6) << 3) + (byte & 1)] = output;
+    SA1_IRAM[(addr + ((byte & 6) << 3) + (byte & 1)) & 0x07ff] = output;
   }
 
   SA1_CC2_line = (SA1_CC2_line + 1) & 15;
