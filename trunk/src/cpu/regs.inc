@@ -832,8 +832,7 @@ reg2144r:
 ; WRAM Read
 reg2180r:
     mov ebx,[wramrwadr]
-    add ebx,[wramdata]
-    mov al,[ebx]
+    mov al,[wramdataa+ebx]
     inc dword[wramrwadr]
     and dword[wramrwadr],01FFFFh
     ret
