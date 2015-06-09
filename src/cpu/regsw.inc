@@ -1265,8 +1265,7 @@ reg2143w:
 ; Read/write WRAM register
 reg2180w:
     mov ebx,[wramrwadr]
-    add ebx,[wramdata]
-    mov [ebx],al
+    mov [wramdataa+ebx],al
     inc dword[wramrwadr]
     and dword[wramrwadr],01FFFFh
     ret
