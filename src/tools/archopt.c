@@ -83,7 +83,7 @@ static const char *x86_flags[] =
              "lahf_lm", "cmp_legacy",       "svm",     "extapic", "cr8_legacy",    "abm",    "sse4a",  "misalignsse",
        "3dnowprefetch",       "osvw",       "ibs",         "xop",     "skinit",    "wdt",          0,          "lwp",
                 "fma4",        "tce",           0,      "nodeid",            0,    "tbm", "topology", "perfctr_core",
-          "perfctr_nb",            0,       "dbx",     "perftsc", "perfctr_l2",        0,          0,              0
+          "perfctr_nb",            0,       "dbx",     "perftsc", "perfctr_l2",        0,          0,              0,
 
             "fsgsbase", "tsc_adjust",       "sgx",        "bmi1",        "hle",   "avx2",          0,         "smep",
                 "bmi2",       "erms",   "invpcid",         "rtm",        "pqm", "depfpp",      "mpx",          "pqe",
