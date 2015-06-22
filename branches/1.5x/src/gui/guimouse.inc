@@ -2481,9 +2481,8 @@ DisplayGUIVideoClick:
   je near .nocheckboxk43
   GUIClickCButtonK 18,175,byte[Keep4_3Ratio],initwinvideo
 .nocheckboxk43
-%endif
 
-%ifdef __MSDOS__
+%else
   xor ebx,ebx                             ; Small Screen
   mov bl,[cvidmode]
   cmp byte[GUISSVID+ebx],0
@@ -2494,13 +2493,12 @@ DisplayGUIVideoClick:
 
   xor ebx,ebx                             ; Full/Wide Screen
   mov bl,[cvidmode]
-  cmp byte[GUIFSVID+ebx],0
+  cmp byte[GUIWSVID+ebx],0
   je .nocheckbox3b
   FilterExcl 128,175,smallscreenon,antienab,En2xSaI
   GUIClickCButton3 128,175,byte[ScreenScale]
 .nocheckbox3b
 %endif
-
 .notfilterstab
 
   cmp dword[GUIVntscTab],1  ; NTSC Tab
