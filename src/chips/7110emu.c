@@ -26,6 +26,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../zpath.h"
 #include "../cfg.h"
 
+#ifndef __GNUC__
+#define INLINE static
+#else
+#define INLINE static inline
+#endif
+
 /*
 Decompression Code by anomie, Nach, and _Demo_
 Based on a reference implementation by neviksti
@@ -140,7 +146,7 @@ static uint32_t pixel_left, pixel_above, pixel_above_left, pixel_context;
 //Note that the following function doesn't neccesarily work right when x is 0
 //So don't use it outside of SPC7110 code without a protect that x isn't 0,
 //or you are happy with input = 0, output = 0.
-static inline uint8_t highest_bit_position(uint8_t x)
+INLINE uint8_t highest_bit_position(uint8_t x)
 {
   #if defined(__GNUC__) && defined(__i386__)
   uint16_t x2 = x;
@@ -159,7 +165,7 @@ static inline uint8_t highest_bit_position(uint8_t x)
   #endif
 }
 
-static inline void update_context(uint8_t con)
+INLINE void update_context(uint8_t con)
 {
   uint8_t prob;
   int flag_lps,shift;
@@ -257,7 +263,7 @@ This method saves needing a whole array, a copy, and extra sorting loops, replac
 with a method at maximum requiring a single loop through the array.
 */
 
-static inline uint32_t pixel_shift(int index)
+INLINE uint32_t pixel_shift(int index)
 {
   uint32_t *p;
 
@@ -556,7 +562,7 @@ static void save_decompression_state()
       if ((fp_gfx = gzopen_dir(ZSramPath, fname, "wb9")))
       {
         struct address_lookup *lookup_ptr = decompression_state.lookup,
-                              *lookup_end = decompression_state.lookup+(decompression_state.lookup_used-1);
+                              *lookup_end = decompression_state.lookup+decompression_state.lookup_used;
         for (; lookup_ptr < lookup_end; ++lookup_ptr)
         {
           unsigned int entry_index;
@@ -826,11 +832,11 @@ static uint8_t read_non_buffered_decompress(uint8_t byte)
   return(byte);
 }
 
-void copy_spc7110_state_data(uint8_t *buffer, void (*copy_func)(unsigned char **, void *, size_t), bool load)
+void copy_spc7110_state_data(uint8_t **buffer, void (*copy_func)(unsigned char **, void *, size_t), bool load)
 {
-  copy_func(&buffer, &decompression_state.last_address, 3);
-  copy_func(&buffer, &decompression_state.last_entry, sizeof(uint8_t));
-  copy_func(&buffer, &decompression_state.decompression_used_length, sizeof(uint16_t));
+  copy_func(buffer, &decompression_state.last_address, 3);
+  copy_func(buffer, &decompression_state.last_entry, sizeof(uint8_t));
+  copy_func(buffer, &decompression_state.decompression_used_length, sizeof(uint16_t));
 
   if (load && decompression_state.last_address)
   {

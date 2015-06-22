@@ -559,10 +559,10 @@ NEWSYM newengine8b
 %macro Process1DualWindow 0
     test ch,1
     jnz %%outside
-    inc ebx
     cmp edx,ebx
     jb %%noclip
     ; Process Inside window
+    inc ebx
     mov [esi],ebx
     sub edx,ebx
     add edx,2
@@ -606,7 +606,7 @@ NEWSYM BuildWindow
     mov dword[valtemp],0EE00h
     push edx
     push ecx
-    mov edx,[winlogicaval+eax*2]
+    mov edx,[nglogicval]
     shl edx,16
     mov dl,[winbg1enval+ebx]
     cmp edx,[pwinen]
@@ -633,7 +633,7 @@ NEWSYM BuildWindow
     mov byte[WindowRedraw],0
     push edx
     push ecx
-    mov edx,[winlogicaval+eax*2]
+    mov edx,[nglogicval]
     shl edx,16
     mov dl,[winbg1enval+ebx]
 .notsimilar
@@ -663,10 +663,10 @@ NEWSYM BuildWindow
 .wina
     test ch,1
     jnz .outside
-    inc ebx
     cmp edx,ebx
     jb .noclip
     ; Process Inside window
+    inc ebx
     mov [esi],ebx
     mov [esi+64],ebx
     sub edx,ebx
@@ -695,7 +695,6 @@ NEWSYM BuildWindow
     mov dword[esi+64],0
     mov [esi+4+64],ebx
     add esi,8
-    dec ebx
 .skipclip
     cmp edx,255
     jne .clip
@@ -706,7 +705,7 @@ NEWSYM BuildWindow
     jmp .finwin
 .clip
     sub edx,ebx
-    inc edx
+    add edx,2
     mov [esi],edx
     mov [esi+64],edx
     mov dword[esi+4],0EE00h
@@ -899,7 +898,6 @@ NEWSYM sprprdrn, resd 1
 NEWSYM csprival, resd 1
 NEWSYM pesimpng2, resd 1
 NEWSYM cfieldad, resd 1
-NEWSYM ignor512, resd 1
 NEWSYM ofsmcptr, resd 1
 NEWSYM ofsmtptr, resd 1
 NEWSYM ofsmmptr, resd 1
@@ -957,7 +955,6 @@ SECTION .text
 
 NEWSYM StartDrawNewGfx
     mov byte[WindowRedraw],1
-    mov dword[ignor512],1
     mov dword[cfieldad],0
     cmp byte[res480],1
     jne .scan2
