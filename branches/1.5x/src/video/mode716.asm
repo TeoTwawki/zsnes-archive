@@ -406,6 +406,7 @@ NEWSYM drawmode7ngextbg16b
 
     cmp byte[mode7hr+ebx],1
 ;    je near drawmode7winextbghr16e
+    CheckTransparency 01h,drawmode7win16bte
     CheckTransparency 02h,drawmode7win16bte
     mov esi,[cwinptr]
     mov [winptrref],esi

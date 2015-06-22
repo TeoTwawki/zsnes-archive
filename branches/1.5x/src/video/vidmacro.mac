@@ -1458,64 +1458,10 @@
 %%skip
 %endmacro
 
-%macro sprdrawprawb 2
-    or %2,%2
-    jz %%skip
-    test byte[sprpriodata+ebx-%1+16],dl
-    jnz %%skip
-    cmp byte[ecx+ebx-%1],1
-    je %%skip
-    add %2,dh
-    mov [edi+ebx-%1],%2
-    or byte[sprpriodata+ebx-%1+16],dl
-%%skip
-%endmacro
-
-%macro sprdrawprb 2
-    or %2,%2
-    jz %%skip
-    add %2,ch
-    mov [edi+ebx-%1],%2
-%%skip
-%endmacro
-
-%macro sprdrawprbwb 2
-    or %2,%2
-    jz %%skip
-    add %2,dh
-    cmp byte[ecx+ebx-%1],1
-    je %%skip
-    mov [edi+ebx-%1],%2
-%%skip
-%endmacro
-
 %macro sprdrawpra2 2
     or %2,%2
     jz %%skip
     or byte[sprpriodata+ebx-%1+16],dl
-%%skip
-%endmacro
-
-%macro sprdrawpraw 2
-    or %2,%2
-    jz %%skip
-    test byte[sprpriodata+ebx-%1+16],dl
-    jnz %%skip
-    cmp byte[winspdata+ebx-%1+16],0
-    jne %%skip
-    add %2,ch
-    mov [edi+ebx-%1],%2
-    or byte[sprpriodata+ebx-%1+16],dl
-%%skip
-%endmacro
-
-%macro sprdrawprbw 2
-    or %2,%2
-    jz %%skip
-    cmp byte[winspdata+ebx-%1+16],0
-    jne %%skip
-    add %2,ch
-    mov [edi+ebx-%1],%2
 %%skip
 %endmacro
 
@@ -1640,12 +1586,9 @@
     shr edx,3
     shl edx,1
     add ax,dx
-    mov dx,[bg3scrolx]
-    test dx,8000h
-    jz .nooma
-    and dx,0F000h
-    shr dx,5
-    add ax,dx
+    cmp word[bg3scroly],0fff7h
+    jbe .nooma
+    add ax,780h
 .nooma
     add eax,40h
     mov edx,eax

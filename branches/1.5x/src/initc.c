@@ -1090,7 +1090,7 @@ void SplitSupport()
   SplittedROM = false;
 
   //Same Game add on
-  if ((curromspace == 0x60000) || (curromspace == 0x80000) && ROM[Hi+CompanyOffset] == 0x33 &&
+  if (((curromspace == 0x60000) || (curromspace == 0x80000)) && ROM[Hi+CompanyOffset] == 0x33 &&
       !ROM[Hi+BankOffset] && !ROM[Hi+BSMonthOffset] && !ROM[Hi+BSDayOffset])
   {
     addOnStart = 0x200000;
@@ -2662,7 +2662,7 @@ extern unsigned int xa, xdb, xpb, xs, xd, xx, xy, scrndis;
 extern unsigned short VIRQLoc, resolutn, xpc;
 extern unsigned char spcextraram[64], SPCROM[64];
 extern unsigned int tableD[256];
-unsigned char SPCSkipXtraROM, bgfixer2 = 0, disableeffects = 0;
+unsigned char SPCSkipXtraROM, disableeffects = 0;
 //This is saved in states
 unsigned char cycpl = 0;   // cycles per scanline
 unsigned char cycphb = 0;    // cycles per hblank
@@ -2685,8 +2685,7 @@ void SPC7110init();
 void init65816()
 {
     unsigned int i;
-    osm2dis = 0;
-    bgfixer2 = 0;
+
     if(SA1Enable)
     {
       SA1Reset();
@@ -2695,8 +2694,6 @@ void init65816()
 
     if(C4Enable)
     {
-      osm2dis = 1;
-      bgfixer2 = 1;
       InitC4();
     }
 
@@ -2783,7 +2780,7 @@ void init65816()
     clearvidsound();
 
     prevoamptr = 0xFF;
-    disableeffects = 0;
+    disableeffects = osm2dis = 0;
     opexec268 = opexec268b;
     opexec358 = opexec358b;
     opexec268cph = opexec268cphb;
