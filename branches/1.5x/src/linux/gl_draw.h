@@ -28,6 +28,8 @@ void gl_end();
 void gl_clearwin();
 void gl_drawwin();
 
+extern char allow_glvsync;
+
 #endif
 
 

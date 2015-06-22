@@ -127,13 +127,15 @@ ifeq (${OS},__MSDOS__)
   FILEFORMAT=coff
   LIBS=${LIBSORIG} -lm
   OE=.do
+  CONFLOC=
 endif
 
 ifeq (${OS},__WIN32__)
   EXE=zsnesw.exe
   FILEFORMAT=win32
-  LIBS=${LIBSORIG} -ldxguid -ldinput8 -lwsock32 -luser32 -lgdi32 -lshell32 -lwinmm -mwindows
+  LIBS=${LIBSORIG} -ldxguid -ldinput8 -lwsock32 -luser32 -lgdi32 -lshfolder -lshell32 -lwinmm -mwindows
   OE=.obj
+  CONFLOC=${WIN_D}/confloc${OE}
 endif
 
 ifeq (${DEBUG},yes)
@@ -278,7 +280,7 @@ else
 endif
 
 %${OE}: %.psr
-	${PSR} -D${OS} -cheader $(patsubst %${OE},%.h,$@) -fname $(patsubst %${OE},%,$@) temppsr.c $<
+	${PSR} -D${OS} -cheader $(patsubst %${OE},%.h,$@) -fname $(notdir $(patsubst %${OE},%,$@)) temppsr.c $<
 ifneq (${ENV},msvc)
 	${CC} ${CFLAGS} -O1 -o $@ -c temppsr.c
 else
