@@ -746,14 +746,26 @@ sa1230Br:
     ret
 
 NEWSYM IRamRead
-    mov al,[IRAM+ecx-3000h]
+    push ecx
+    sub ecx,3000h
+    and ecx,7ffh
+    mov al,[IRAM+ecx]
+    pop ecx
     ret
 
 NEWSYM IRamWrite
-    mov [IRAM+ecx-3000h],al
+    push ecx
+    sub ecx,3000h
+    and ecx,7ffh
+    mov [IRAM+ecx],al
+    pop ecx
     ret
 NEWSYM IRamWrite2
-    mov [IRAM+ecx-3000h],al
+    push ecx
+    sub ecx,3000h
+    and ecx,7ffh
+    mov [IRAM+ecx],al
+    pop ecx
     xor dh,dh
     ret
 
@@ -976,16 +988,23 @@ NEWSYM sa12239w
 SECTION .bss
 NEWSYM sa1dmaptr, resd 1
 NEWSYM sa1dmaptrs, resd 1
+NEWSYM sa1dmaptrend, resd 1
 
 SECTION .text
 
 NEWSYM sa1dmairam
+    mov ebx,IRAM
+    add ebx,7FFh
+    mov [sa1dmaptrend],ebx
     mov ebx,[SA1DMADest]
     and ebx,7FFh
     add ebx,IRAM
     mov [sa1dmaptr],ebx
     jmp executesa1dma
 NEWSYM sa1dmabwram
+    mov ebx,SA1RAMArea
+    add ebx,3FFFFh
+    mov [sa1dmaptrend],ebx
     mov ebx,[SA1DMADest]
     and ebx,3FFFFh
     add ebx,[SA1RAMArea]
@@ -1020,7 +1039,12 @@ executesa1dma:
     push edx
     push eax
     push ecx
+    mov ecx,[sa1dmaptrend]
+    sub ecx,[sa1dmaptr]
+    cmp ecx,[SA1DMACount]
+    jb .overflow
     mov ecx,[SA1DMACount]
+.overflow
     or ecx,ecx
     jz .notransfer
     mov ebx,[sa1dmaptrs]

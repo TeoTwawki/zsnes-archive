@@ -27,6 +27,7 @@ Multiline replace is of course supported.
 #include <string>
 using namespace std;
 
+#include <unistd.h>
 #include "fileutil.h"
 
 string SearchText, ReplaceText;

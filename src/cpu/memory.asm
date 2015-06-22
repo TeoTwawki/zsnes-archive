@@ -716,12 +716,15 @@ NEWSYM membank0r8ramSA1             ; 0000-1FFF
     mov al,[wramdataa+ecx+ebx]
     ret
 .nowram
+    add ecx,ebx
     cmp ecx,800h
     jae .invaccess
-    mov al,[IRAM+ecx+ebx]
+    mov al,[IRAM+ecx]
+    sub ecx,ebx
     ret
 .invaccess
     xor al,al
+    sub ecx,ebx
     ret
 NEWSYM membank0r16ramSA1             ; 0000-1FFF
     cmp byte[SA1Status],0
@@ -729,12 +732,15 @@ NEWSYM membank0r16ramSA1             ; 0000-1FFF
     mov ax,[wramdataa+ecx+ebx]
     ret
 .nowram
+    add ecx,ebx
     cmp ecx,800h
     jae .invaccess
-    mov ax,[IRAM+ecx+ebx]
+    mov ax,[IRAM+ecx]
+    sub ecx,ebx
     ret
 .invaccess
     xor ax,ax
+    sub ecx,ebx
     ret
 NEWSYM membank0w8ramSA1             ; 0000-1FFF
     cmp byte[SA1Status],0
@@ -742,10 +748,12 @@ NEWSYM membank0w8ramSA1             ; 0000-1FFF
     mov [wramdataa+ecx+ebx],al
     ret
 .nowram
+    add ecx,ebx
     cmp ecx,800h
     jae .invaccess
-    mov [IRAM+ecx+ebx],al
+    mov [IRAM+ecx],al
 .invaccess
+    sub ecx,ebx
     ret
 NEWSYM membank0w16ramSA1             ; 0000-1FFF
     cmp byte[SA1Status],0
@@ -753,10 +761,12 @@ NEWSYM membank0w16ramSA1             ; 0000-1FFF
     mov [wramdataa+ecx+ebx],ax
     ret
 .nowram
+    add ecx,ebx
     cmp ecx,800h
     jae .invaccess
-    mov [IRAM+ecx+ebx],ax
+    mov [IRAM+ecx],ax
 .invaccess
+    sub ecx,ebx
     ret
 
 ; --- 8 BIT READ STUFF ---
