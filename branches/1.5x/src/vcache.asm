@@ -199,12 +199,9 @@ NEWSYM cachevideo
     mov dword[bgcmsung],0
     mov dword[modeused],0
     mov dword[modeused+4],0
-    mov dword[scaddsngb],0
-    mov dword[scaddtngb],0
     mov dword[sprprdrn],0
     mov dword[ngmsdraw],0
     mov dword[ngextbg],0
-    mov dword[scaddtngbx],0FFFFFFFFh
     mov byte[hiresstuff],0
     mov byte[Mode7HiRes],0
 
