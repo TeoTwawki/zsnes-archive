@@ -292,8 +292,57 @@ NEWSYM setpalette16bng
 .noveg2
     ret
 
+NEWSYM Gendcolortable
+    ; generate Direct Color Table
+    push eax
+    push ebx
+    push ecx
+    push edx
+    xor ecx,ecx
+.loopdct
+    mov al,cl
+    and eax,00000111b
+    mov bl,[vidbright]
+    mul bl
+    mov bl,15
+    div bl
+    xor ah,ah
+    shl eax,13
+    mov edx,eax
+    mov al,cl
+    and eax,00111000b
+    shr eax,3
+    mov bl,[vidbright]
+    mul bl
+    mov bl,15
+    div bl
+    xor ah,ah
+    shl eax,8
+    or edx,eax
+    mov al,cl
+    and eax,11000000b
+    shr eax,6
+    mov bl,[vidbright]
+    mul bl
+    mov bl,15
+    div bl
+    xor ah,ah
+    shl eax,3
+    or edx,eax
+    mov [dcolortab+ecx*2],dx
+    or dx,[UnusedBit]
+    mov [dcolortab+ecx*2+512],dx
+    inc cl
+    jnz .loopdct
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    ret
+
 section .data
 prevpal2 times 256 dw 0F00Fh
+NEWSYM prevbrightdc, db 16
 section .text
 
 %macro WinBGCheck 1
@@ -419,12 +468,10 @@ section .text
     jmp %%skip
 %%nodisable
     mov cl,bl
-    or cl,bh
     and cl,0Ah
     cmp cl,0Ah
     je %%skip
     mov ch,bl
-    or ch,bh
     mov edx,[winl1]
     cmp cl,02h
     je %%bg1
@@ -448,6 +495,8 @@ section .text
 %endmacro
 
 section .data
+mosstart times 4 dd 0
+moscountdown db 0
 BackAreaAdd dd 0
 BackAreaUnFillCol dd 0
 BackAreaFillCol dd 0
@@ -550,6 +599,11 @@ BackAreaFill:
 .yeswindowb
     ret
 
+NEWSYM drawline
+    cmp byte[ForceNewGfxOff],0
+    jnz drawline16b
+    cmp byte[newengen],0
+    jz drawline16b
 NEWSYM newengine16b
     ; store line by line data
     ; BGMode, BGxScrollX, BGxScrollY, both BGPtrs
@@ -584,16 +638,7 @@ NEWSYM newengine16b
     mov dword[palchanged],0
 
     ; BG3 Priority
-    test byte[scaddset],2
-    jz .noscaddset
-    or [bgcmsung],ebx
-.noscaddset
-
     mov bl,[bg3highst]
-    ;cmp byte[bgmode],7
-    ;mov bl,1
-    ;je .notmode7
-;.notmode7
     mov [BG3PRI+eax],bl
     cmp [BG3PRI+eax-1],bl
     je .nosbg3pr
@@ -631,6 +676,8 @@ NEWSYM newengine16b
     mov byte[clinemainsub],0
     cmp word[cgram],0
     jne .ngmsdraw0
+    test byte[scaddset],2
+    jnz .ngmsdraw0
     mov bl,[scrnon]
     and bl,1Fh
     or bl,0E0h
@@ -697,11 +744,8 @@ NEWSYM newengine16b
     mov bl,[bgmode]
     and bl,07h
     mov [BGMA+eax],bl
-    cmp bl,4
-    je .changedmode4
     cmp [BGMA+eax-1],bl
     je .nobgma
-.changedmode4
     mov byte[bgallchange+eax],1
 .nobgma
 
@@ -958,13 +1002,33 @@ NEWSYM newengine16b
     je .winnchanged
     mov byte[bgwinchange+eax],1
 .winnchanged
+    mov bl,[winbg1enval+eax]
+    cmp [winbg1enval+eax-1],bl
+    je .winnchanged1
+    mov byte[bgwinchange+eax],1
+.winnchanged1
+    mov bl,[winbg2enval+eax]
+    cmp [winbg2enval+eax-1],bl
+    je .winnchanged2
+    mov byte[bgwinchange+eax],1
+.winnchanged2
+    mov bl,[winbg3enval+eax]
+    cmp [winbg3enval+eax-1],bl
+    je .winnchanged3
+    mov byte[bgwinchange+eax],1
+.winnchanged3
+    mov bl,[winbg4enval+eax]
+    cmp [winbg4enval+eax-1],bl
+    je .winnchanged4
+    mov byte[bgwinchange+eax],1
+.winnchanged4
 
     ; generate sprite window
     cmp byte[winbg1enval+eax+4*256],0
-    je near .skipobjw
+    je near .windisable
 
     mov ebx,[winl1]
-    mov dl,[winobjen]
+    mov dl,[winbg1enval+eax+4*256]
     mov dh,[winlogicb]
     and dh,03h
     ; Same as previous line?
@@ -1043,10 +1107,10 @@ NEWSYM newengine16b
     jmp .skipobjw
 .usecurrent
     mov ecx,[objclineptr+eax*4]
-    mov [CSprWinPtr],ecx
     cmp ecx,0FFFFFFFFh
-    jnz .skipobjw
-    jmp .disablesprwin
+    je .disablesprwin
+    mov [CSprWinPtr],ecx
+    jmp .skipobjw
     ; copy over if it's the same
 .notchanged
     mov [objwlrpos+eax*4],ebx
@@ -1054,16 +1118,17 @@ NEWSYM newengine16b
     mov ebx,[objclineptr+eax*4-4]
     mov [objclineptr+eax*4],ebx
     cmp ebx,0FFFFFFFFh
-    je .disablesprwin
-.skipobjw
-    pop edx
-    pop ecx
-    jmp .okaywin
+    jne .skipobjw
 .disablesprwin
     mov dword[objclineptr+eax*4],0FFFFFFFFh
     mov byte[winbg1enval+eax+4*256],0
     mov byte[winbg1envals+eax+4*256],0
     mov byte[winbg1envalm+eax+4*256],0
+    jmp .skipobjw
+.windisable
+    ;mov dword[objclineptr+eax*4],0FFFFFFFFh
+    mov dword[objwlrpos+eax*4],0FFFFFFFFh
+.skipobjw
     pop edx
     pop ecx
     jmp .okaywin
@@ -1073,8 +1138,17 @@ NEWSYM newengine16b
     mov byte[winbg3enval+eax],0
     mov byte[winbg4enval+eax],0
     mov byte[winbgobjenval+eax],0
+    mov byte[winbg1envalm+eax],0
+    mov byte[winbg1envalm+eax+256],0
+    mov byte[winbg1envalm+eax+256*2],0
+    mov byte[winbg1envalm+eax+256*3],0
+    mov byte[winbg1envalm+eax+256*4],0
+    mov byte[winbg1envals+eax],0
+    mov byte[winbg1envals+eax+256],0
+    mov byte[winbg1envals+eax+256*2],0
+    mov byte[winbg1envals+eax+256*3],0
+    mov byte[winbg1envals+eax+256*4],0
 .okaywin
-    xor ebx,ebx
 
     mov ebx,[coladdr-1]
     mov bl,[vidbright]
@@ -1123,12 +1197,12 @@ NEWSYM newengine16b
     or byte[FillSubScr+eax],2
     jmp .notblack
 .black
-    cmp byte[scrnon+1],0
-    jne .notblack
+;    cmp byte[scrnon+1],0
+;    jne .notblack
 ;    mov byte[clinemainsub],1
-    test byte[scadtng+eax],40h
-    jnz .notblack
-    xor byte[scadtng+eax],1
+;    test byte[scadtng+eax],40h
+;    jnz .notblack
+;    xor byte[scadtng+eax],1
 ;    mov byte[FillSubScr+eax],0
 .notblack
 
@@ -1641,7 +1715,7 @@ NEWSYM StartDrawNewGfx16b
 .nodobg4mb
     test byte[scrndis],4h
     jnz near .nodobg3mb
-    test dword[bgcmsung],4h
+    test dword[bgcmsung],404h
     jz near .nodobg3mb
     mov eax,[bg3totng]
     cmp eax,[bg3drwng]
@@ -2047,7 +2121,7 @@ NEWSYM domosaicng16b
     je near .nodraw
     or ax,[UnusedBit]
     %2 0
-    and ax,[UnusedBit]
+    and ax,[UnusedBitXor]
     %2 75036*2
     mosender %3
 %endmacro
@@ -2352,8 +2426,6 @@ NEWSYM drawbg4linepr116b
 .loopobj2
     test byte[esi+7],20h
     jnz near .drawspriteflipx2
-    or byte[esi+4],0        ;this prevents some games from crashing
-    jz near .exitnow
     mov bx,[esi]
     mov ch,[esi+6]
     mov esi,[esi+2]
@@ -2362,7 +2434,6 @@ NEWSYM drawbg4linepr116b
     mov esi,edx
     dec cl
     jnz near .loopobj2
-.exitnow
     pop ebx
     pop esi
     ret
@@ -2580,15 +2651,15 @@ drawsprng16bt:
     xor eax,eax
     test byte[BGMS1+ebx*2+1],10h
     jnz near drawsprng16bmst
-    mov al,[BGMS1+ebx*2]
-    shr al,2
-    test byte[BGMS1+ebx*2],al
-    jnz .transpwin
-    test byte[scaddset],0C0h
-    jz .transpwin
-    cmp byte[BGMS1+ebx*2+1],0
-    jnz .main
-.transpwin
+;    mov al,[BGMS1+ebx*2]
+;    shr al,2
+;    test byte[BGMS1+ebx*2],al
+;    jnz .transpwin
+;    test byte[scaddset],0C0h
+;    jz .transpwin
+;    cmp byte[BGMS1+ebx*2+1],0
+;    jnz .main
+;.transpwin
     mov edi,[CMainWinScr]
     cmp byte[edi+ebx+4*256],0
     jne near drawsprngw16bt
@@ -3010,11 +3081,20 @@ ProcessTransparencies:
 .prochalfadddo
     movq mm0,[esi]
     movq mm1,[esi+75036*2]
-    pand mm0,[HalfTrans]
-    pand mm1,[HalfTrans]
+    pand mm0,[UnusedBitXor]
+    movq mm2,mm0
+    pxor mm2,mm1
+    pand mm2,[HalfTransB]
+    movq mm3,mm0
+    pand mm3,mm1
+    psllw mm3,15
+    psrlw mm3,15
     psrlw mm0,1
     psrlw mm1,1
+    psrlw mm2,1
     paddw mm0,mm1
+    psubw mm0,mm2
+    paddw mm0,mm3
     movq [esi],mm0
     add esi,8
     dec ecx
@@ -3062,15 +3142,14 @@ ProcessTransparencies:
     %if %1>0
     psrlw mm0,%1
     %endif
+    pand mm4,[FullBitAnd]
     paddusw mm2,mm4
     psllw mm3,%3
     pand mm2,[FullBitAnd]
     psllw mm1,%3
     psrlw mm2,%2
-    pand mm1,[FullBitAnd]
     paddusw mm3,mm1
     por mm0,mm2
-    pand mm3,[FullBitAnd]
     psrlw mm3,%3
     por mm0,mm3
     dec ecx
@@ -3134,7 +3213,6 @@ ProcessTransparencies:
     psllw mm3,%3
     psllw mm1,%3
     paddusw mm3,mm1
-    pand mm3,[FullBitAnd]
     psrlw mm3,%3
     por mm0,mm3
     por mm0,mm2
@@ -3147,11 +3225,19 @@ ProcessTransparencies:
     pxor mm6,[UnusedBitXor]
     pand mm5,mm6
     pand mm7,[UnusedBit]
-    pand mm4,[HalfTrans]
-    pand mm1,[HalfTrans]
+    movq mm2,mm1
+    pxor mm2,mm4
+    pand mm2,[HalfTransB]
+    movq mm3,mm1
+    pand mm3,mm4
+    psllw mm3,15
+    psrlw mm3,15
     psrlw mm1,1
     psrlw mm4,1
+    psrlw mm2,1
     paddw mm1,mm4
+    psubw mm1,mm2
+    paddw mm1,mm3
     pcmpeqw mm7,[UnusedBit]
     pand mm0,mm7
     pxor mm7,[UnusedBitXor]
@@ -3209,14 +3295,13 @@ ProcessTransparencies:
     %endif
     psllw mm2,%2
     psllw mm1,%2
+    pand mm1,[FullBitAnd]
     paddusw mm2,mm1
     pand mm2,[FullBitAnd]
     psrlw mm2,%2
     psllw mm3,%3
     psllw mm4,%3
-    pand mm4,[FullBitAnd]
     paddusw mm3,mm4
-    pand mm3,[FullBitAnd]
     psrlw mm3,%3
     por mm0,mm3
     por mm0,mm2
@@ -3228,7 +3313,7 @@ ProcessTransparencies:
     pand mm5,mm6
     pand mm7,[UnusedBit]
     movq mm1,mm0
-    pand mm1,[HalfTrans]
+    pand mm1,[HalfTransC]
     psrlw mm1,1
     pcmpeqw mm7,[UnusedBit]
     pand mm0,mm7
@@ -3289,14 +3374,13 @@ ProcessTransparencies:
     psllw mm2,%2
     movq mm1,mm4
     psllw mm4,%2
+    pand mm4,[FullBitAnd]
     paddusw mm2,mm4
     psllw mm3,%3
     pand mm2,[FullBitAnd]
     psllw mm1,%3
     psrlw mm2,%2
-    pand mm1,[FullBitAnd]
     paddusw mm3,mm1
-    pand mm3,[FullBitAnd]
     %if %1>0
     psrlw mm0,%1
     %endif
@@ -3358,14 +3442,13 @@ ProcessTransparencies:
     %endif
     psllw mm2,%2
     psllw mm1,%2
+    pand mm1,[FullBitAnd]
     paddusw mm2,mm1
     pand mm2,[FullBitAnd]
     psrlw mm2,%2
     psllw mm3,%3
     psllw mm4,%3
-    pand mm4,[FullBitAnd]
     paddusw mm3,mm4
-    pand mm3,[FullBitAnd]
     psrlw mm3,%3
     por mm0,mm3
     por mm0,mm2
@@ -3483,10 +3566,11 @@ section .text
 %endmacro
 
 %macro SCMainC 0
+    mov ebx,[UnusedBit]
 %endmacro
 
 %macro SCSubC 0
-    xor ebx,0FFFFFFFFh
+    mov ebx,[UnusedBitXor]
 %endmacro
 
 %macro SCMainD 0
@@ -3512,10 +3596,7 @@ section .text
     and al,0C0h
     cmp al,0C0h
     jne .notentire
-    mov ebx,[UnusedBit]
     %3
-    mov ecx,256
-    mov edx,256
     jmp .startclippingfull
 .notentire
 
@@ -3536,46 +3617,40 @@ section .text
     pop eax
 .nowindowing
 
-    mov ebx,[UnusedBit]
     %3
     mov edx,256
     cmp dword[ngwinen],0
     jne .windowenabled
     cmp al,80h
     je near .finclipping
-    mov ecx,256
     jmp .startclippingfull
 .windowenabled
-    cmp al,80h
-    je near .outsideclipping
     mov edi,ngwintable
     mov ecx,[edi]
+    add edi,4
     cmp ecx,0
     je .nodec
     dec ecx
+    jmp .notzero
 .nodec
-    add edi,4
+    dec dword[edi]
+.notzero
+    cmp al,80h
+    je near .outsideclipping
     or ecx,ecx
     jnz near .startclippingb
-    mov ecx,[edi]
-    add edi,4
-    jmp .noclipping
+    jmp .skipclipping
 .outsideclipping
-    mov edi,ngwintable
-    mov ecx,[edi]
-    add edi,4
     or ecx,ecx
     jnz .noclipping
     mov ecx,[edi]
-    cmp ecx,0
-    je .nodec2
-    dec ecx
-.nodec2
     add edi,4
-    jmp .startclippingb
 .startclippingb
     cmp ecx,256
     jae near .startclippingfull
+.startclippingc
+    or ecx,ecx
+    jz .skipclipping
 .startclipping
     %2
     add esi,2
@@ -3583,6 +3658,7 @@ section .text
     jz .finclipping
     dec ecx
     jnz .startclipping
+.skipclipping
     mov ecx,[edi]
     add edi,4
 .noclipping
@@ -3593,7 +3669,7 @@ section .text
     add esi,ecx
     mov ecx,[edi]
     add edi,4
-    jmp .startclipping
+    jmp .startclippingc
 .startclippingfull
     mov ecx,128
 .loopclipfull

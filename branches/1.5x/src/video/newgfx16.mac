@@ -958,6 +958,20 @@
 %%skip
 %endmacro
 
+%macro mosaic_countdown 1
+    cmp byte[moscountdown],0
+    je %%doit
+    cmp ebx,1
+    jne %%nofirstline
+%%doit
+    mov [mosstart+%1*4],ebx
+    mov al,[mosszng+ebx]
+    inc al
+    mov [moscountdown],al
+%%nofirstline
+    dec byte[moscountdown]
+%endmacro
+
 %macro Procbgpr016b 5
     ; Draw BG 2
     ; Start line by line drawing/check
@@ -966,6 +980,7 @@
 ;    add esi,16*2+288*2
     xor ebx,ebx
 %%nextline
+    mosaic_countdown %1
     cmp byte[BGFB+ebx],0
     jne %%nogo
     %4 %5, %%nogo
@@ -1013,7 +1028,7 @@
     jnz near %%proclinebyline
     test dword[bg1change+ebx+%1*256+4],0FFFFFFFFh
     jnz near %%proclinebyline
-    cmp byte[BGMA+ebx],5
+    cmp byte[BGMA+ebx],4
     jae near %%proclinebyline
     cmp byte[BGMA+ebx],2
     je near %%proclinebyline
@@ -1047,6 +1062,7 @@
 ;    add esi,16+288
     xor ebx,ebx
 %%nextline
+    mosaic_countdown %1
     cmp byte[BGFB+ebx],0
     jne %%nogo
     %4 %5, %%nogo
@@ -1127,6 +1143,7 @@
 ;    add esi,16*2+288*2
     xor ebx,ebx
 %%nextline
+    mosaic_countdown %1
     cmp byte[BGFB+ebx],0
     jne %%nogo
     %5 %6, %%nogo
@@ -1148,8 +1165,8 @@
     jmp %%donextbg
 %%tile
     push esi
-    mov eax,[cpalval+ebx*4]
-    mov [CPalPtrng],eax
+;    mov eax,[cpalval+ebx*4]
+;    mov [CPalPtrng],eax
     call %3
     pop esi
     add ebx,8
@@ -1166,6 +1183,7 @@
     add esi,16*2
     xor ebx,ebx
 %%nextline
+    mosaic_countdown %1
     cmp byte[BGFB+ebx],0
     jne near %%nogo
     %5 %6, %%nogo
@@ -1192,8 +1210,8 @@
     jmp %%donextbg
 %%tile
     push esi
-    mov eax,[cpalval+ebx*4]
-    mov [CPalPtrng],eax
+;    mov eax,[cpalval+ebx*4]
+;    mov [CPalPtrng],eax
     call %3
     pop esi
     add ebx,8
@@ -1210,6 +1228,7 @@
     add esi,16*2
     xor ebx,ebx
 %%nextline
+    mosaic_countdown %1
     cmp byte[BGFB+ebx],0
     jne near %%nogo
     %5 %6, %%nogo
@@ -1235,8 +1254,8 @@
     jmp %%donextbg
 %%tile
     push esi
-    mov eax,[cpalval+ebx*4]
-    mov [CPalPtrng],eax
+;    mov eax,[cpalval+ebx*4]
+;    mov [CPalPtrng],eax
     call %3
     pop esi
     add ebx,8
@@ -1433,17 +1452,18 @@
     push esi
     push ebx
     test byte[scadsng+ebx],1
-    jnz %%directmode
+    jz %%nodirectmode
+    mov cl,[vidbright]
+    cmp cl,[prevbrightdc]
+    je %%nodcchange
+    mov [prevbrightdc],cl
+    call Gendcolortable
+%%nodcchange
+    mov ebp,dcolortab
+%%nodirectmode
     push esi
     push ebx
     call drawmode7win16b
-    pop ebx
-    pop esi
-    jmp %%donemode7
-%%directmode
-    push esi
-    push ebx
-    call drawmode7win16bd
     pop ebx
     pop esi
 %%donemode7
@@ -1456,12 +1476,7 @@
     je %%nogoc
     cmp byte[scanlines],0
     jne %%nogoc
-    test byte[scadsng+ebx],1
-    jnz %%directmodeb
     call processmode7hires16b
-    jmp %%nogoc
-%%directmodeb
-    call processmode7hires16bd
 %%nogoc
 
 %%nogo
@@ -1717,7 +1732,7 @@
 
 %macro tilenormalb 1
     cmp word[ecx+%1],0FFFFh
-    je %%nott
+    je short %%nott
     mov bx,[ecx+%1]
     mov [edi+%1],bx
 %%nott
@@ -1736,7 +1751,7 @@
 
 %macro tilenormalbs 1
     cmp word[ecx+%1],0FFFFh
-    je %%nott
+    je short %%nott
     mov bx,[ecx+%1]
     mov [edi+%1+75036*2],bx
 %%nott
@@ -1759,7 +1774,7 @@
 
 %macro tilenormalbt 1
     cmp word[ecx+%1],0FFFFh
-    je %%nott
+    je short %%nott
     mov bx,[ecx+%1]
     or bx,[UnusedBit]
     mov [edi+%1],bx
@@ -1783,7 +1798,7 @@
 
 %macro tilenormalbmsnt 1
     cmp word[ecx+%1],0FFFFh
-    je %%nott
+    je short %%nott
     mov bx,[ecx+%1]
     mov [edi+%1],bx
     mov [edi+%1+75036*2],bx
@@ -1811,7 +1826,7 @@
 
 %macro tilenormalbmst 1
     cmp word[ecx+%1],0FFFFh
-    je %%nott
+    je short %%nott
     mov bx,[ecx+%1]
     mov [edi+%1+75036*2],bx
     or bx,[UnusedBit]
@@ -1832,7 +1847,7 @@
     %7
     jnz near %%docache
     cmp byte[%9+ecx],dl
-    je %%returnfromcache
+    je short %%returnfromcache
     mov [%9+ecx],dl
     call %10
 %%returnfromcache
@@ -1843,7 +1858,7 @@
     %2
     ; start drawing from ecx
     test dword[vrama+eax],4000h
-    jz %%noflipxfull
+    jz short %%noflipxfull
     add ecx,128
 %%noflipxfull
     test dword[vrama+eax],8000h
@@ -1871,7 +1886,7 @@
     %2
     ; start drawing from ecx to edi
     test word[vrama+eax],4000h
-    jz %%noflipxpart
+    jz short %%noflipxpart
     add ecx,128
 %%noflipxpart
     test word[vrama+eax],8000h
@@ -1942,11 +1957,11 @@
     add ecx,[ngptrdat2]
     add cx,[taddnfy16x16]
     test dword[vrama+eax],8000h
-    jz %%noflipy
+    jz short %%noflipy
     add cx,[taddfy16x16]
 %%noflipy
     test dword[vrama+eax],4000h
-    jz %%noflipx
+    jz short %%noflipx
     inc cx
 %%noflipx
 %%nexttile
@@ -1956,7 +1971,7 @@
     %7
     jnz near %%docache
     cmp byte[%9+ecx],dl
-    je %%returnfromcache
+    je short %%returnfromcache
     mov [%9+ecx],dl
     call %10
 %%returnfromcache
@@ -1967,7 +1982,7 @@
     %2
     ; start drawing from ecx
     test dword[vrama+eax],4000h
-    jz %%noflipxfull
+    jz short %%noflipxfull
     add ecx,128
 %%noflipxfull
     test dword[vrama+eax],8000h
@@ -1995,7 +2010,7 @@
     %2
     ; start drawing from ecx to edi
     test word[vrama+eax],4000h
-    jz %%noflipxpart
+    jz short %%noflipxpart
     add ecx,128
 %%noflipxpart
     test word[vrama+eax],8000h
@@ -2038,7 +2053,7 @@
     pop ecx
     inc cx
     test dword[vrama+eax],4000h
-    jz %%noflipxb
+    jz short %%noflipxb
     sub cx,2
 %%noflipxb
     add edi,16
@@ -2097,6 +2112,7 @@
 %endmacro
 
 %macro drawbgtileng16b 2
+    mov byte[curmosaicsz],1
     mov dword[ng16bprval],0
     mov dword[ng16bbgval],%1
     cmp byte[t16x161+ebx+%1*256],1
@@ -2133,6 +2149,7 @@
     mov edx,[colormodedef+edx*4+%1]
     neg edi
     add edi,edi
+    mov ebp,[cpalval+ebx*4]
     cmp dl,2
     jne near .no4bit
     shr ecx,5
@@ -2179,6 +2196,16 @@
     mov [ngptrdat2],ecx
     mov [ngceax+%2*1024+ebx*4],eax
     mov [ngcedi+%2*1024+ebx*4],edi
+    test byte[scadsng+ebx],1
+    jz .nodirect
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchange
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchange
+    mov ebp,dcolortab
+.nodirect
     ; eax = pointer to beginning of tile area
     ProcessBuildWindow %1
     mov ecx,ebx
@@ -2229,6 +2256,7 @@
     mov edx,[colormodedef+edx*4+%1]
     neg edi
     add edi,edi
+    mov ebp,[cpalval+ebx*4]
     cmp dl,2
     jne near .no4bit2
     shr ecx,5
@@ -2268,13 +2296,23 @@
     jmp drawtileng16x162b16b
 .no2bit2
     cmp dl,3
-    jne near .no8bit
+    jne near .no8bit2
     shr ecx,6
     add edi,esi
     mov [ngptrdat+%2*1024+ebx*4],ecx
     mov [ngptrdat2],ecx
     mov [ngceax+%2*1024+ebx*4],eax
     mov [ngcedi+%2*1024+ebx*4],edi
+    test byte[scadsng+ebx],1
+    jz .nodirect2
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchange2
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchange2
+    mov ebp,dcolortab
+.nodirect2
     ; eax = pointer to beginning of tile area
     ProcessBuildWindow %1
     mov ecx,ebx
@@ -2287,6 +2325,7 @@
 %endmacro
 
 %macro drawbgtilengpr116b 2
+    mov byte[curmosaicsz],1
     mov dword[ng16bprval],2000h
     mov dword[ng16bbgval],%1
     cmp byte[t16x161+ebx+%1*256],1
@@ -2301,6 +2340,7 @@
     mov [ngptrdat2],ecx
     mov eax,[ngceax+%2*1024+ebx*4]
     mov edi,[ngcedi+%2*1024+ebx*4]
+    mov ebp,[cpalval+ebx*4]
     cmp dl,2
     jne near .no4bit
     ; eax = pointer to beginning of tile area
@@ -2329,6 +2369,16 @@
 .no2bit
     cmp dl,3
     jne near .no8bit
+    test byte[scadsng+ebx],1
+    jz .nodirect
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchange
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchange
+    mov ebp,dcolortab
+.nodirect
     ; eax = pointer to beginning of tile area
     ProcessBuildWindow %1
     mov ecx,ebx
@@ -2359,6 +2409,7 @@
     mov [ngptrdat2],ecx
     mov eax,[ngceax+%2*1024+ebx*4]
     mov edi,[ngcedi+%2*1024+ebx*4]
+    mov ebp,[cpalval+ebx*4]
     cmp dl,2
     jne near .no4bit2
     ; eax = pointer to beginning of tile area
@@ -2387,6 +2438,16 @@
 .no2bit2
     cmp dl,3
     jne near .no8bit2
+    test byte[scadsng+ebx],1
+    jz .nodirect2
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchange2
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchange2
+    mov ebp,dcolortab
+.nodirect2
     ; eax = pointer to beginning of tile area
     ProcessBuildWindow %1
     mov ecx,ebx
@@ -2414,7 +2475,7 @@
     mov bl,[esi+%1]
     add bl,dl
     test bl,%3
-    jz %%nodraw
+    jz short %%nodraw
     mov cx,[eax+ebx*2]
     mov [edi+%2],cx
 %%nodraw
@@ -2436,7 +2497,7 @@
     mov bl,[esi+%1]
     add bl,dl
     test bl,%3
-    jz %%nodraw
+    jz short %%nodraw
     mov cx,[eax+ebx*2+512]
     mov [edi+%2],cx
 %%nodraw
@@ -2458,7 +2519,7 @@
     mov bl,[esi+%1]
     add bl,dl
     test bl,%3
-    jz %%nodraw
+    jz short %%nodraw
     mov cx,[eax+ebx*2]
     mov [edi+%2],cx
 %%nodraw
@@ -2472,8 +2533,8 @@
     mov bx,[eax+ebx*2+512]
     shl ebx,16
     mov bx,[eax+ecx*2+512]
-    and ebx,[UnusedBitXor]
     mov [edi+%3],ebx
+    and ebx,[UnusedBitXor]
     mov [edi+%3+75036*2],ebx
     xor ebx,ebx
 %endmacro
@@ -2482,7 +2543,7 @@
     mov bl,[esi+%1]
     add bl,dl
     test bl,%3
-    jz %%nodraw
+    jz short %%nodraw
     mov cx,[eax+ebx*2+512]
     mov [edi+%2],cx
     and cx,[UnusedBitXor]
@@ -2507,7 +2568,7 @@
     mov bl,[esi+%1]
     add bl,dl
     test bl,%3
-    jz %%nodraw
+    jz short %%nodraw
     mov cx,[eax+ebx*2]
     mov [edi+%2],cx
     mov [edi+%2+75036*2],cx
@@ -2530,7 +2591,7 @@
     mov bl,[esi+%1]
     add bl,dl
     test bl,%3
-    jz %%nodraw
+    jz short %%nodraw
     mov cx,[eax+ebx*2]
     mov [edi+%2+75036*2],cx
 %%nodraw
@@ -2557,7 +2618,7 @@
     %2
     ; start drawing from ecx
     test dword[vrama+eax],8000h
-    jz %%notflipyfull
+    jz short %%notflipyfull
     add ecx,[flipyposng]
     jmp %%yesflipyfull
 %%notflipyfull
@@ -2592,7 +2653,7 @@
     %2
     ; start drawing from ecx to edi
     test word[vrama+eax],8000h
-    jz %%noflipypart
+    jz short %%noflipypart
     add ecx,[flipyposng]
     jmp %%yesflipypart
 %%noflipypart
@@ -2661,11 +2722,11 @@
     add ecx,[ngptrdat2]
     add cx,[taddnfy16x16]
     test dword[vrama+eax],8000h
-    jz %%noflipy
+    jz short %%noflipy
     add cx,[taddfy16x16]
 %%noflipy
     test dword[vrama+eax],4000h
-    jz %%noflipx
+    jz short %%noflipx
     inc cx
 %%noflipx
 %%nexttile
@@ -2682,7 +2743,7 @@
     %2
     ; start drawing from ecx
     test word[vrama+eax],8000h
-    jz %%noflipyfull
+    jz short %%noflipyfull
     add ecx,[flipyposng]
     jmp %%yesflipyfull
 %%noflipyfull
@@ -2717,7 +2778,7 @@
     %2
     ; start drawing from ecx to edi
     test word[vrama+eax],8000h
-    jz %%noflipypart
+    jz short %%noflipypart
     add ecx,[flipyposng]
     jmp %%yesflipypart
 %%noflipypart
@@ -2758,7 +2819,7 @@
     pop ecx
     inc cx
     test dword[vrama+eax],4000h
-    jz %%noflipxb
+    jz short %%noflipxb
     sub cx,2
 %%noflipxb
     add edi,16
@@ -2788,168 +2849,6 @@
     jmp %%next
 %endmacro
 
-%macro offsetmode16x16 2
-.offsetm16x16
-    pushad
-    xor edx,edx
-    mov dx,[BG3SYl+ebx*2]
-    and dx,3FFh
-    shr edx,3
-    shl edx,6
-    xor eax,eax
-    mov ax,[BGPT3+ebx*2]
-    add ax,dx
-    xor edx,edx
-    mov dx,[BG3SXl+ebx*2]
-    and dx,0F8h
-    mov [ofsmcyps],ebx
-    shr edx,3
-    shl edx,1
-    add ax,dx
-    cmp word[BG3SYl+ebx*2],0fff7h
-    jbe .nooma16x16
-    add ax,780h
-.nooma16x16
-    cmp byte[BGMA+ebx],4
-    je .offsetm416x16
-    add eax,40h
-.offsetm416x16
-    mov edx,eax
-    and edx,0FFFFFFC0h
-    add edx,[vram]
-    mov [ofsmcptr],edx
-    and eax,3Fh
-    mov [ofsmcptr2],eax
-    mov eax,[BGPT1Y+ebx*2+%1*512]
-    mov [ofsmady],eax
-    mov eax,[BGPT1X+ebx*2+%1*512]
-    mov [ofsmadx],eax
-    mov eax,[BGPT1+ebx*2+%1*512]
-    mov [ofsmtptr],eax
-    mov [ofsmtptrs],eax
-    test ecx,100h
-    jz .noyincd16x16
-    add eax,[BGPT1Y+ebx*2+%1*512]
-.noyincd16x16
-    lea ecx,[ecx*8]
-    mov edx,ecx
-    and ecx,07C0h      ; 1Fh*40h
-    and edx,38h
-    add eax,ecx
-    mov [yposng],edx
-    mov [yposngom],edx
-    xor edx,38h
-    mov ecx,[BG1SXl+ebx*2+%1*512]
-    mov [flipyposng],edx
-    mov [flipyposngom],edx
-    mov edx,[BGPT1X+ebx*2+%1*512]
-    test ecx,100h
-    jz .noxincd16x16
-    add eax,edx
-    add [ofsmtptr],edx
-    neg dx
-.noxincd16x16
-    mov edi,ecx
-    sub dx,64
-    and ecx,0F8h
-    and eax,0FFFFh
-    shr ecx,2
-    mov [bgtxadd],edx
-    mov [bgtxad+ebx*2+%2*512],dx
-    add eax,ecx
-    add [ofsmtptr],ecx
-    mov [ofsmmptr],eax
-    mov dword[ofshvaladd],0
-    popad
-
-    mov eax,[BGPT1+ebx*2+%1*512]
-    mov [ofsmtptr],eax
-    mov [ofsmtptrs],eax
-
-    mov dword[taddnfy16x16],0
-    mov dword[taddfy16x16],16
-    test ecx,08h
-    jz .nobottomy16om
-    mov dword[taddnfy16x16],16
-    mov dword[taddfy16x16],-16
-.nobottomy16om
-    mov eax,[BGPT1+ebx*2+%1*512]
-    test ecx,200h
-    jz .noyinc216om
-    add eax,[BGPT1Y+ebx*2+%1*512]
-.noyinc216om
-    lea edx,[ecx*8]
-    lea ecx,[ecx*4]
-    and edx,38h
-    and ecx,07C0h      ; 1Fh*40h
-    mov [yposng],edx
-    xor edx,38h
-    add eax,ecx
-    mov [flipyposng],edx
-    mov [flipyposngom],edx
-    mov ecx,[BG1SXl+ebx*2+%1*512]
-    mov edx,[BGPT1X+ebx*2+%1*512]
-    test ecx,200h
-    jz .noxinc216om
-    add eax,edx
-    add [ofsmtptr],edx
-    neg dx
-.noxinc216om
-    mov edi,ecx
-    sub dx,64
-    and ecx,1F0h
-    and eax,0FFFFh
-    shr ecx,3
-    mov [bgtxadd],edx
-    mov [bgtxad+ebx*2+%2*512],dx
-    add eax,ecx
-    add [ofsmtptr],ecx
-    mov [ofsmmptr],eax
-
-    mov word[bgtxadd2],0
-    cmp word[BGPT3X+ebx*2],0
-    je %%yesoverfl
-    mov cx,[BG3SXl+ebx*2]
-    add cx,16
-    test cx,100h
-    jz %%notoverfl
-    add dword[ofsmcptr],800h
-    sub word[bgtxadd2],800h
-    jmp %%yesoverfl
-%%notoverfl
-    add word[bgtxadd2],800h
-%%yesoverfl
-
-    mov ecx,[BGOPT1+ebx*2+%1*512]
-    mov edx,[BGMA+ebx]
-    and edi,0Fh
-    and edx,07h
-    and ecx,0FFFFh
-    mov edx,[colormodedef+edx*4+%1]
-    neg edi
-    add edi,edi
-    cmp dl,2
-    jne near .no4bitom16x16
-    shr ecx,5
-    add edi,esi
-    mov [ngptrdat+%2*1024+ebx*4],ecx
-    mov [ngptrdat2],ecx
-    mov [ngceax+%2*1024+ebx*4],eax
-    mov [ngcedi+%2*1024+ebx*4],edi
-    ; eax = pointer to beginning of tile area
-    mov dword[ofsmval],2000h << %1
-    mov dword[ofsmvalh],2000h << %1
-    mov dword[cbgval],%1
-    ProcessBuildWindow %1
-    mov ecx,ebx
-    mov dl,1 << %2
-    add ecx,%2*256
-    jmp drawlinengom16x164b16b
-.no4bitom16x16
-    pop ebx
-    ret
-%endmacro
-
 %macro drawbglineng16b 2
     mov dword[ng16bprval],0
     mov [pesimpng],esi
@@ -2971,23 +2870,14 @@
     jz %%nomosaic
     inc al
     mov [curmosaicsz],al
-    mov cl,al
-    mov al,bl
-    div cl
-    mul cl
-    mov ebx,eax
     mov edi,xtravbuf+32
     mov ecx,128
     mov eax,0FFFFFFFFh
     mov esi,xtravbuf+32
     rep stosd
-    or ebx,ebx
-    jnz %%nozeroline
-    inc ebx
-%%nozeroline
     mov ecx,[BG1SYl+ebx*2+%1*512]
     and ecx,0FFFFh
-    add ecx,ebx
+    add ecx,[mosstart+%1*4]
 %%nomosaic
     cmp byte[BGMA+ebx],5
     jae near .tiles16x8
@@ -3082,6 +2972,17 @@
     mov [ngptrdat2],ecx
     mov [ngceax+%2*1024+ebx*4],eax
     mov [ngcedi+%2*1024+ebx*4],edi
+    test byte[scadsng+ebx],1
+    jz .nodirect
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchange
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchange
+    mov ecx,dcolortab
+    mov [CPalPtrng],ecx
+.nodirect
     ; eax = pointer to beginning of tile area
     ProcessBuildWindow %1
     mov ecx,ebx
@@ -3175,13 +3076,24 @@
     jmp drawlineng16x162b16b
 .no2bit2
     cmp dl,3
-    jne near .no8bit
+    jne near .no8bit2
     shr ecx,6
     add edi,esi
     mov [ngptrdat+%2*1024+ebx*4],ecx
     mov [ngptrdat2],ecx
     mov [ngceax+%2*1024+ebx*4],eax
     mov [ngcedi+%2*1024+ebx*4],edi
+    test byte[scadsng+ebx],1
+    jz .nodirect2
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchange2
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchange2
+    mov ecx,dcolortab
+    mov [CPalPtrng],ecx
+.nodirect2
     ; eax = pointer to beginning of tile area
     ProcessBuildWindow %1
     mov ecx,ebx
@@ -3288,8 +3200,184 @@
     pop ebx
     ret
 
+.offsetm16x16
+    xor edx,edx
+    mov dx,[BG3SYl+ebx*2]
+    and dx,3FFh
+    shr edx,3
+    shl edx,6
+    xor eax,eax
+    mov ax,[BGPT3+ebx*2]
+    add ax,dx
+    xor edx,edx
+    mov dx,[BG3SXl+ebx*2]
+    and dx,0F8h
+    mov [ofsmcyps],ebx
+    cmp byte[curmosaicsz],1
+    je %%nomosopt16x16
+    mov edi,[mosstart+%1*4]
+    mov [ofsmcyps],edi
+%%nomosopt16x16
+    shr edx,3
+    shl edx,1
+    add ax,dx
+    cmp word[BG3SYl+ebx*2],0fff7h
+    jbe .nooma16x16
+    add ax,780h
+.nooma16x16
+;    cmp byte[BGMA+ebx],4
+;    je .offsetm416x16
+    add eax,40h
+.offsetm416x16
+    mov edx,eax
+    and edx,0FFFFFFC0h
+    add edx,[vram]
+    mov [ofsmcptr],edx
+    and eax,3Fh
+    mov [ofsmcptr2],eax
+    mov eax,[BGPT1Y+ebx*2+%1*512]
+    mov [ofsmady],eax
+    mov eax,[BGPT1X+ebx*2+%1*512]
+    mov [ofsmadx],eax
+    mov eax,[BGPT1+ebx*2+%1*512]
+    mov [ofsmtptr],eax
+    mov [ofsmtptrs],eax
+
+    mov dword[taddnfy16x16],0
+    mov dword[taddfy16x16],16
+    test ecx,08h
+    jz .nobottomy16om
+    mov dword[taddnfy16x16],16
+    mov dword[taddfy16x16],-16
+.nobottomy16om
+    test ecx,200h
+    jz .noyinc216om
+    add eax,[BGPT1Y+ebx*2+%1*512]
+.noyinc216om
+    lea edx,[ecx*8]
+    lea ecx,[ecx*4]
+    and edx,38h
+    and ecx,07C0h      ; 1Fh*40h
+    mov [yposng],edx
+    mov [yposngom],edx
+    xor edx,38h
+    add eax,ecx
+    mov [flipyposng],edx
+    mov [flipyposngom],edx
+    mov ecx,[BG1SXl+ebx*2+%1*512]
+    mov edx,[BGPT1X+ebx*2+%1*512]
+    test ecx,200h
+    jz .noxinc216om
+    add eax,edx
+    add [ofsmtptr],edx
+    neg dx
+.noxinc216om
+    mov edi,ecx
+    sub dx,64
+    and ecx,1F0h
+    and eax,0FFFFh
+    shr ecx,3
+    mov [bgtxadd],edx
+    mov [bgtxad+ebx*2+%2*512],dx
+    add eax,ecx
+    add [ofsmtptr],ecx
+    mov [ofsmmptr],eax
+
+    mov word[bgtxadd2],0
+    cmp word[BGPT3X+ebx*2],0
+    je %%yesoverfl
+    mov cx,[BG3SXl+ebx*2]
+    add cx,16
+    test cx,100h
+    jz %%notoverfl
+    add dword[ofsmcptr],800h
+    sub word[bgtxadd2],800h
+    jmp %%yesoverfl
+%%notoverfl
+    add word[bgtxadd2],800h
+%%yesoverfl
+
+    mov dword[ofshvaladd],0
+    mov ecx,[BGOPT1+ebx*2+%1*512]
+    mov edx,[BGMA+ebx]
+    and edi,0Fh
+    and edx,07h
+    and ecx,0FFFFh
+    mov edx,[colormodedef+edx*4+%1]
+    neg edi
+    add edi,edi
+    cmp dl,2
+    jne near .no4bitom16x16
+    shr ecx,5
+    add edi,esi
+    mov [ngptrdat+%2*1024+ebx*4],ecx
+    mov [ngptrdat2],ecx
+    mov [ngceax+%2*1024+ebx*4],eax
+    mov [ngcedi+%2*1024+ebx*4],edi
+    ; eax = pointer to beginning of tile area
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom16x164b16b
+.no4bitom16x16
+
+    cmp dl,1
+    jne near .no2bitom16x16
+    shr ecx,4
+    add edi,esi
+    mov [ngptrdat+%2*1024+ebx*4],ecx
+    mov [ngptrdat2],ecx
+    mov [ngceax+%2*1024+ebx*4],eax
+    mov [ngcedi+%2*1024+ebx*4],edi
+    ; eax = pointer to beginning of tile area
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov dword[mode0add],0
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom16x162b16b
+.no2bitom16x16
+
+    cmp dl,3
+    jne near .no8bitom16x16
+    shr ecx,6
+    add edi,esi
+    mov [ngptrdat+%2*1024+ebx*4],ecx
+    mov [ngptrdat2],ecx
+    mov [ngceax+%2*1024+ebx*4],eax
+    mov [ngcedi+%2*1024+ebx*4],edi
+    test byte[scadsng+ebx],1
+    jz .nodirectom16x16
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchangeom16x16
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchangeom16x16
+    mov ecx,dcolortab
+    mov [CPalPtrng],ecx
+.nodirectom16x16
+    ; eax = pointer to beginning of tile area
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom16x168b16b
+.no8bitom16x16
+    pop ebx
+    ret
+
     ; Offsetmode calculation : <b2-7,2109>*1024+<b3-7,2112>*32+<b3-7,2111>
-    offsetmode16x16 %1,%2
 .offsetm
     cmp byte[t16x161+ebx+%1*256],1
     je near .offsetm16x16
@@ -3311,6 +3399,11 @@
     mov dx,[BG3SXl+ebx*2]
     and dx,0F8h
     mov [ofsmcyps],ebx
+    cmp byte[curmosaicsz],1
+    je %%nomosopt
+    mov edi,[mosstart+%1*4]
+    mov [ofsmcyps],edi
+%%nomosopt
     shr edx,3
     shl edx,1
     add ax,dx
@@ -3412,7 +3505,6 @@
 .no4bitd
     cmp dl,1
     jne near .no2bitdn
-    ; eax = pointer to beginning of tile area
     shr ecx,4
     add edi,esi
     mov [ngptrdat+%2*1024+ebx*4],ecx
@@ -3420,32 +3512,44 @@
     mov [ngceax+%2*1024+ebx*4],eax
     mov [ngcedi+%2*1024+ebx*4],edi
     ; eax = pointer to beginning of tile area
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
     mov dword[mode0add],0
-    mov byte[tleftn],33
-
-.loopdn
-    mov cx,[vrama+eax]
-    test cx,2000h
-    jnz near .fintiledn
-    drawlinengom216b tltype2b, preparet2ba, cachesingle2bng,.loopdn,.fintiledn,ngpalcon2b,test2ba,03h,%1
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom2b16b
 .no2bitdn
     cmp dl,3
     jne near .no8bitdn
-    ; eax = pointer to beginning of tile area
     shr ecx,6
     add edi,esi
     mov [ngptrdat+%2*1024+ebx*4],ecx
     mov [ngptrdat2],ecx
     mov [ngceax+%2*1024+ebx*4],eax
     mov [ngcedi+%2*1024+ebx*4],edi
+    test byte[scadsng+ebx],1
+    jz .nodirectdn
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchangedn
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchangedn
+    mov ecx,dcolortab
+    mov [CPalPtrng],ecx
+.nodirectdn
     ; eax = pointer to beginning of tile area
-    mov byte[tleftn],33
-
-.loopdn2
-    mov cx,[vrama+eax]
-    test cx,2000h
-    jnz near .fintiledn2
-    drawlinengom216b tltype8b, preparet8ba, cachesingle8bng,.loopdn2,.fintiledn2,ngpalcon8b,test8ba,0FFh,%1
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom8b16b
 .no8bitdn
     pop ebx
     ret
@@ -3458,7 +3562,6 @@
     dec ecx
     jnz near .next
     pop esi
-    mov dword[ignor512],0
     ret
 %endmacro
 
@@ -3476,19 +3579,11 @@
     jz %%nomosaic
     inc al
     mov [curmosaicsz],al
-    mov cl,al
-    mov al,bl
-    div cl
-    mul cl
-    mov ebx,eax
     mov edi,xtravbuf+32
     mov ecx,128
     mov eax,0FFFFFFFFh
     mov esi,xtravbuf+32
     rep stosd
-    or ebx,ebx
-    jnz %%nomosaic
-    inc ebx
 %%nomosaic
     cmp byte[BGMA+ebx],5
     jae near .tiles16x8
@@ -3504,10 +3599,19 @@
     mov eax,[BG1SYl+ebx*2+%1*512]
     and eax,0FFFFh
     add eax,ebx
+    cmp byte[curmosaicsz],1
+    je %%nomos
+    sub eax,ebx
+    add eax,[mosstart+%1*4]
+%%nomos
     test byte[intrlng+ebx],01h
     jz %%nointerl
     add eax,ebx
     add eax,[cfieldad]
+    cmp byte[curmosaicsz],1
+    je %%nointerl
+    sub eax,ebx
+    add eax,[mosstart+%1*4]
 %%nointerl
     lea eax,[eax*8]
     and eax,38h
@@ -3551,6 +3655,17 @@
 .no2bit
     cmp dl,3
     jne near .no8bit
+    test byte[scadsng+ebx],1
+    jz .nodirect
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchange
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchange
+    mov ecx,dcolortab
+    mov [CPalPtrng],ecx
+.nodirect
     ; eax = pointer to beginning of tile area
     ProcessBuildWindow %1
     mov ecx,ebx
@@ -3564,15 +3679,24 @@
 .tiles16x16
     mov ecx,[BG1SYl+ebx*2+%1*512]
     and ecx,0FFFFh
-    mov dword[taddnfy16x16],0
     add ecx,ebx
+    cmp byte[curmosaicsz],1
+    je %%nomos16x16
+    sub ecx,ebx
+    add ecx,[mosstart+%1*4]
+%%nomos16x16
 
     test byte[intrlng+ebx],01h
     jz %%nointerl7
     add ecx,ebx
     add ecx,[cfieldad]
+    cmp byte[curmosaicsz],1
+    je %%nointerl7
+    sub ecx,ebx
+    add ecx,[mosstart+%1*4]
 %%nointerl7
 
+    mov dword[taddnfy16x16],0
     mov dword[taddfy16x16],16
     test ecx,08h
     jz .nobottomy
@@ -3623,6 +3747,17 @@
 .no2bit2
     cmp dl,3
     jne near .no8bit2
+    test byte[scadsng+ebx],1
+    jz .nodirect2
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchange2
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchange2
+    mov ecx,dcolortab
+    mov [CPalPtrng],ecx
+.nodirect2
     ; eax = pointer to beginning of tile area
     ProcessBuildWindow %1
     mov ecx,ebx
@@ -3637,11 +3772,20 @@
     mov ecx,[BG1SYl+ebx*2+%1*512]
     and ecx,0FFFFh
     add ecx,ebx
+    cmp byte[curmosaicsz],1
+    je %%nomos16x8
+    sub ecx,ebx
+    add ecx,[mosstart+%1*4]
+%%nomos16x8
 
     test byte[intrlng+ebx],01h
     jz %%nointerl8
     add ecx,ebx
     add ecx,[cfieldad]
+    cmp byte[curmosaicsz],1
+    je %%nointerl8
+    sub ecx,ebx
+    add ecx,[mosstart+%1*4]
 %%nointerl8
 
     mov dword[taddnfy16x16],0
@@ -3694,7 +3838,160 @@
     pop ebx
     ret
 
-    offsetmode16x16 %1,%2
+.offsetm16x16
+    xor edx,edx
+    mov dx,[BG3SYl+ebx*2]
+    and dx,3FFh
+    shr edx,3
+    shl edx,6
+    xor eax,eax
+    mov ax,[BGPT3+ebx*2]
+    add ax,dx
+    xor edx,edx
+    mov dx,[BG3SXl+ebx*2]
+    and dx,0F8h
+    mov [ofsmcyps],ebx
+    cmp byte[curmosaicsz],1
+    je %%nomosopt16x16
+    mov edi,[mosstart+%1*4]
+    mov [ofsmcyps],edi
+%%nomosopt16x16
+    shr edx,3
+    shl edx,1
+    add ax,dx
+    cmp word[BG3SYl+ebx*2],0fff7h
+    jbe .nooma16x16
+    add ax,780h
+.nooma16x16
+;    cmp byte[BGMA+ebx],4
+;    je .offsetm416x16
+    add eax,40h
+.offsetm416x16
+    mov edx,eax
+    and edx,0FFFFFFC0h
+    add edx,[vram]
+    mov [ofsmcptr],edx
+    and eax,3Fh
+    mov [ofsmcptr2],eax
+    mov eax,[BGPT1Y+ebx*2+%1*512]
+    mov [ofsmady],eax
+    mov eax,[BGPT1X+ebx*2+%1*512]
+    mov [ofsmadx],eax
+    mov eax,[BGPT1+ebx*2+%1*512]
+    mov [ofsmtptr],eax
+    mov [ofsmtptrs],eax
+
+    mov ecx,[BG1SXl+ebx*2+%1*512]
+    mov edx,[BGPT1X+ebx*2+%1*512]
+    test ecx,200h
+    jz .noxinc216om
+    add [ofsmtptr],edx
+.noxinc216om
+    and ecx,1F0h
+    shr ecx,3
+    add [ofsmtptr],ecx
+
+    mov eax,[BG1SYl+ebx*2+%1*512]
+    and eax,0FFFFh
+    add eax,ebx
+    cmp byte[curmosaicsz],1
+    je %%nomosopt116x16
+    sub eax,ebx
+    add eax,[mosstart+%1*4]
+%%nomosopt116x16
+    mov dword[taddnfy16x16],0
+    mov dword[taddfy16x16],16
+    test eax,08h
+    jz .nobottomy16om2
+    mov dword[taddnfy16x16],16
+    mov dword[taddfy16x16],-16
+.nobottomy16om2
+    lea eax,[eax*8]
+    and eax,38h
+    mov [yposng],eax
+    mov [yposngom],eax
+    xor eax,38h
+    mov [flipyposng],eax
+    mov [flipyposngom],eax
+    mov edx,[BGMA+ebx]
+    mov ecx,[bgtxad+ebx*2+%2*512]
+    and edx,07h
+    mov [bgtxadd],cx
+    mov ecx,[ngptrdat+%2*1024+ebx*4]
+    mov edx,[colormodedef+edx*4+%1]
+    mov [ngptrdat2],ecx
+    mov eax,[ngceax+%2*1024+ebx*4]
+    mov edi,[ngcedi+%2*1024+ebx*4]
+    mov [ofsmmptr],eax
+    mov dword[ofshvaladd],0
+
+    mov word[bgtxadd2],0
+    cmp word[BGPT3X+ebx*2],0
+    je %%yesoverfl
+    mov cx,[BG3SXl+ebx*2]
+    add cx,16
+    test cx,100h
+    jz %%notoverfl
+    add dword[ofsmcptr],800h
+    sub word[bgtxadd2],800h
+    jmp %%yesoverfl
+%%notoverfl
+    add word[bgtxadd2],800h
+%%yesoverfl
+
+    cmp dl,2
+    jne near .no4bitom16x16
+    ; eax = pointer to beginning of tile area
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom16x164b16b
+.no4bitom16x16
+
+    cmp dl,1
+    jne near .no2bitom16x16
+    ; eax = pointer to beginning of tile area
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov dword[mode0add],0
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom16x162b16b
+.no2bitom16x16
+
+    cmp dl,3
+    jne near .no8bitom16x16
+    test byte[scadsng+ebx],1
+    jz .nodirectom16x16
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchangeom16x16
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchangeom16x16
+    mov ecx,dcolortab
+    mov [CPalPtrng],ecx
+.nodirectom16x16
+    ; eax = pointer to beginning of tile area
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom16x168b16b
+.no8bitom16x16
+    pop ebx
+    ret
+
 .offsetm
     cmp byte[t16x161+ebx+%1*256],1
     je near .offsetm16x16
@@ -3713,6 +4010,11 @@
     mov dx,[BG3SXl+ebx*2]
     and dx,0F8h
     mov [ofsmcyps],ebx
+    cmp byte[curmosaicsz],1
+    je %%nomosopt
+    mov edi,[mosstart+%1*4]
+    mov [ofsmcyps],edi
+%%nomosopt
     shr edx,3
     shl edx,1
     add ax,dx
@@ -3764,6 +4066,11 @@
     mov eax,[BG1SYl+ebx*2+%1*512]
     and eax,0FFFFh
     add eax,ebx
+    cmp byte[curmosaicsz],1
+    je %%nomosopt1
+    sub eax,ebx
+    add eax,[mosstart+%1*4]
+%%nomosopt1
     lea eax,[eax*8]
     and eax,38h
     mov [yposng],eax
@@ -3797,24 +4104,38 @@
     cmp dl,1
     jne near .no2bitdn
     ; eax = pointer to beginning of tile area
-    mov byte[tleftn],33
-
-.loopdn
-    mov cx,[vrama+eax]
-    test cx,2000h
-    jz near .fintiledn
-    drawlinengom216b tltype2b, preparet2ba, cachesingle2bng,.loopdn,.fintiledn,ngpalcon2b,test2ba,03h,%1
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov dword[mode0add],0
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom2b16b
 .no2bitdn
     cmp dl,3
     jne near .no8bitdn
+    test byte[scadsng+ebx],1
+    jz .nodirectdn
+    mov dl,[vidbright]
+    cmp dl,[prevbrightdc]
+    je .nodcchangedn
+    mov [prevbrightdc],dl
+    call Gendcolortable
+.nodcchangedn
+    mov ecx,dcolortab
+    mov [CPalPtrng],ecx
+.nodirectdn
     ; eax = pointer to beginning of tile area
-    mov byte[tleftn],33
-
-.loopdn2
-    mov cx,[vrama+eax]
-    test cx,2000h
-    jz near .fintiledn2
-    drawlinengom216b tltype8b, preparet8ba, cachesingle8bng,.loopdn2,.fintiledn2,ngpalcon8b,test8ba,0FFh,%1
+    mov dword[ofsmval],2000h << %1
+    mov dword[ofsmvalh],2000h << %1
+    mov dword[cbgval],%1
+    ProcessBuildWindow %1
+    mov ecx,ebx
+    mov dl,1 << %2
+    add ecx,%2*256
+    jmp drawlinengom8b16b
 .no8bitdn
     pop ebx
     ret
