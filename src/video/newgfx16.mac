@@ -1402,6 +1402,9 @@
     xor edx,edx
     mul cl
     mov ebx,eax
+    or ebx,ebx
+    jnz %%nomosaic
+    inc ebx
 %%nomosaic
     ; process line by line
     mov edx,[mode7ab+ebx*4]
@@ -1520,6 +1523,9 @@
     xor edx,edx
     mul cl
     mov ebx,eax
+    or ebx,ebx
+    jnz %%nomosaic
+    inc ebx
 %%nomosaic
     ; process line by line
     mov edx,[mode7ab+ebx*4]
@@ -1602,6 +1608,9 @@
     xor edx,edx
     mul cl
     mov ebx,eax
+    or ebx,ebx
+    jnz %%nomosaic
+    inc ebx
 %%nomosaic
     ; process line by line
     mov edx,[mode7ab+ebx*4]
@@ -2817,9 +2826,7 @@
     mov ecx,[BG1SYl+ebx*2+%1*512]
     and ecx,0FFFFh
     add ecx,ebx
-    jmp %%yesmosaic
 %%nomosaic
-%%yesmosaic
     cmp byte[BGMA+ebx],5
     jae near .tiles16x8
     cmp byte[osm2dis],1
@@ -2827,13 +2834,12 @@
     cmp byte[BGMA+ebx],2
     je near .offsetm
     cmp byte[bgmode],4
-    je .nooffsetm4
+    je .nooffsetm
     cmp byte[BGMA+ebx],4
     je near .offsetm
-.nooffsetm4
+.nooffsetm
     cmp byte[t16x161+ebx+%1*256],1
     je near .tiles16x16
-.nooffsetm
     mov eax,[BGPT1+ebx*2+%1*512]
     test ecx,100h
     jz .noyinc
@@ -3138,12 +3144,9 @@
     shr edx,3
     shl edx,1
     add ax,dx
-    mov dx,[bg3scrolx]
-    test dx,1000h
-    jz .nooma16x16
-    and dx,0F000h
-    shr dx,5
-    add ax,dx
+    cmp word[BG3SYl+ebx*2],0fff7h
+    jbe .nooma16x16
+    add ax,780h
 .nooma16x16
     cmp byte[BGMA+ebx],4
     je .offsetm416x16
@@ -3306,12 +3309,9 @@
     shr edx,3
     shl edx,1
     add ax,dx
-    mov dx,[bg3scrolx]
-    test dx,1000h
-    jz .nooma
-    and dx,0F000h
-    shr dx,5
-    add ax,dx
+    cmp word[BG3SYl+ebx*2],0fff7h
+    jbe .nooma
+    add ax,780h
 .nooma
 ;    cmp byte[BGMA+ebx],4
 ;    je .offsetm4
@@ -3484,9 +3484,7 @@
     or ebx,ebx
     jnz %%nomosaic
     inc ebx
-    jmp %%yesmosaic
 %%nomosaic
-%%yesmosaic
     cmp byte[BGMA+ebx],5
     jae near .tiles16x8
     cmp byte[t16x161+ebx+%1*256],1
@@ -3707,12 +3705,9 @@
     shr edx,3
     shl edx,1
     add ax,dx
-    mov dx,[bg3scrolx]
-    test dx,1000h
-    jz .nooma
-    and dx,0F000h
-    shr dx,5
-    add ax,dx
+    cmp word[BG3SYl+ebx*2],0fff7h
+    jbe .nooma
+    add ax,780h
 .nooma
     mov edx,eax
 ;    cmp byte[BGMA+ebx],4
