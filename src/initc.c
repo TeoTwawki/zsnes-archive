@@ -1151,8 +1151,10 @@ bool NSRTHead(unsigned char *ROM)
 
 void calculate_state_sizes(), InitRewindVars(), zst_init();
 bool findZipIPS(char *, char *);
+bool PatchUsingIPS(char *);
 extern bool EMUPause;
 extern unsigned char device1, device2;
+extern unsigned char IPSPatched;
 unsigned char lorommapmode2, curromsize, snesinputdefault1, snesinputdefault2;
 bool input1gp, input1mouse, input2gp, input2mouse, input2scope, input2just;
 
@@ -1367,6 +1369,20 @@ void loadROM()
   if (curromspace)
   {
     unsigned char *ROM = (unsigned char *)romdata;
+
+    if (!IPSPatched)
+    {
+      int i;
+      char ext[4];
+
+      strcpy(ext, "ips");
+      for (i = 0; PatchUsingIPS(ext); i++)
+      {
+        if (i > 9) { break; }
+        ext[2] = i+'0';
+      }
+    }
+
     NumofBytes = curromspace;
     NumofBanks = curromspace >> 15;
     BankCheck();
@@ -1743,8 +1759,6 @@ void SPC7_Data_Load()
     fclose(fp);
   }
 }
-
-extern unsigned char IPSPatched;
 
 unsigned int showinfogui()
 {
@@ -2537,7 +2551,6 @@ void initsnes()
   }
 }
 
-bool PatchUsingIPS(char *);
 void DosExit(), OpenSramFile(), CheatCodeLoad(), LoadSecondState(), LoadGameSpecificInput();
 extern unsigned char GUIOn, GUIOn2;
 
@@ -2560,18 +2573,6 @@ bool loadfileGUI()
     if (!(GUIOn || GUIOn2))
     {
       puts("File opened successfully !");
-    }
-    if (!IPSPatched)
-    {
-      int i;
-      char ext[4];
-
-      strcpy(ext, "ips");
-      for (i = 0; PatchUsingIPS(ext); i++)
-      {
-        if (i > 9) { break; }
-        ext[2] = i+'0';
-      }
     }
   }
   else
