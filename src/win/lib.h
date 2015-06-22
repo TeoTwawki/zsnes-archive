@@ -28,23 +28,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef _MSC_VER
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
-
-struct dirent
-{
-  char d_name[256];
-};
-
-typedef struct
-{
-  intptr_t find_first_handle;
-  struct _finddata_t fileinfo;
-  struct dirent entry;
-} DIR;
-
-DIR *opendir(const char *path);
-struct dirent *readdir(DIR *dir);
-int closedir(DIR *dir);
-
 #endif
 
 char *realpath(const char *path, char *resolved_path);
