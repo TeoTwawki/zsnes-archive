@@ -54,7 +54,7 @@ SLASH=/
 PSR=parsegen
 ASM=nasm
 ASMOPT=-O1
-ASMFLAGSORIG=
+ASMFLAGSORIG=-w-orphan-labels
 COPT=-O3
 CPUOPT=i586
 ifneq ($(CPU),)
