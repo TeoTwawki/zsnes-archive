@@ -2388,7 +2388,6 @@ static void raw_audio_write(unsigned int samples)
   }
 }
 
-#define PIXEL (vidbuffer[((y+1)*288) + x + 16])
 static void raw_video_write_frame()
 {
   if (raw_vid.vp)
