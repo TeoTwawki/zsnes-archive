@@ -25,14 +25,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <pwd.h>
 #else
 #ifdef __WIN32__
+#include <windows.h>
 #include <io.h>
+#include <shlobj.h>
 #include <direct.h>
 #include "win/safelib.h"
 #include "win/lib.h"
+#include "win/confloc.h"
 #else
 #include "dos/lib.h"
 #include <unistd.h>
 #endif
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #endif
@@ -115,6 +119,56 @@ void cfgpath_ensure(const char *launch_command)
 
 #else
 
+#ifdef __WIN32__
+static void user_specifc_path()
+{
+  char path_buffer[PATH_SIZE];
+  bool relbase_override = false;
+
+  psr_cfg_run(read_confloc_vars, ZCfgPath, "zcfgloc.cfg");
+
+  if (zsnesw_config_location && (zsnesw_config_location != 1))
+  {
+    OSVERSIONINFO version;
+    version.dwOSVersionInfoSize = sizeof(version);
+    GetVersionEx(&version);
+
+    if (((version.dwPlatformId == 2) && (version.dwMajorVersion >= 6)) || //NT 6+
+        (version.dwPlatformId > 2)) //>NT
+    {
+      zsnesw_config_location = 0;
+      relbase_override = true;
+    }
+    else
+    {
+      zsnesw_config_location = 1;
+    }
+    psr_cfg_run(write_confloc_vars, ZCfgPath, "zcfgloc.cfg");
+  }
+
+  if (!zsnesw_config_location && SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA | CSIDL_FLAG_CREATE, 0, 0, path_buffer)))
+  {
+    const char *const zpath = "ZSNES";
+
+    strcatslash(path_buffer);
+    strcat(path_buffer, zpath);
+    if (mkpath(path_buffer, 0755))
+    {
+      strcatslash(path_buffer);
+      strcpy(ZCfgPath, path_buffer);
+
+      if (relbase_override)
+      {
+        psr_cfg_run(read_cfg_vars, ZCfgPath, ZCfgFile);
+        RelPathBase = 0;
+      }
+    }
+  }
+}
+#else
+static void user_specifc_path() {}
+#endif
+
 void cfgpath_ensure(const char *launch_command)
 {
   ZCfgPath = malloc(PATH_SIZE);
@@ -139,6 +193,8 @@ void cfgpath_ensure(const char *launch_command)
     {
       strdirname(ZCfgPath);
       strcatslash(ZCfgPath);
+
+      user_specifc_path(); //This will set a user specific config directory if desired
     }
     else
     {
@@ -596,8 +652,10 @@ static bool mkpath_help(char *path, char *element, mode_t mmode)
       p = strchr(element, DIR_SLASH_C);
       if (p) { *p = 0; }
 
-      //Current path fragment created or already exists as a directory already
-      if ((created = !mkdir_p(path)) || (!stat(path, &stat_buffer) && S_ISDIR(stat_buffer.st_mode)))
+      //Current path fragment created or already exists as a drive or directory already
+      if ((created = !mkdir_p(path)) ||
+          (isalpha(*path) && !strcmp(path+1, ":") && ((errno == EACCES) || (errno == EEXIST))) ||
+          (!stat(path, &stat_buffer) && S_ISDIR(stat_buffer.st_mode)))
       {
         if (p)
         {
