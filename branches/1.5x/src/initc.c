@@ -2316,9 +2316,6 @@ void map_sfx()
 void map_sa1()
 {
   unsigned char *ROM = (unsigned char *)romdata;
-  unsigned char test[] = { 0xA9, 0x10, 0xCF, 0xAD };
-
-  if(!memcmp(ROM+0xB95, test, 4)) { ROM[0xB96] = 0; }
 
   // set addresses 8000-FFFF
   // set banks 00-3F (40h x 32KB ROM banks @ 8000h)
