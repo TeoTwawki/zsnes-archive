@@ -2425,67 +2425,6 @@ DisplayGUIVideoClick:
 %endif
 .noradiobuttons
 
-%ifndef __MSDOS__
-  xor ebx,ebx                             ; GL Scanlines
-  mov bl,[cvidmode]
-  cmp byte[GUIBIFIL+ebx],0
-  je .noglscanlines
-
-  cmp eax,23                     ; X-Range for click-area
-  jl near .nobar
-  cmp eax,23+100
-  jg near .nobar
-  sub al,23
-  cmp edx,88                     ; Y-Range for click-area
-  jl near .nobar
-  cmp edx,92
-  jg near .barnotselected
-  mov [sl_intensity],al
-  mov byte[GUIHold],8            ; Lock mouse to bar when clicked
-  mov eax,[GUIwinposy+5*4]
-  add eax,90
-  mov [GUIHoldYlim],eax
-.barnotselected
-  mov eax,[GUIwinposx+5*4]
-  add eax,23
-  mov [GUIHoldXlimL],eax
-  add eax,100
-  mov [GUIHoldXlimR],eax
-.nobar
-  jmp near .noswscanlines
-.noglscanlines
-%endif
-  xor ebx,ebx                             ; Scanlines
-  mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUISLVID+ebx],0
-%else
-  cmp byte[GUIDSIZE+ebx],0
-%endif
-  je near .nocheckboxb
-  FilterExcl 168,87,En2xSaI,hqFilter,NTSCFilter
-  GUIPButtonHoleS 18,87,byte[scanlines],0
-  GUIPButtonHoleS 168,87,byte[scanlines],1
-.nocheckboxb
-%ifdef __MSDOS__
-  cmp byte[ScreenScale],1
-  je .nohsline
-%endif
-  xor ebx,ebx
-  mov bl,[cvidmode]
-%ifdef __MSDOS__
-  cmp byte[GUIHSVID+ebx],0
-%else
-  cmp byte[GUIDSIZE+ebx],0
-%endif
-  je near .nohsline
-  FilterExcl 68,87,En2xSaI,hqFilter,NTSCFilter
-  FilterExcl 118,87,En2xSaI,hqFilter,NTSCFilter
-  GUIPButtonHoleS 68,87,byte[scanlines],2
-  GUIPButtonHoleS 118,87,byte[scanlines],3
-.nohsline
-.noswscanlines
-
   GUIClickCButton 18,115,byte[GrayscaleMode]  ; Grayscale
 
   xor ebx,ebx                             ; Hires Mode7
@@ -2505,7 +2444,7 @@ DisplayGUIVideoClick:
   GUIClickCButtonT 18,145,byte[vsyncon],byte[Triplebufen]
 %endif
 %ifdef __WIN32__
-  xor ebx,ebx
+  xor ebx,ebx                             ; Triple buffs/vsyncs
   mov bl,[cvidmode]
   cmp byte[GUIWFVID+ebx],0
   je near .notriplebufferwin
@@ -2547,6 +2486,66 @@ DisplayGUIVideoClick:
   GUIClickCButton3 128,175,byte[ScreenScale]
 .nocheckbox3b
 %endif
+
+
+%ifndef __MSDOS__
+  xor ebx,ebx                             ; GL Scanlines
+  mov bl,[cvidmode]
+  cmp byte[GUIBIFIL+ebx],0
+  je .noglscanlines
+
+  mov eax,[GUImouseposx]    ; update mouse location
+  sub eax,[GUIwinposx+5*4]
+  mov edx,[GUImouseposy]
+  sub edx,[GUIwinposy+5*4]
+
+  GUIClickArea 23,88,23+100,92,.nobar
+  sub al,23
+  mov [sl_intensity],al
+  mov byte[GUIHold],8            ; Lock mouse to bar when clicked
+  mov eax,[GUIwinposy+5*4]
+  add eax,90
+  mov [GUIHoldYlim],eax
+  mov eax,[GUIwinposx+5*4]
+  add eax,23
+  mov [GUIHoldXlimL],eax
+  add eax,100
+  mov [GUIHoldXlimR],eax
+.nobar
+  jmp near .noswscanlines
+.noglscanlines
+%endif
+  xor ebx,ebx                             ; Scanlines
+  mov bl,[cvidmode]
+%ifdef __MSDOS__
+  cmp byte[GUISLVID+ebx],0
+%else
+  cmp byte[GUIDSIZE+ebx],0
+%endif
+  je near .nocheckboxb
+  FilterExcl 168,87,En2xSaI,hqFilter,NTSCFilter
+  GUIPButtonHoleS 18,87,byte[scanlines],0
+  GUIPButtonHoleS 168,87,byte[scanlines],1
+.nocheckboxb
+%ifdef __MSDOS__
+  cmp byte[ScreenScale],1
+  je .nohsline
+%endif
+  xor ebx,ebx
+  mov bl,[cvidmode]
+%ifdef __MSDOS__
+  cmp byte[GUIHSVID+ebx],0
+%else
+  cmp byte[GUIDSIZE+ebx],0
+%endif
+  je near .nohsline
+  FilterExcl 68,87,En2xSaI,hqFilter,NTSCFilter
+  FilterExcl 118,87,En2xSaI,hqFilter,NTSCFilter
+  GUIPButtonHoleS 68,87,byte[scanlines],2
+  GUIPButtonHoleS 118,87,byte[scanlines],3
+.nohsline
+.noswscanlines
+
 .notfilterstab
 
   cmp dword[GUIVntscTab],1  ; NTSC Tab
