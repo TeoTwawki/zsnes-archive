@@ -71,8 +71,6 @@ unsigned char *regptw = regptwa;
 unsigned char *vcache2b;            // 2-bit video cache
 unsigned char *vcache4b;            // 4-bit video cache
 unsigned char *vcache8b;            // 8-bit video cache
-unsigned char *SPC7110PackPtr;
-unsigned char *SPC7110IndexPtr;
 unsigned char romispal;             // 0 = NTSC, 1 = PAL
 unsigned char newgfx16b;
 
@@ -266,8 +264,6 @@ void deallocmem()
   deallocmemhelp(debugbuf);
 #endif
   deallocmemhelp(sram);
-  deallocmemhelp(SPC7110PackPtr);
-  deallocmemhelp(SPC7110IndexPtr);
 }
 
 #define AllocmemFail(ptr, size) if (!(ptr = malloc(size))) { outofmemory(); }
