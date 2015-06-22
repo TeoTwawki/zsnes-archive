@@ -126,6 +126,7 @@ EXTSYM GUIJT_offset,GUIJT_viewable,GUIGenericJumpTo,SSAutoFire,SSPause
 
 %ifdef __UNIXSDL__
 EXTSYM numlockptr
+EXTSYM CheckOpenGL
 %elifdef __WIN32__
 EXTSYM initDirectDraw,reInitSound,CheckAlwaysOnTop,CheckPriority,AlwaysOnTop
 EXTSYM CheckScreenSaver,MouseWheel,TrapMouseCursor,AllowMultipleInst,TripleBufferWin
@@ -140,8 +141,8 @@ EXTSYM JoyMinX209,JoyMaxX209,JoyMinY209,JoyMaxY209,DOSClearScreen,dosmakepal,Res
 
 %ifndef __MSDOS__
 EXTSYM ZsnesPage,DocsPage,GUICustomX,GUICustomY,GetCustomXY,SetCustomXY,initwinvideo
-EXTSYM Keep4_3Ratio,PrevFSMode,PrevWinMode,NTSCFilterInit,hqFilterlevel
-EXTSYM GUIWFVID,GUIDSIZE,GUIHQ3X,GUIHQ4X,GUIKEEP43,Keep43Check,changeRes
+EXTSYM Keep4_3Ratio,PrevFSMode,PrevWinMode,NTSCFilterInit,hqFilterlevel,BilinearFilter,GUIBIFIL
+EXTSYM GUIWFVID,GUIDSIZE,GUIHQ3X,GUIHQ4X,GUIKEEP43,Keep43Check,changeRes,sl_intensity
 %endif
 
 %ifndef __WIN32__
@@ -149,7 +150,7 @@ EXTSYM GUII2VID
 %endif
 
 %ifdef __OPENGL__
-EXTSYM BilinearFilter,GUIBIFIL,blinit,allow_glvsync
+EXTSYM blinit,allow_glvsync
 %endif
 
 %include "gui/guitools.inc"
@@ -784,6 +785,8 @@ SECTION .text
 
 NEWSYM StartGUI
 %ifdef __OPENGL__
+  cmp byte[FilteredGUI],0
+  jne near .skipbl
   cmp byte[BilinearFilter],1
   jne near .skipbl
   mov byte[blinit],1

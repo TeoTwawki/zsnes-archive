@@ -902,11 +902,7 @@ unsigned char prevNTSCMode = 0;
 unsigned char changeRes = 1;
 unsigned char prevKeep4_3Ratio = 0;
 unsigned char prevsync = 0;
-
-bool OGLModeCheck()
-{
-   return(cvidmode > 4);
-}
+char CheckOGLMode();
 
 void initwinvideo(void)
 {
@@ -929,7 +925,7 @@ void initwinvideo(void)
     FullScreen = GUIWFVID[cvidmode];
 #ifdef __OPENGL__
     UseOpenGL = 0;
-    if (OGLModeCheck())
+    if (CheckOGLMode())
        UseOpenGL = 1;
 
     if ((cvidmode == 20) || (cvidmode == 21) || (cvidmode == 22))
@@ -938,7 +934,7 @@ void initwinvideo(void)
        SetHiresOpt(CustomResX,CustomResY);
     }
 #else
-    if (OGLModeCheck())
+    if (CheckOGLMode())
       cvidmode = 2; // set it to the default 512x448 W
 #endif
 
@@ -1031,7 +1027,7 @@ void initwinvideo(void)
   if (newmode == 1)
   {
     #ifdef __OPENGL__
-    if(OGLModeCheck())
+    if(CheckOGLMode())
     {
       SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 #if (SDL_MAJOR_VERSION > 1) || ((SDL_MINOR_VERSION > 2) || ((SDL_MINOR_VERSION == 2) && (SDL_PATCHLEVEL >= 10)))

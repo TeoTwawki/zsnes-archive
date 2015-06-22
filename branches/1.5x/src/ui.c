@@ -41,6 +41,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define true 1
 #define false 0
 
+#define BIT(x) (1 << (x))
+
 extern unsigned int xa, MessageOn, maxromspace;
 extern unsigned char FPSOn, spcon, device1, device2;
 extern char *Msgptr, CSStatus[], CSStatus2[], CSStatus3[];
@@ -140,6 +142,8 @@ void cycleinputdevice1()
   }
 }
 
+static bool device2_wrap = false;
+
 void cycleinputdevice2()
 {
   for (;;)
@@ -147,6 +151,7 @@ void cycleinputdevice2()
     device2++;
     if (device2 >= 5)
     {
+      device2_wrap = true;
       device2 = 0;
     }
     if (device2 == 0)
@@ -579,7 +584,6 @@ void MultiMouseInit()
   }
 }
 
-#define BIT(x) (1 << (x))
 #define MOUSE_BUTTON_HANDLE(mouse, bit, value) \
   if (value) { mouse |= BIT(bit); } \
   else { mouse &= ~BIT(bit); }

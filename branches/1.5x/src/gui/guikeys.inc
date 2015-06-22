@@ -1017,11 +1017,19 @@ GUIGUIOptnsKeys:
   call DOSClearScreen
 %endif
   pushad
-%ifdef __OPENGL__
-  cmp byte[cvidmode],5
-  jl near .skipinit
+%ifndef __MSDOS__
+  xor ebx,ebx
+  mov bl,[cvidmode]
+  cmp byte[GUIBIFIL+ebx],0
+  je .skipinit
   pushad
+%ifdef __WIN32__
+  call initDirectDraw
+%elifdef __OPENGL__
   call initwinvideo
+%else
+
+%endif
   popad
 .skipinit
 %endif
@@ -1223,13 +1231,17 @@ GUIVideoKeys:
   jne .nointerpolation
   xor ebx,ebx
   mov bl,[cvidmode]
-%ifdef __OPENGL__
+%ifndef __MSDOS__
   cmp byte[GUIBIFIL+ebx],0
   je .nobilinearfilter
   xor byte[BilinearFilter],1
   FilterExcl2 NTSCFilter
   pushad
+%ifdef __WIN32__
+  call initDirectDraw
+%elifdef __OPENGL__
   call initwinvideo
+%endif
   call Clear2xSaIBuffer
   popad
   jmp .nointerpolation

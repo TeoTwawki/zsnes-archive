@@ -56,12 +56,14 @@ DWORD FirstActivate = 1;
 #define WORD   unsigned short
 #define DWORD  unsigned long
 
-HWND hMainWindow;
 HANDLE debugWindow = 0;
 
 extern "C"
 {
+HWND hMainWindow;
 HINSTANCE hInst;
+HDC hDC;
+HGLRC hRC;
 }
 
 LPDIRECTSOUND8          lpDirectSound = NULL;
@@ -112,7 +114,7 @@ DWORD                   NumBTN[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 DWORD                   CurrentJoy=0;
 
-DWORD                   BitDepth;
+uint32_t                BitDepth;
 DWORD                   GBitMask;
 BYTE                    BackColor=0;
 DEVMODE                 mode;
@@ -134,8 +136,8 @@ RECT                    BlitArea;
 BYTE                    AltSurface=0;
 extern "C" {
 DWORD                   MouseButton;
-DWORD                   SurfaceX=0;
-DWORD                   SurfaceY=0;
+int32_t                 SurfaceX=0;
+int32_t                 SurfaceY=0;
 }
 
 HANDLE hLock, hThread;
@@ -1393,6 +1395,7 @@ int InitDirectDraw()
      v = 128 + ((-r + 2*g -b)>>3);
      *(((unsigned int *)RGBtoYUVPtr) + (i << 11) + (j << 5) + k) = (Y<<16) + (u<<8) + v;
    }
+      gl_start(512, 448, 16,0);
 
    if (!hMainWindow)
    {
@@ -1971,6 +1974,11 @@ void initwinvideo(void)
          WindowWidth=CustomResX;
          WindowHeight=CustomResY;
          break;
+	  case 43:
+         WindowWidth=512;
+         WindowHeight=448;
+//		 gl_start(100, 100, 16, 0);
+		 break;
       default:
          WindowWidth=256;
          WindowHeight=224;
@@ -2808,7 +2816,7 @@ void drawscreenwin(void)
      }
    }
    UnlockSurface();
-   DrawScreen();
+   gl_drawwin();
 }
 
 void SwitchFullScreen(void);
@@ -2998,7 +3006,7 @@ int GetMouseX(void)
 
       if (TrapMouseCursor == 1)
       {
-         if (abs((int)MouseMoveX) > 10 && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
+         if (abs((int)MouseMoveX) > (10/MouseSensitivity) && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
          {
             MouseInput->Unacquire();
             SetCursorPos(X + WindowWidth + 32, (int)(Y + (MouseY * WindowHeight / 224)));
@@ -3017,7 +3025,7 @@ int GetMouseX(void)
 
       if (TrapMouseCursor == 1)
       {
-         if (abs((int)MouseMoveX) > 10 && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
+         if (abs((int)MouseMoveX) > (10/MouseSensitivity) && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
          {
             MouseInput->Unacquire();
             SetCursorPos(X - 32, (int)(Y + (MouseY * WindowHeight / 224)));
@@ -3042,7 +3050,7 @@ int GetMouseY(void)
 
       if (TrapMouseCursor == 1)
       {
-         if (abs((int)MouseMoveY) > 10 && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
+         if (abs((int)MouseMoveY) > (10/MouseSensitivity) && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
          {
             MouseInput->Unacquire();
             SetCursorPos((int)(X+(MouseX * WindowWidth / 256)), Y + WindowHeight + 32);
@@ -3061,7 +3069,7 @@ int GetMouseY(void)
 
       if (TrapMouseCursor == 1)
       {
-         if (abs((int)MouseMoveY) > 10 && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
+         if (abs((int)MouseMoveY) > (10/MouseSensitivity) && T36HZEnabled == 1 && FullScreen == 0 && MouseButtonPressed == 0)
          {
             MouseInput->Unacquire();
             SetCursorPos((int)(X + (MouseX * WindowWidth / 256)), Y - 32);

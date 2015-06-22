@@ -59,7 +59,7 @@ void UpdateVFrame();
 
 void gl_scanlines();
 
-bool OGLModeCheck();
+char CheckOGLMode();
 
 int gl_start(int width, int height, int req_depth, int FullScreen)
 {
@@ -129,7 +129,7 @@ int gl_start(int width, int height, int req_depth, int FullScreen)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   }
 
-  if (scanlines) gl_scanlines();
+  if (sl_intensity) gl_scanlines();
 
   return true;
 }
@@ -282,7 +282,7 @@ void gl_drawwin()
         // (see ProcessTransparencies in newgfx16.asm
         //  for ZSNES' current transparency code)
   UpdateVFrame();
-  if (curblank || !OGLModeCheck())
+  if (curblank || !CheckOGLMode())
     return;
 
   if (SurfaceX >= 512 && (hqFilter || En2xSaI))
@@ -358,12 +358,12 @@ void gl_drawwin()
      * filters are on, however.  Feel free to change the GUI, and
      * move this outside the if (En2xSaI) {}, if you do.
      */
-    if (scanlines)
+    if (sl_intensity)
     {
       glDisable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
 
-      if (scanlines != glscanready) gl_scanlines();
+      if (sl_intensity != glscanready) gl_scanlines();
 
       glBlendFunc(GL_DST_COLOR, GL_ZERO);
       glBindTexture(GL_TEXTURE_1D, gltextures[3]);
@@ -391,7 +391,7 @@ void gl_drawwin()
 void gl_scanlines(void)
 {
   GLubyte scanbuffer[256][4];
-  int i, j = scanlines==1 ? 0 : (scanlines==2 ? 192 : 128);
+  int i, j = (100-sl_intensity)*256/100;
 
   for (i = 0; i < 256; i += 2)
   {
@@ -408,5 +408,5 @@ void gl_scanlines(void)
   glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, 256, 0, GL_RGBA,
          GL_UNSIGNED_BYTE, scanbuffer);
 
-  glscanready = scanlines;
+  glscanready = sl_intensity;
 }
