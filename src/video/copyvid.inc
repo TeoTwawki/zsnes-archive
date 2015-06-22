@@ -43,6 +43,15 @@ EXTSYM _2xSaILine,_2xSaISuperEagleLine,_2xSaISuper2xSaILine
 %%nofilter
 %endmacro
 
+%macro SelectTile 0
+    mov ebx,hirestiledat+1
+    cmp byte[GUIOn],1
+    je %%loopab
+    cmp byte[newengen],0
+    je %%loopab
+    mov ebx,SpecialLine+1
+%%loopab
+%endmacro
 
 ; Blends two 16-bit pixels at 50%.
 
@@ -2834,6 +2843,8 @@ NEWSYM copyvesa2640x480x16b
     add edi,[VidStartDraw]
     add esi,16*2+256*2+32*2
     xor eax,eax
+    xor ebx,ebx
+    xor edx,edx
     ; Check if interpolation mode
     cmp byte[FilteredGUI],0
     jne .yi
@@ -2979,12 +2990,7 @@ NEWSYM copyvesa2640x480x16b
     jmp .return
 
 .scanlines
-    mov ebx,hirestiledat+1
-    cmp byte[GUIOn],1
-    je .loopab
-    cmp byte[newengen],0
-    je .loopab
-    mov ebx,SpecialLine+1
+    SelectTile
 .loopab
     mov ecx,256
     cmp byte[Triplebufen],1
@@ -3059,12 +3065,7 @@ NEWSYM copyvesa2640x480x16b
     jmp .returnb
 
 .halfscanlines
-    mov ebx,hirestiledat+1
-    cmp byte[GUIOn],1
-    je .loopabh
-    cmp byte[newengen],0
-    je .loopabh
-    mov ebx,SpecialLine+1
+    SelectTile
 .loopabh
     cmp byte[ebx],1
     jbe .ignorehrbh
@@ -3155,12 +3156,7 @@ NEWSYM copyvesa2640x480x16b
 
 .quartscanlines
     mov [lineleft],dl
-    mov ebx,hirestiledat+1
-    cmp byte[GUIOn],1
-    je .loopabh2
-    cmp byte[newengen],0
-    je .loopabh2
-    mov ebx,SpecialLine+1
+    SelectTile
 .loopabh2
     cmp byte[ebx],1
     jbe .ignorehrbh2
@@ -3571,13 +3567,7 @@ HighResProc:
     ret
 
 Process2xSaI:
-    mov ebx,hirestiledat+1
-    cmp byte[GUIOn],1
-    je .loopabi
-    cmp byte[newengen],0
-    je .loopabi
-    mov ebx,SpecialLine+1
-.loopabi
+    SelectTile
     mov [InterPtr],ebx
 
     mov dl,[resolutn]
@@ -4000,13 +3990,7 @@ MMXInterpol:
     mov dl,[resolutn]
     movq mm2,[HalfTransC]
 
-    mov ebx,hirestiledat+1
-    cmp byte[GUIOn],1
-    je .loopab
-    cmp byte[newengen],0
-    je .loopab
-    mov ebx,SpecialLine+1
-.loopab
+    SelectTile
     cmp byte[scanlines],1
     je near .scanlines
     cmp byte[scanlines],2
@@ -4329,15 +4313,8 @@ SECTION .text
 NEWSYM interpolate640x480x16b
     cmp byte[MMXSupport],1
     je near MMXInterpol
-    mov byte[MMXSupport],0
 
-    mov ebx,hirestiledat+1
-    cmp byte[GUIOn],1
-    je .loopabi
-    cmp byte[newengen],0
-    je .loopabi
-    mov ebx,SpecialLine+1
-.loopabi
+    SelectTile
     mov [InterPtr],ebx
 
     mov dl,[resolutn]
@@ -4426,14 +4403,7 @@ NEWSYM interpolate640x480x16b
     ret
 
 .scanlines
-    xor eax,eax
-    mov ebx,hirestiledat+1
-    cmp byte[GUIOn],1
-    je .loopabis
-    cmp byte[newengen],0
-    je .loopabis
-    mov ebx,SpecialLine+1
-.loopabis
+    SelectTile
 .loopab
     mov ecx,255
     cmp byte[Triplebufen],1
@@ -4505,7 +4475,6 @@ NEWSYM interpolate640x480x16b
     ret
 
 .scanlineshalf
-    xor eax,eax
     mov [lineleft],dl
 .loopab2
     mov ebx,[InterPtr]
@@ -4562,7 +4531,6 @@ NEWSYM interpolate640x480x16b
     ret
 
 .scanlinesquart
-    xor eax,eax
     mov [lineleft],dl
 .loopab3
     mov ebx,[InterPtr]
