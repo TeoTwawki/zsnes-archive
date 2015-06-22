@@ -22,8 +22,8 @@
 %include "macros.mac"
 
 EXTSYM vidbuffer,GUIOn,MMXSupport,resolutn,En2xSaI,antienab,scanlines
-EXTSYM hirestiledat,res512switch,curblank,spritetablea,lineleft,_2xSaILineW
-EXTSYM _2xSaISuperEagleLineW,_2xSaISuper2xSaILineW,newengen,cfield,HalfTrans
+EXTSYM hirestiledat,res512switch,curblank,spritetablea,lineleft,_2xSaILine
+EXTSYM _2xSaISuperEagleLine,_2xSaISuper2xSaILine,newengen,cfield,HalfTrans
 EXTSYM GUIOn2,FilteredGUI,SpecialLine,vidbufferofsb,HalfTransB,HalfTransC
 
 ALIGN32
@@ -819,21 +819,21 @@ Process2xSaIwin:
     mov ebx,SpecialLine+1
 .loopabi
     mov [InterPtr],ebx
-
-;    add edi,[VESAAddr]
 %ifdef __UNIXSDL__
     mov dl,224
 %else
     mov dl,[resolutn]
 %endif
     mov [lineleft],dl
-    mov dword[esi+512],0
-    mov dword[esi+512+576*2],0
+    mov word[esi+512],0
+
     mov ebx,[vidbufferofsb]
     add ebx,288*2
 
 .next
-    mov dword[esi+512+576*3],0
+    mov word[esi+512+576],0
+    mov dword[edi+576+288+156-2],0
+    mov dword[edi+576*3+256+64-4],0
 
     mov eax,[InterPtr]
     cmp byte[eax],1
@@ -878,13 +878,13 @@ Process2xSaIwin:
     je .supereagle
     cmp byte[En2xSaI],3
     je .super2xSaI
-    call _2xSaILineW
+    call _2xSaILine
     jmp .normal
 .supereagle
-    call _2xSaISuperEagleLineW
+    call _2xSaISuperEagleLine
     jmp .normal
 .super2xSaI
-    call _2xSaISuper2xSaILineW
+    call _2xSaISuper2xSaILine
 .normal
     add esp,24
     pop ebx

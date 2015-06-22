@@ -33,7 +33,7 @@ EXTSYM DrawScreen,MMXSupport
 EXTSYM Get_MouseData,Get_MousePositionDisplacement,GUIEnableTransp,GUIFontData
 EXTSYM StopSound,StartSound,PrevPicture,nggposng,current_zst,newest_zst
 EXTSYM GetTimeInSeconds,bg3ptr,bg3scroly,bg3scrolx,C4Ram
-EXTSYM genfulladdtab,genfulladdtabng,TimerEnable,ShowTimer,debugdisble,GUIOn
+EXTSYM genfulladdtab,TimerEnable,ShowTimer,debugdisble,GUIOn
 EXTSYM FilteredGUI,HalfTrans,SmallMsgText,Mode7HiRes,mosenng,mosszng
 EXTSYM intrlng,mode7hr,newgfx16b,vesa2_clbitng,vesa2_clbitng2,CSStatus
 EXTSYM CSStatus2,CSStatus3,CSStatus4,SpecialLine,Clear2xSaIBuffer,vidbufferofsb,bg1scroly
@@ -53,9 +53,8 @@ EXTSYM numlockptr
 %endif
 
 %ifdef __MSDOS__
-%include "video/2xsaimmx.inc"
-%endif
 %include "video/copyvid.inc"
+%endif
 
 SECTION .text
 
@@ -2918,9 +2917,6 @@ NEWSYM copyvid
     je .notatud
     mov [prevengval],al
     call genfulladdtab
-    jmp .notatud
-.redadd
-    call genfulladdtabng
 .notatud
     cmp dword[MessageOn],0
     je near .nomsg
