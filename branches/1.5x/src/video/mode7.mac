@@ -1242,32 +1242,6 @@ EXTSYM m7starty
     jmp %%finishmode7
 %endmacro
 
-%macro ProcessBuildWindow 1
-    mov dword[ngwinen],0
-    test byte[winbg1enval+ebx+%1*256],0Ah
-    jz %%nowindowing
-    push eax
-    push ebx
-    mov al,[winlogicaval+ebx*2]
-    shr al,%1*2
-    and al,03h
-    mov [nglogicval],al
-    mov eax,ebx
-    add ebx,%1*256
-    call BuildWindow
-    cmp dword[ngwintable],0
-    je %%zero
-    dec dword[ngwintable]
-    jmp %%notzero
-%%zero
-    dec dword[ngwintable+4]
-%%notzero
-    pop ebx
-    pop eax
-    mov dword[ngcwinptr],ngwintable
-%%nowindowing
-%endmacro
-
 ;************************************
 
 %macro Mode7Processngw 3

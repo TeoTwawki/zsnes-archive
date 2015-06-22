@@ -20,6 +20,7 @@
 %include "macros.mac"
 
 EXTSYM KeyRewind,statesaver,Voice0Status,UpdateDPage
+EXTSYM rtoflags,sprcnt,sprstart,sprtilecnt,sprend,sprendx
 EXTSYM StartGUI,romdata,initvideo,DosExit,sfxramdata,deinitvideo
 EXTSYM vidbufferofsa,device2,RawDumpInProgress
 EXTSYM KeySaveState,KeyLoadState,KeyQuickExit,KeyQuickLoad,KeyQuickRst
@@ -722,6 +723,11 @@ Donextlinecache:
 .next
     mov byte[sprlefttot+ecx],0
     mov dword[sprleftpr+ecx*4],0
+    mov byte[sprcnt+ecx],0
+    mov byte[sprstart+ecx],0
+    mov byte[sprtilecnt+ecx],0
+    mov byte[sprend+ecx],0
+    mov word[sprendx+ecx*2],0
     inc cl
     jnz .next
     call processsprites
@@ -845,6 +851,10 @@ NEWSYM NoHDMALine, db 0
 SECTION .text
 
 NEWSYM cpuover
+    cmp word[curypos],0
+    jne .nortoreset
+    mov byte[rtoflags],0
+.nortoreset
     dec esi
     cmp byte[HIRQNextExe],0
     je .nohirq
@@ -1040,6 +1050,18 @@ NEWSYM cpuover
 .returnfromsfx
 ;    inc dword[numinst]          ;Temporary
     inc word[curypos]
+    xor eax,eax
+    mov ax,[curypos]
+    cmp ax,[resolutn]
+    ja .norangeover
+    cmp byte[sprtilecnt+eax],34
+    jbe .notimeover
+    or byte[rtoflags],80h
+.notimeover
+    cmp byte[sprcnt+eax],32
+    jbe .norangeover
+    or byte[rtoflags],40h
+.norangeover
     add dh,[cycpl]
     mov ax,[totlines]
     cmp word[curypos],ax
