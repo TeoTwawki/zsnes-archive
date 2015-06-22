@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007 Nach, grinvader ( http://www.zsnes.com )
+Copyright (C) 2005-2008 Nach, grinvader ( http://www.zsnes.com )
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -39,14 +39,14 @@ static unsigned char getsize(const string_ci& token, const char mode)
     val = 0;
 
     if (token == "al" || token == "ah" || token == "bl" || token == "bh" ||
-        token == "cl" || token == "ch" || token == "dl" || token == "dh" ||
-        token == "di" || token == "si" || token == "bp")
+        token == "cl" || token == "ch" || token == "dl" || token == "dh")
     { val = 1; }
-    else if (token == "ax" || token == "bx" || token == "cx" || token == "dx")
+    else if (token == "ax" || token == "bx" || token == "cx" || token == "dx" ||
+             token == "sp" || token == "bp" || token == "si" || token == "di")
     { val = 2; }
     else if (token == "eax" || token == "ebx" || token == "ecx" ||
-             token == "edx" || token == "edi" || token == "esi" ||
-             token == "ebp")
+             token == "edx" || token == "esp" || token == "edi" ||
+             token == "esi" || token == "ebp")
     { val = 4; }
   }
 

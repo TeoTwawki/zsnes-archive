@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007 Nach, grinvader ( http://www.zsnes.com )
+Copyright (C) 2005-2008 Nach, grinvader ( http://www.zsnes.com )
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -150,7 +150,7 @@ void handle_file(const char *filename)
   }
 }
 
-void section_test(const char *filename, struct stat& stat_buffer)
+void section_test(const char *filename, struct stat&)
 {
   if (is_asm_file(filename))
   {

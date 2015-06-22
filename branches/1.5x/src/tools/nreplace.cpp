@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007 Nach, grinvader ( http://www.zsnes.com )
+Copyright (C) 2005-2008 Nach, grinvader ( http://www.zsnes.com )
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@ Multiline replace is of course supported.
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 using namespace std;
 
 #include <unistd.h>
@@ -55,7 +56,7 @@ void readin_file(istream& stream, string& buffer)
   }
 }
 
-void handle_file(const char *filename, struct stat& stat_buffer)
+void handle_file(const char *filename, struct stat&)
 {
   fstream ModifyFile(filename, ios::in | ios::out);
   if (ModifyFile)
@@ -65,13 +66,13 @@ void handle_file(const char *filename, struct stat& stat_buffer)
 
     bool changed = false;
 
-    for (size_t start_pos = 0;;)
+    for (string::size_type start_pos = 0;;)
     {
-      size_t match_point = ModifyText.find(SearchText, start_pos);
+      string::size_type match_point = ModifyText.find(SearchText, start_pos);
       if (match_point != string::npos)
       {
         ModifyText.replace(match_point, SearchText.size(), ReplaceText);
-        start_pos += ReplaceText.size();
+        start_pos = match_point + ReplaceText.size();
         changed = true;
       }
       else
@@ -96,10 +97,10 @@ void handle_file(const char *filename, struct stat& stat_buffer)
   }
 }
 
-int main(size_t argc, const char **argv)
+int main(int argc, const char *const *argv)
 {
   bool subdir_scan = false;
-  const char **argp = argv+1;
+  const char *const *argp = argv+1;
 
   if (*argp && !strcmp(*argp, "-r"))
   {
