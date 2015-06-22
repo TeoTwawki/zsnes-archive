@@ -1021,7 +1021,6 @@ GUIGUIOptnsKeys:
   cmp byte[cvidmode],5
   jl near .skipinit
   pushad
-  call drawscreenwin
   call initwinvideo
   popad
 .skipinit
@@ -1230,7 +1229,6 @@ GUIVideoKeys:
   xor byte[BilinearFilter],1
   FilterExcl2 NTSCFilter
   pushad
-  call drawscreenwin
   call initwinvideo
   call Clear2xSaIBuffer
   popad
