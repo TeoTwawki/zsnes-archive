@@ -1236,7 +1236,6 @@ GUIWinClicked:
   GUIClickArea %1+1,%2+3,%1+6,%2+8,%%noclick
   xor %3,1
   pushad
-  call drawscreenwin
   call initwinvideo
   call Clear2xSaIBuffer
   popad
@@ -1385,10 +1384,7 @@ GUIWinClicked:
 %ifdef __OPENGL__
   cmp byte[cvidmode],5
   jl %%skipinit
-  pushad
-  call drawscreenwin
   call initwinvideo
-  popad
 %%skipinit
 %endif
   call Clear2xSaIBuffer
