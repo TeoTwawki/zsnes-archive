@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007 Nach, grinvader ( http://www.zsnes.com )
+Copyright (C) 2005-2008 Nach, grinvader ( http://www.zsnes.com )
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -27,8 +27,16 @@ This program generates dependencies for all C/C++/Assembly files
 #include <cstdlib>
 using namespace std;
 
+#include <unistd.h>
+
 #include "fileutil.h"
 #include "strutil.h"
+
+#ifdef __WIN32__
+#define IS_ABSOLUTE(path) (((path)[0] == '\\') || ((path)[0] && ((path)[1] == ':')))
+#else
+#define IS_ABSOLUTE(path) (((path)[0] == '/') || ((path)[0] == '~'))
+#endif
 
 string cc;
 string nasm;
@@ -72,6 +80,7 @@ void fix_line(string &line, const char *filename)
 void dependency_calculate_c(const char *filename)
 {
   string command = cc + " " + cflags + " -M -MG " + filename;
+  cout << flush;
   FILE *fp = popen(command.c_str(), "r");
   if (fp)
   {
@@ -85,7 +94,7 @@ void dependency_calculate_c(const char *filename)
       Tokenize(string(line), tokens, " \t\n\\"); //Break apart into each dependency
       for (vector<string>::iterator i = tokens.begin(); i != tokens.end(); i++)
       {
-        if ((*i)[0] != '/') //If dependency isn't a system header (all system headers would begin with /)
+        if (!IS_ABSOLUTE(*i)) //If dependency isn't a system header (all system headers would begin with /)
         {
           //This if has to be before the dependency is added onto the processed line string
           if (processed_line.length() > 50) //Let's wrap every time we go over 50 characters
@@ -128,9 +137,24 @@ void dependency_calculate_c(const char *filename)
   }
 }
 
+void dependency_calculate_moc(const char *filename)
+{
+  const char *p1 = strstr(filename, "moc_");
+  const char *p2 = strrchr(filename, '.');
+  string moc(filename, p2-filename);
+  string dir(filename, p1-filename);
+  p1 += strlen("moc_");
+  string base(p1, p2-p1);
+  moc += ".cpp";
+
+  cout << filename << ": " << moc << " " << dir << base << ".h\n";
+  cout << moc << ": " << dir << base << ".h\n";
+}
+
 void dependency_calculate_asm(const char *filename)
 {
   string command = nasm + " " + nflags + " -M " + filename;
+  cout << flush;
   system(command.c_str());
 }
 
@@ -143,9 +167,13 @@ void dependency_calculate_psr(const char *filename)
   cout << o_suffix << " " << h_suffix << ": " << filename << "\n";
 }
 
-void dependency_calculate(const char *filename, struct stat& stat_buffer)
+void dependency_calculate(const char *filename, struct stat&)
 {
-  if (extension_match(filename, ".asm"))
+  if (strstr(filename, "moc_"))
+  {
+    dependency_calculate_moc(filename);
+  }
+  else if (extension_match(filename, ".asm"))
   {
     dependency_calculate_asm(filename);
   }
@@ -210,7 +238,7 @@ int main(int argc, const char *const *const argv)
     else
     {
       struct stat unused;
-      for (size_t i = 5; i < argc; i++)
+      for (int i = 5; i < argc; i++)
       {
         dependency_calculate(argv[i], unused);
       }

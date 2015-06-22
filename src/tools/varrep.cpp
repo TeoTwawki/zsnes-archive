@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007 Nach, grinvader ( http://www.zsnes.com )
+Copyright (C) 2005-2008 Nach, grinvader ( http://www.zsnes.com )
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -117,7 +117,7 @@ void handle_c_file(const char *filename)
   }
 }
 
-void variable_replace(const char *filename, struct stat& stat_buffer)
+void variable_replace(const char *filename, struct stat&)
 {
   if (is_c_file(filename) ||
       is_cpp_file(filename))
@@ -145,7 +145,7 @@ bool process_vars(const char *fname)
   return(false);
 }
 
-int main(size_t argc, const char *const *const argv)
+int main(int argc, const char *const *const argv)
 {
   if (argc >= 4)
   {
