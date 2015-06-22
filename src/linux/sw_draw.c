@@ -49,8 +49,7 @@ extern BYTE GUIOn,GUIOn2;
 void UpdateVFrame(void);
 void NTSCFilterInit();
 void NTSCFilterDraw(int SurfaceX, int SurfaceY, int pitch, unsigned char * buffer);
-
-bool OGLModeCheck();
+char CheckOGLMode();
 void initwinvideo();
 
 bool sw_start(int width, int height, int req_depth, int FullScreen)
@@ -150,7 +149,7 @@ void sw_drawwin()
 
   UpdateVFrame();
 
-  if (curblank || OGLModeCheck()) return;
+  if (curblank || CheckOGLMode()) return;
   LockSurface();
 
   if (NTSCFilter != prevNTSCMode) initwinvideo();

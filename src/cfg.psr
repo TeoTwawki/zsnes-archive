@@ -240,7 +240,7 @@ CustomResY dd 480
 %endif
 
 @
-%ifdef __OPENGL__
+%ifndef __MSDOS__
 @ Enable Video Interpolation, Bilinear Filtering (0 = NO, 1 = Yes)
 @ Bilinear Filtering is compatible with all filters except NTSC.
 @ Bilinear Filtering replaces Interpolation and is OpenGL only.
@@ -254,7 +254,7 @@ CustomResY dd 480
 @ Note: This option enables the Eagle filter in the VESA2 640x480 8-bit mode.
 %endif
 antienab db 0
-%ifdef __OPENGL__
+%ifndef __MSDOS__
 BilinearFilter db 0
 %endif
 
@@ -326,6 +326,10 @@ hqFilterlevel db 2
 @ 256x256 or 640x480 8bit modes only (25% and 50% in 640x480 16bit mode only)
 #endif
 scanlines db 0
+#ifndef __MSDOS__
+@ OpenGL scanlines intensity [0..100]
+sl_intensity db 0
+#endif
 
 @
 @ Enable Grayscale Mode (0 = NO, 1 = Yes) - don't enable this for other than nostalgia
@@ -904,6 +908,7 @@ MovieVideoAudio db 1
 @ Extra Device in Port 1/2 Cycle
 KeyExtraEnab1 dd 0
 KeyExtraEnab2 dd 0
+KeyExtraRotate dd 8
 
 @
 @ State Keys:
