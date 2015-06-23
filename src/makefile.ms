@@ -64,7 +64,7 @@ CFLAGSORIG=-march=${CPUOPT} -ffast-math -fomit-frame-pointer -fno-unroll-loops -
 LIBSORIG=-lz -lpng
 DRESOBJ=${WINDIR}/zsnes.obj
 CROSS=no
-STRIP=-Ws -s
+STRIP=-s
 
 
 ifeq (${ENV},dos)
@@ -101,9 +101,9 @@ ifeq (${ENV},dos-cross)
 endif
 
 ifeq (${ENV},win32-cross)
-  CC = i586-mingw32-gcc
-  CPPC = i586-mingw32-g++
-  WINDRES = i586-mingw32-windres
+  CC = i686-w64-mingw32-gcc
+  CPPC = i686-w64-mingw32-g++
+  WINDRES = i686-w64-mingw32-windres
   OS=__WIN32__
   CROSS=yes
   OBJFIX=objfix
@@ -136,7 +136,7 @@ ifeq (${OS},__WIN32__)
   FILEFORMAT=win32
   LIBS=${LIBSORIG} -ldxguid -ldinput8 -lwsock32 -luser32 -lgdi32 -lshfolder -lshell32 -lwinmm -mwindows -lopengl32 -lglu32
   OE=.obj
-  CONFLOC=${WIN_D}/confloc${OE}
+  CONFLOC=${WINDIR}/confloc${OE}
 endif
 
 ifeq (${DEBUG},yes)
@@ -242,8 +242,8 @@ endif
 
 ifeq (${OS},__WIN32__)
 WINOBJ=${DRESOBJ}\
-	${WINDIR}/winintrf${OE} ${WINDIR}/winlink${OE} ${WINDIR}/lib${OE}\
-	${WINDIR}/safelib${OE} ${MMLIBDIR}/mm${OE} ${MMLIBDIR}/windows${OE}
+	${CONFLOC} ${WINDIR}/winintrf${OE} ${WINDIR}/winlink${OE} ${WINDIR}/lib${OE}\
+	${WINDIR}/safelib${OE} ${MMLIBDIR}/mm${OE} ${MMLIBDIR}/windows${OE} ${WINDIR}/gl_draw${OE}
 
 WINVIDOBJ=${VIDEODIR}/sw_draw${OE} ${VIDEODIR}/hq2x16${OE} ${VIDEODIR}/hq2x32${OE}\
 	${VIDEODIR}/hq3x16${OE} ${VIDEODIR}/hq3x32${OE}\
@@ -478,9 +478,10 @@ ${VIDEODIR}/procvidc${OE}: ${VIDEODIR}/procvidc.c zpath.h \
 ${VIDEODIR}/sw_draw${OE}: ${VIDEODIR}/sw_draw.asm macros.mac
 
 ${WINDIR}/copyvwin${OE}: ${WINDIR}/copyvwin.asm macros.mac
+${WINDIR}/confloc${OE} ${WINDIR}/confloc.h: ${WINDIR}/confloc.psr ${PSR}
 ${WINDIR}/lib${OE}: ${WINDIR}/lib.c zpath.h ${JMADIR}/zsnesjma.h \
 	${WINDIR}/lib.h ${ZIPDIR}/zunzip.h
-${WINDIR}/safelib${OE}: ${WINDIR}/safelib.c argv.h
+${WINDIR}/safelib${OE}: ${WINDIR}/safelib.c argv.h ${WINDIR}/confloc.h
 ifeq (${ENV},msvc)
 ${WINDIR}/winintrf${OE}: ${WINDIR}/winintrf.asm macros.mac
 ${WINDIR}/winlink.obj: ${WINDIR}/winlink.cpp cfg${OE} ${WINDIR}/resource.h input${OE}
