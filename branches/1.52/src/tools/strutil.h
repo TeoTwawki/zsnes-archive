@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007 Nach, grinvader ( http://www.zsnes.com )
+Copyright (C) 2005-2008 Nach, grinvader ( http://www.zsnes.com )
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -29,18 +29,18 @@ This is part of a toolkit used to assist in ZSNES development
 
 struct ci_char_traits : public std::char_traits<char>
 {
-  static bool eq(char c1, char c2) { return tolower(c1) == tolower(c2); }
-  static bool ne(char c1, char c2) { return tolower(c1) != tolower(c2); }
-  static bool lt(char c1, char c2) { return tolower(c1) < tolower(c2); }
-  static int compare(const char* s1, const char* s2, size_t n) { return strncasecmp( s1, s2, n ); }
+  static bool eq(char c1, char c2) { return(tolower(c1) == tolower(c2)); }
+  static bool ne(char c1, char c2) { return(tolower(c1) != tolower(c2)); }
+  static bool lt(char c1, char c2) { return(tolower(c1) < tolower(c2)); }
+  static int compare(const char* s1, const char* s2, size_t n) { return(strncasecmp(s1, s2, n)); }
 
-  static const char* find( const char* s, int n, char a )
+  static const char* find(const char* s, int n, char a)
   {
-    while(n-- > 0 && tolower(*s) != tolower(a))
+    while (n-- > 0 && tolower(*s) != tolower(a))
     {
-      ++s;
+      s++;
     }
-    return n >= 0 ? s : 0;
+    return(n >= 0 ? s : 0);
   }
 };
 

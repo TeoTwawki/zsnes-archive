@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007 Nach, grinvader ( http://www.zsnes.com )
+Copyright (C) 2005-2008 Nach, grinvader ( http://www.zsnes.com )
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@ This program prints out a macro with params passed on command line in expanded/u
 #include <iostream>
 #include <fstream>
 #include <set>
+#include <cstdlib>
 #include "strutil.h"
 using namespace std;
 
@@ -199,7 +200,7 @@ void process_file(string filename)
   }
 }
 
-void build_macro(const char *filename, struct stat& stat_buffer)
+void build_macro(const char *filename, struct stat&)
 {
   if (extension_match(filename, ".asm"))
   {
@@ -207,7 +208,7 @@ void build_macro(const char *filename, struct stat& stat_buffer)
   }
 }
 
-int main(size_t argc, char **argv)
+int main(int argc, const char *const *argv)
 {
   if (argc > 1)
   {
