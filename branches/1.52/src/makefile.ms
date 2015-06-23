@@ -54,7 +54,7 @@ SLASH=/
 PSR=parsegen
 ASM=nasm
 ASMOPT=-O1
-ASMFLAGSORIG=
+ASMFLAGSORIG=-w-orphan-labels
 COPT=-O3
 CPUOPT=i586
 ifneq ($(CPU),)
@@ -205,7 +205,7 @@ endif
 
 MAINOBJ=endmem${OE} init${OE} initc${OE} patch${OE}\
 	ui${OE} vcache${OE} version${OE} zmovie${OE} zstate${OE} zloader${OE}\
-	cfg${OE} md${OE} input${OE} zpath${OE} ztimec${OE} ztime${OE}
+	cfg${OE} md${OE} input${OE} zdir${OE} zpath${OE} ztimec${OE} ztime${OE}
 
 ifneq (${DEBUGGER},no)
   MAINOBJ+= debugger${OE} debugasm${OE}

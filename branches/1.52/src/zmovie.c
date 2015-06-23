@@ -57,6 +57,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cfg.h"
 #include "zpath.h"
 #include "zmovie.h"
+#include "zdir.h"
 
 #define NUMCONV_FR2
 #define NUMCONV_FR3
